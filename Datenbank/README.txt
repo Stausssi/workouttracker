@@ -1,1 +1,0 @@
-Das ist der Ordner für die Datenbank
