@@ -5,7 +5,7 @@ class Body extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {
-			apiResponse: ""
+			apiResponse = ""
 		};
 	}
 	
