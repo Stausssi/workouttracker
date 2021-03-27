@@ -7,7 +7,7 @@ export const Head = () =>
     <nav className="navbar">
         <div className="navbar-brand">
           <a className="navbar-item" href="/Second">
-            <img src="https://bulma.io/images/bulma-type-white.png" alt="Logo"/>
+            <img src={Logo} alt="Logo"/>
           </a>
         </div>
         <div id="navbarMenuHeroA" className="navbar-menu">
