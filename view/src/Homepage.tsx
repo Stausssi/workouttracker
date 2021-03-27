@@ -13,7 +13,6 @@ class Homepage extends React.Component<any, any> {
     }
     render() {
         return (
-
             <section className='main'>
                 <Head></Head>
                 <Body></Body>
