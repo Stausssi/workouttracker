@@ -1,9 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './css/App.css';
 import ToggleButton from'./ToggleButton'
 import 'bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css'
-import Calendar1 from './FullCalendar';
-import SmallCalendar from './SmallCalendar';
 
 interface Props {
 }
@@ -33,8 +31,6 @@ export default class Body extends React.Component<Props,State> {
 	}
 
   render () {  
-    const active = this.state.active ? "is-active" : "";
-    const children =this.props.children
     return(
     <section id="body-content">
     <div id="col-1">
@@ -43,16 +39,9 @@ export default class Body extends React.Component<Props,State> {
     <div>
     <ToggleButton />
     </div>
-    <div>
-    <SmallCalendar />
-    </div>
     </div>
     <div id="col-2">
     <h1>Hier kommen Statistiken, Analytik, Charts und Kalender</h1>
-    <div id="testcal">
-      <Calendar1/>
-    </div>
-    <div>Test</div>
     </div>
   </section>
     )

@@ -18,16 +18,14 @@ export default class Modal extends React.Component<Props,State> {
           active: false
         };
       }
-        test = () => {
+      action = () => {
             this.setState((state) =>({active:!state.active}))
-            console.log("Kinder sind:" + this.props.children)
           };
         
     
 
   render () {  
     const active = this.state.active ? "is-active" : "";
-    const children =this.props.children
     return(
         <section className='main'>
          <div className={`modal ${active}`} id="myModal">
@@ -35,7 +33,7 @@ export default class Modal extends React.Component<Props,State> {
                 <div className="modal-card">
                 <header className="modal-card-head">
                     <p className="modal-card-title">Modal title</p>
-                    <button className="delete" aria-label="close" onClick={()=>this.test()}></button>
+                    <button className="delete" aria-label="close" onClick={()=>this.action()}></button>
                 </header>
                 <section className = "modal-card-body">
                     <div className = "content">
@@ -74,52 +72,19 @@ export default class Modal extends React.Component<Props,State> {
                   <input
                     className="input"
                     type="text"
-                    placeholder="e.g Alex Smith"
+                    placeholder="e.g John Smith"
                   />
                 </div>
-                <h1>Test2</h1>
-                <p>{this.props.children}</p>
-                <div>
 </div>
-                <h1>Level One</h1>
-                        <p>
-                        This is simple text. This is simple text. 
-                        This is simple text. This is simple text.
-                        </p>
-                
-                        <h2>Level Two</h2>
-                         <p>
-                         This is simple text. This is simple text. 
-                        This is simple text. This is simple text.
-                        </p>
-                
-                        <h3>Level Three</h3>
-                        <blockquote>
-                        This is simple text. This is simple text. 
-                        This is simple text. This is simple text.
-                        </blockquote>
-                
-                        <h4>Level Four</h4>
-                        <p>
-                        This is simple text. This is simple text. 
-                        This is simple text. This is simple text.
-                        </p>
-                
-                        <h5>Level Five</h5>
-                        <p>
-                        This is simple text. This is simple text. 
-                        This is simple text. This is simple text.
-                        </p>
-             </div>
           </section>
         <footer className="modal-card-foot">
             <button className="button is-success">Save changes</button>
-            <button className="button" onClick={()=>this.test()} >Cancel</button>
+            <button className="button" onClick={()=>this.action()} >Cancel</button>
         </footer>
     </div>
     </div>
 
-<button className="button is-primary is-rounded" onClick={()=>this.test()}>
+<button className="button is-primary is-rounded" onClick={()=>this.action()}>
 <span className="icon">
     <FontAwesomeIcon icon ={faPlusCircle}/>
     </span>
