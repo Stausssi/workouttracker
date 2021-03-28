@@ -1,5 +1,9 @@
 import Search from './Search';
 import Logo from './img/WorkoutLogo.png'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faSignInAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import React from 'react';
+import Modal from './Modal';
 
 export const Head = () =>
 <section className="hero is-dark is-small">
@@ -7,7 +11,7 @@ export const Head = () =>
     <nav className="navbar">
         <div className="navbar-brand">
           <a className="navbar-item" href="/Second">
-            <img src={Logo} alt="Logo"/>
+            <img src={Logo}alt="Logo"/>
           </a>
         </div>
         <div id="navbarMenuHeroA" className="navbar-menu">
@@ -16,19 +20,25 @@ export const Head = () =>
           <div className="navbar-item">
         <Search></Search>
         </div>
-            <a className="navbar-item is-active" href="/#">
-              Home
+            <a className="navbar-item" href="/">
+            <span className="icon">
+                  <FontAwesomeIcon icon={faHome}/>
+                </span>
+                <div>Home</div>
             </a>
             <a className="navbar-item" href="/Profil">
-              Profil
+            <span className="icon">
+                  <FontAwesomeIcon icon={faUser}/>
+                </span>
+                <div>Profil</div>
             </a>
-            <a className="navbar-item" href="https://bulma.io/documentation/">
-              Documentation
-            </a>
+            <div className="navbar-item">
+              <Modal> </Modal>
+            </div>
             <span className="navbar-item">
               <a className="button is-primary is-inverted" href='/Login' >
                 <span className="icon">
-                  <i className="fa fa-sign-in" aria-hidden="true"></i>
+                  <FontAwesomeIcon icon={faSignInAlt}/>
                 </span>
                 <span>Login</span>
               </a>
@@ -39,10 +49,10 @@ export const Head = () =>
   <div className="hero-body">
     <div className="container has-text-centered">
       <p className="title">
-        Title
+        Workout-Tracker
       </p>
       <p className="subtitle">
-        Subtitle
+        Time for Sport
       </p>
     </div>
   </div>
