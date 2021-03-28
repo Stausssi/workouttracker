@@ -10,7 +10,6 @@ interface State {
 
 class OwnFeed extends React.Component<Props> {
 	render() {
-	//	const { } = this.props;
 		return (
 			<>
                 <div>Hier kommt die eigene Aktivität hin</div>
@@ -22,7 +21,6 @@ class OwnFeed extends React.Component<Props> {
 
 class FriendsFeed extends React.Component<Props> {
 	render() {
-		//const { } = this.props;
 		return (
 			<>
                 <div>Hier kommt die Aktivitäten der Freunde hin</div>
