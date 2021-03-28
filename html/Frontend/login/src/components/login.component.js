@@ -1,30 +1,81 @@
 import React, { Component } from "react";
 
 export default class Login extends Component {
+    constructor(props){
+        super(props);
+        this.state= {
+            email: '',
+            password: '',
+            errorMessage: ''
+        };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleChange(event) {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+    
+        this.setState({
+          [name]: value
+        });
+    }
+
+    handleSubmit(event) {
+        const email = this.state.email;
+        const pw = this.state.password;
+        event.preventDefault();
+
+        if(!(email === '' || pw === '')){
+            //catch wrong
+            alert('Email ' + email + ' Pw: ' +  pw);
+
+            //hash Password ?
+
+            //sends User credentials to API
+
+            fetch('http://localhost:3000/backend/login', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: pw
+                })
+            });
+
+            //Bestätigung
+
+            // Speicherung Token in Cookie/ APP- State
+
+            //redirect
+        } else {
+            this.setState({errorMessage:'Please enter an email and a password!'})
+        }   
+    }
+
     render() {
         return (
             <form>
-
                 <h3>Log in</h3>
 
                 <div className="form-group">
                     <label>Email</label>
-                    <input type="email" className="form-control" placeholder="Enter email" />
+                    <input type="email" autoFocus name="email" className="form-control" placeholder="Enter email" value={this.state.email} onChange={this.handleChange} />
                 </div>
 
                 <div className="form-group">
                     <label>Password</label>
-                    <input type="password" className="form-control" placeholder="Enter password" />
+                    <input type="password" name="password" className="form-control" placeholder="Enter password" value={this.state.password} onChange={this.handleChange} />
                 </div>
 
-                <div className="form-group">
-                    <div className="custom-control custom-checkbox">
-                        <input type="checkbox" className="custom-control-input" id="customCheck1" />
-                        <label className="custom-control-label" htmlFor="customCheck1">Remember me</label>
-                    </div>
-                </div>
+                <div>{this.state.errorMessage}<br></br><br></br></div>
 
-                <button type="submit" className="btn btn-dark btn-lg btn-block">Sign in</button>
+                <button className="btn btn-dark btn-lg btn-block" onClick={this.handleSubmit} >Sign in</button>
                 <p className="forgot-password text-right">
                     Forgot <a href="#">password?</a>
                 </p>
