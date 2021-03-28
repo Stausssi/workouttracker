@@ -5,7 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction"; 
 const events = [{ title: "Today", date: new Date() }];  
 export class Calendar1 extends Component {  
-    handleDateClick = (arg: { dateStr: any; }) => { // bind with an arrow function
+    handleDateClick = (arg: { dateStr: any; }) => { 
         alert(arg.dateStr)
       }
 
