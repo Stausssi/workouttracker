@@ -1,3 +1,5 @@
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 
 class Search extends React.Component {
@@ -6,7 +8,7 @@ class Search extends React.Component {
       <section>
  <div className="search"> 
                 <input className="input is-primary" type="text" placeholder="Search"/>
-                <button type="submit"><i className="fa fa-search"></i></button>
+                <button type="submit"><FontAwesomeIcon icon ={faSearch}/></button>
 </div>
           </section>
     );
