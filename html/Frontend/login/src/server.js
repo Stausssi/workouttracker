@@ -13,5 +13,9 @@ app.post('/backend/login', function (req, res) {
   console.log(req);
 });
 
-app.listen(process.env.PORT || 8080
-  );
+app.post('/backend/signup', function (req, res) {
+  res.send('Login Recieved!');
+  console.log(req);
+});
+
+app.listen(process.env.PORT || 8080);
