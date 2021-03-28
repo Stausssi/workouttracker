@@ -8,6 +8,7 @@ interface Props {
 interface State {
   showPopup:boolean
   active:boolean
+  apiResponse:any
 }
 
 export default class Body extends React.Component<Props,State> {
@@ -15,14 +16,27 @@ export default class Body extends React.Component<Props,State> {
     super(props);
     this.state = {
       showPopup: false,
-      active: false
+      active: false,
+      apiResponse: ""
     };
   }
+  callAPI() {
+		fetch("http://157.90.160.201:9000/testAPI")
+			.then(res => res.text())
+			.then(res => this.setState({ apiResponse: res }));
+	}
+
+	componentWillMount() {
+		this.callAPI();
+	}
+
   render () {  
     return(
     <section id="body-content">
     <div id="col-1">
     <h1>This is half of a page</h1>
+    <p>{this.state.apiResponse}</p>
+    <div>
     <ToggleButton />
     </div>
     </div>
@@ -33,5 +47,3 @@ export default class Body extends React.Component<Props,State> {
     )
   }
 }
-
-
