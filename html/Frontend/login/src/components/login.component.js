@@ -58,6 +58,17 @@ export default class Login extends Component {
         }   
     }
 
+    errorBox(){
+        //renders an errorBox with the current state of the error message
+        if(this.state.errorMessage === ''){
+            return(<br></br>);
+        } else{
+            return(
+                <div class="alert alert-primary" role="alert">{this.state.errorMessage}</div>
+            );
+        }
+    }
+
     render() {
         return (
             <form>
@@ -73,7 +84,7 @@ export default class Login extends Component {
                     <input type="password" name="password" className="form-control" placeholder="Enter password" value={this.state.password} onChange={this.handleChange} />
                 </div>
 
-                <div>{this.state.errorMessage}<br></br><br></br></div>
+                {this.errorBox()}
 
                 <button className="btn btn-dark btn-lg btn-block" onClick={this.handleSubmit} >Sign in</button>
                 <p className="forgot-password text-right">
