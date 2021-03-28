@@ -18,30 +18,7 @@ export default class Modal extends React.Component<Props,State> {
           active: false
         };
       }
-
-/*      open() {
-        var modal = document.getElementById("myModal");
-        var html = document.querySelector('html');
-        if (modal && html)
-        {
-            modal.classList.add('is-active');
-            html.classList.add('is-clipped');
-        }
-        else {
-        console.log("Fehler")
-        }
-        }
-    close () {
-        var modal = document.getElementById("myModal");
-        var html = document.querySelector('html');
-        if (modal && html)
-        {
-        modal.classList.remove('is-active');
-        html.classList.remove('is-clipped');
-        }
-    }*/
         test = () => {
-            /*this.setState({ active: !this.state.active });*/
             this.setState((state) =>({active:!state.active}))
             console.log("Kinder sind:" + this.props.children)
           };
@@ -103,11 +80,6 @@ export default class Modal extends React.Component<Props,State> {
                 <h1>Test2</h1>
                 <p>{this.props.children}</p>
                 <div>
-    Song List
-    {(children: any[])=>{
-      children.map((item, i) => {
-       return(`Song ${i} - ${item}`);
-    })}}
 </div>
                 <h1>Level One</h1>
                         <p>
@@ -142,7 +114,7 @@ export default class Modal extends React.Component<Props,State> {
           </section>
         <footer className="modal-card-foot">
             <button className="button is-success">Save changes</button>
-            <button className="button" onClick={this.test} >Cancel</button>
+            <button className="button" onClick={()=>this.test()} >Cancel</button>
         </footer>
     </div>
     </div>
