@@ -16,7 +16,7 @@ const User = function(user) {
 
 //return 1 if user was created and 0 if user was not created
 User.create = (newUser, result) => {
-    sql.query("INSERT INTO users SET ?", newUser, (err, res) => {
+    sql.query("INSERT INTO user SET ?", newUser, (err, res) => {
         if (err) {
             console.log("error: ", err);
             return(0);
@@ -28,22 +28,30 @@ User.create = (newUser, result) => {
 };
 
 //test, if username/email already exist in database
-//returns 1 if user exist and 0 if user doesn´t
+//returns True if user exist and False if user doesn´t
 User.exists = (newUser) => {
-    sql.query("SELECT * FROM users WHERE username = :username OR email = :email", {
-        email: newUser.email,
-        username: newUser.username
-    }, function(error, results){
-        if(results[0]){
-        //!!!!!!!!!!!!!!!!!!!!!!!!! results empty
-            console.log("User " + newUser.username + " / " + newUser.email + "already exists");
-            return(1);
+    user_exists = true;
+
+    newUser.username = "test"; //REMOVE + IMPLEMENT!!!!!!!!!!!!!!
+
+    console.log("New User: " + newUser.username + "|" + newUser.email);
+    sql.query("SELECT * FROM user WHERE username = ? OR email = ?", [
+        newUser.username,
+        newUser.email
+    ], function(error, results){
+        console.log(results);
+        if(error) return;
+        if(typeof(results[0]) == undefined){
+            //results are empty
+            console.log("Signup: User " + newUser.username + " / " + newUser.email + " does not exist");
+            user_exists = false;
         }else{
-            console.log("User " + newUser.username + " / " + newUser.email + "does not exist");
-            return(0);
+            //a user with the corresponding username/ email was found!
+            console.log("Signup: User " + newUser.username + " / " + newUser.email + " does already exist");
+            user_exists = true;
         }
     });
-    // add errorHandling
+    return user_exists;
 };
 
 module.exports = User;
