@@ -50,22 +50,21 @@ export default class Login extends Component {
                 if(response.ok){
                     if(response.status === 201){
                         //update error message: --> success
-                        this.setState({errorMessage: "user was created"});
+                        this.setState({errorMessage: "user was created!"});
+
+                        // redirect oder popup
+                        // handle token
+                        // Username in irgendeinen Storage zwischenspeichern
+                        // Speicherung Token in Cookie/ APP- State --> Session Storage
+
+                    }else{
+                        //update error message: --> no success
+                        this.setState({errorMessage: "The given username or email already exist!"});
                     }
-
                 }else{
-                    //server error
+                    this.setState({errorMessage: "A server error occured!"});
                 }
-            }
-            )
-
-            //Bestätigung
-
-            // Username in irgendeinen Storage zwischenspeichern
-
-            // Speicherung Token in Cookie/ APP- State
-
-            //redirect
+            });
         } else {
             this.setState({errorMessage:'Please enter an email and a password!'})
         }   
@@ -81,6 +80,8 @@ export default class Login extends Component {
             );
         }
     }
+
+    //return rendered component
 
     render() {
         return (

@@ -61,11 +61,25 @@ export default class SignUp extends Component {
                             password: pw1,
                             username: username
                         })
+                    }).then((response) => {
+                        if(response.ok){
+                            if(response.status === 201){
+                                //update error message: --> success
+                                this.setState({errorMessage: "The user was created!"});
+        
+                                // redirect oder popup
+                                // handle token
+                                // Username in irgendeinen Storage zwischenspeichern
+                                // Speicherung Token in Cookie/ APP- State --> Session Storage
+        
+                            }else{
+                                //update error message: --> no success
+                                this.setState({errorMessage: "The given username or email already exist!"});
+                            }
+                        }else{
+                            this.setState({errorMessage: "A server error occured!"});
+                        }
                     });
-    
-                    //Bestätigung
-    
-                    //redirect
                 } else {
                     this.setState({errorMessage:'The passwords must have at least 5 characters!'})
                 }
@@ -74,7 +88,7 @@ export default class SignUp extends Component {
             }
         } else {
             this.setState({errorMessage:'Please fill out every field!'})
-        }   
+        }
     }
 
     errorBox(){
