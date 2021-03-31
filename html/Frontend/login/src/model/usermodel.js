@@ -14,7 +14,7 @@ const User = function(user) {
     this.emailVerify = user.emailVerify;
 }
 
-//return true if user was created and false if user was not created --> Status
+//status is true if user was created and false if user was not created --> Status
 User.create = (newUser, status) => {
     sql.query("INSERT INTO user SET ?", newUser, (error, result) => {
         if (error) {
