@@ -18,4 +18,6 @@ app.post('/backend/login', function (req, res) {
 
 app.post('/backend/signup', users.signup );
 
+app.get('/verify/:hash', users.verifyEmail ); 
+
 app.listen(process.env.PORT || 8080);

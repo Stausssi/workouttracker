@@ -29,7 +29,7 @@ exports.signup = (req, res) => {
                 res.status(500).send({message: "internal server error"});
             } else {
                 // no error occured
-                
+
                 if(exists){
                     res.status(200).send({
                         message: "user exists"
@@ -53,11 +53,24 @@ exports.signup = (req, res) => {
                                 res.status(201).send({
                                     message: "user was created"
                                 });
-                            }                        
+
+                                //
+                            }
                         }
                     });
                 }
             }
         });
-    }   
+    }
 }
+
+exports.login = (username, email, password) => {
+
+};
+
+exports.verifyEmail = () => {
+
+
+};
+
+//This is a controller file, not a modell file --> Move
