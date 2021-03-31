@@ -10,7 +10,8 @@ export default class SignUp extends Component {
             email: '',
             password1: '',
             password2: '',
-            errorMessage: ''
+            errorMessage: '',
+            username: ''
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -18,6 +19,7 @@ export default class SignUp extends Component {
     }
 
     handleChange(event) {
+        // makes all input attributes "controlled components"
         const target = event.target;
         const value = target.value;
         const name = target.name;
@@ -33,16 +35,16 @@ export default class SignUp extends Component {
         const pw2 = this.state.password2;
         const firstname = this.state.firstname;
         const lastname = this.state.lastname;
+        const username = this.state.username;
         event.preventDefault();
 
-        if(!(email === '' || pw1 === '' || pw2 === '' || firstname === '' || lastname === '')){
-            //all fields must be filled
+        if(!(email === '' || pw1 === '' || pw2 === '' || firstname === '' || lastname === '' || username === '')){
+            //all inputs must be filled
             if(pw1 === pw2){
                 //the passwords must be equal
                 if(pw1.length > 4){
+                    //password must be longer than 4 characters
                     alert('Login: Email ' + email + ' Pw: ' +  pw1);
-
-                    //hash Password ?
     
                     //sends User credentials to API
     
@@ -56,7 +58,8 @@ export default class SignUp extends Component {
                             firstname: firstname,
                             lastname: lastname,
                             email: email,
-                            password: pw1
+                            password: pw1,
+                            username: username
                         })
                     });
     
@@ -85,7 +88,6 @@ export default class SignUp extends Component {
         }
     }
 
-
     render() {
         return (
             <form>
@@ -99,6 +101,11 @@ export default class SignUp extends Component {
                 <div className="form-group">
                     <label>Last name</label>
                     <input name="lastname" type="text" className="form-control" placeholder="Last name" value={this.state.lastname} onChange={this.handleChange}/>
+                </div>
+
+                <div className="form-group">
+                    <label>Username</label>
+                    <input name="username" type="text" className="form-control" placeholder="Enter username" value={this.state.username} onChange={this.handleChange}/>
                 </div>
 
                 <div className="form-group">

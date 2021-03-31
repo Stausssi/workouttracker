@@ -46,9 +46,22 @@ export default class Login extends Component {
                     email: email,
                     password: pw
                 })
-            });
+            }).then((response) => {
+                if(response.ok){
+                    if(response.status === 201){
+                        //update error message: --> success
+                        this.setState({errorMessage: "user was created"});
+                    }
+
+                }else{
+                    //server error
+                }
+            }
+            )
 
             //Bestätigung
+
+            // Username in irgendeinen Storage zwischenspeichern
 
             // Speicherung Token in Cookie/ APP- State
 

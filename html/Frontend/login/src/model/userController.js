@@ -6,9 +6,7 @@ exports.signup = (req, res) => {
     //validate request --> add more checks
     console.log(req.body);
     if(!req.body && !req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password){
-        res.status(400).send({
-            message: "bad request"
-        });
+        res.status(400).send({message: "bad request"});
     } else {
 
         //create a user object
@@ -23,26 +21,43 @@ exports.signup = (req, res) => {
             emailVerify : 0 
         });
 
-        //check if the user already exists in the database
-        if(User.exists(newuser)){
-            res.status(400).send({
-                message: "user exists"
-            });
-        } else {
-            //user does not exist in the database
-            //save user to the database
-
-            const status = User.create(newuser);
-            if(!status){
-                res.status(500).send({
-                    message: "user could not be saved in the database"
-                });
+        //check if the user already exists in the database: Attention: async !!!
+        User.exists(newuser, function(err, exists){
+            if(err){
+                // Internal Server Error, could not check if user already exists
+                console.log(err);
+                res.status(500).send({message: "internal server error"});
             } else {
-                res.status(201).send({
-                    message: "user was created"
-                });
+                // no error occured
+                
+                if(exists){
+                    res.status(200).send({
+                        message: "user exists"
+                    });
+                } else {
+                    //user does not exist in the database
+                    //save user to the database
+        
+                    User.create(newuser, function(err, status){
+                        if(err){
+                            // Internal Server Error, user could not be saved to db
+                            console.log(err);
+                            res.status(500).send({message: "internal server error"});
+                        } else {
+                            // user was created
+                            if(!status){
+                                res.status(500).send({
+                                    message: "user could not be created"
+                                });
+                            } else {
+                                res.status(201).send({
+                                    message: "user was created"
+                                });
+                            }                        
+                        }
+                    });
+                }
             }
-
-        }
+        });
     }   
 }
