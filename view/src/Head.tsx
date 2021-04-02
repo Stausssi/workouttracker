@@ -1,7 +1,7 @@
 import Search from './Search';
 import Logo from './img/WorkoutLogo.png'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faSignInAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faHome, faSignInAlt, faUser} from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
 
 //Head of React app. Used on every page. Integration of Modal to create Activity and Search 
@@ -16,11 +16,27 @@ export const Head = () =>
             <img src={Logo}alt="Logo" width={150}/>
           </a>
         </div>
-        <div id="navbarMenuHeroA" className="navbar-menu">
+        <div className="hero-body">
+            <div className="container has-text-centered">
+                <p className="title">
+                    Workout-Tracker
+                </p>
+                <p className="subtitle">
+                    Time for Sport
+                </p>
+            </div>
         </div>
-          <div className="navbar-end">
-          <div className="navbar-item">
-        <Search></Search>
+        <div className="hero-foot">
+            <nav className="tabs">
+                <ul>
+                    <li className="is-active"><a href="/#">Overview</a></li>
+                    <li><a href="/#">Modifiers</a></li>
+                    <li><a href="/#">Grid</a></li>
+                    <li><a href="/#">Elements</a></li>
+                    <li><a href="/#">Components</a></li>
+                    <li><a href="/#">Layout</a></li>
+                </ul>
+            </nav>
         </div>
             <a className="navbar-item" href="/">
             <span className="icon">

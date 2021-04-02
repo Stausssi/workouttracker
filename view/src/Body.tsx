@@ -1,32 +1,34 @@
 import React from 'react';
 import './css/App.css';
-import ToggleButton from'./ToggleButton'
+import ToggleButton from './ToggleButton'
 import 'bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css'
 import Calendar1 from './FullCalendar';
 import Graphs from './Charts';
 
 interface Props {
 }
+
 interface State {
   showPopup:boolean
   active:boolean
   apiResponse:string
 }
 
-export default class Body extends React.Component<Props,State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      showPopup: false,
-      active: false,
-      apiResponse: ""
-    };
-  }
-  callAPI() {
-		fetch("http://157.90.160.201:9000/backend/testConnection")
-			.then(res => res.text())
-			.then(res => this.setState({ apiResponse: res }));
-	}
+export default class Body extends React.Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            showPopup: false,
+            active: false,
+            apiResponse: ""
+        };
+    }
+
+    callAPI() {
+        fetch("http://157.90.160.201:9000/backend/testConnection")
+            .then(res => res.text())
+            .then(res => this.setState({apiResponse: res}));
+    }
 
 	componentDidMount() {
 		this.callAPI();
