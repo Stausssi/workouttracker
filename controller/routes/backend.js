@@ -5,7 +5,7 @@ var router = express.Router();
 const users = require("../userController");
 
 router.get('/', function (req, res, next) {
-    res.render('index', { title: 'Workout-Tracker' })
+    res.render('index')
 });
 
 router.post('/login', function (req, res) {
