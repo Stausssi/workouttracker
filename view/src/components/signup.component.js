@@ -44,7 +44,6 @@ export default class SignUp extends Component {
                 //the passwords must be equal
                 if(pw1.length > 4){
                     //password must be longer than 4 characters
-                    alert('Login: Email ' + email + ' Pw: ' +  pw1);
     
                     //sends User credentials to API
     
