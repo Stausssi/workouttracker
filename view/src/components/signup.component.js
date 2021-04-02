@@ -48,7 +48,7 @@ export default class SignUp extends Component {
     
                     //sends User credentials to API
     
-                    fetch('http://localhost:3000/backend/signup', {
+                    fetch('http://localhost:9000/backend/signup', {
                         method: 'POST',
                         headers: {
                             Accept: 'application/json',
