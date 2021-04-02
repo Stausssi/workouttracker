@@ -21,7 +21,7 @@ export default class Body extends React.Component<Props,State> {
     };
   }
   callAPI() {
-		fetch("http://157.90.160.201:9000/testAPI")
+		fetch("http://157.90.160.201:9000/backend/testConnection")
 			.then(res => res.text())
 			.then(res => this.setState({ apiResponse: res }));
 	}
