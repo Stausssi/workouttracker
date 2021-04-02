@@ -30,7 +30,6 @@ export default class Login extends Component {
 
         if(!(email === '' || pw === '')){
             //catch wrong
-            alert('Email ' + email + ' Pw: ' +  pw);
 
             //hash Password ?
 
