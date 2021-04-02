@@ -5,4 +5,4 @@ module.exports = {
     USER: "root",
     PASSWORD: "",
     DB: "trackerdata"
-  };
+};

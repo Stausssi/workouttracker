@@ -1,5 +1,5 @@
 const { request } = require('express');
-const User = require('./usermodel');
+const User = require('../model/usermodel');
 
 //create a new user
 exports.signup = (req, res) => {
