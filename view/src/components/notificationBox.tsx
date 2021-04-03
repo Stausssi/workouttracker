@@ -5,6 +5,7 @@ interface Props {
     type: string
 }
 
+// TODO: Add an (x) to close the notification
 export default class NotificationBox extends Component<Props> {
     render() {
         //renders an errorBox with the current state of the error message
