@@ -3,6 +3,8 @@ var router = express.Router();
 
 //initialize the database controllers
 const users = require("../userController");
+const activity = require("../activityController");
+const sport = require("../sportController");
 const event = require("../calendarController");
 const chart = require("../chartController");
 
@@ -19,6 +21,9 @@ router.post('/signup', users.signup);
 
 router.get('/verify/:hash', users.verifyEmail);
 
+router.post('/activity/add', activity.add);
+
+router.all('/sports/fetch', sport.getAll);
 /* Calendar routes */
 
 router.get('/events/get', event.findAll); 

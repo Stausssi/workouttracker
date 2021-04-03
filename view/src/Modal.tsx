@@ -10,6 +10,7 @@ interface Props {
 interface State {
     showPopup: boolean
     active: boolean
+    sports: {[name: string]: number}
 }
 
 export default class Modal extends React.Component<Props, State> {
@@ -17,7 +18,8 @@ export default class Modal extends React.Component<Props, State> {
         super(props);
         this.state = {
             showPopup: false,
-            active: false
+            active: false,
+            sports: {}
         };
     }
 
@@ -28,15 +30,29 @@ export default class Modal extends React.Component<Props, State> {
         }
     }
 
-    toggleActive = () => {
-        this.setState((state) => ({active: !state.active}), () => {if(!this.state.active) document.forms[0].reset()});
+    toggleActive() {
+        let active = !this.state.active;
+        this.setState({active: active});
+
+        if (active) {
+            // Fetch activities from database
+            fetch("http://localhost:9000/backend/sports/fetch").then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+            }).then((response) => {
+                this.setState({sports: JSON.parse(response.body)});
+            });
+        } else {
+            // Reset input form on close
+            document.forms[0].reset()
+        }
     };
 
     render() {
-        const active = this.state.active ? "is-active" : "";
         return (
             <section className='main'>
-                <div className={`modal ${active}`}>
+                <div className={`modal ${this.state.active ? "is-active" : ""}`}>
                     <div className="modal-background"/>
                     <div className="modal-card">
                         <header className="modal-card-head">
@@ -46,7 +62,7 @@ export default class Modal extends React.Component<Props, State> {
 
                         <section className="modal-card-body">
                             <div className="content">
-                                <AddActivity />
+                                <AddActivity sports={this.state.sports}/>
                             </div>
                         </section>
 
