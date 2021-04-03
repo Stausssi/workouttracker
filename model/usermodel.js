@@ -54,4 +54,14 @@ User.exists = (newUser, user_exists) => {
     });
 };
 
+User.verifyToken = (token, success) => {
+
+    sql.query("UPDATE user SET emailVerify = 1 WHERE confirmationToken = ?", [
+        token
+    ], function(error, results){
+        console.log(error);
+        console.log(result);
+    });
+}
+
 module.exports = User;
