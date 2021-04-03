@@ -10,7 +10,6 @@ interface Props {
 interface State {
     showPopup: boolean
     active: boolean
-    allowSubmit: boolean
 }
 
 export default class Modal extends React.Component<Props, State> {
@@ -18,8 +17,7 @@ export default class Modal extends React.Component<Props, State> {
         super(props);
         this.state = {
             showPopup: false,
-            active: false,
-            allowSubmit: false
+            active: false
         };
     }
 
@@ -31,7 +29,7 @@ export default class Modal extends React.Component<Props, State> {
     }
 
     toggleActive = () => {
-        this.setState((state) => ({active: !state.active}))
+        this.setState((state) => ({active: !state.active}), () => {if(!this.state.active) document.forms[0].reset()});
     };
 
     render() {
@@ -45,11 +43,13 @@ export default class Modal extends React.Component<Props, State> {
                             <p className="modal-card-title">Aktivität hinzufügen</p>
                             <button className="delete" aria-label="close" onClick={() => this.toggleActive()}/>
                         </header>
+
                         <section className="modal-card-body">
                             <div className="content">
                                 <AddActivity />
                             </div>
                         </section>
+
                         <footer className="modal-card-foot">
                             <button className="button is-success" id="submit-activity" onClick={() => document.forms[0].requestSubmit()}>
                                 <span className="icon is-small">
