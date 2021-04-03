@@ -82,7 +82,8 @@ exports.login = (username, email, password) => {
 
 };
 
-exports.verifyEmail = () => {
+//check if a confirmation token is valid an update the "emailVerify" attribute, to activate the user
+exports.verifyEmail = (req, res) => {
 
 
 };
