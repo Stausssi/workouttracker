@@ -84,7 +84,13 @@ exports.login = (username, email, password) => {
 
 //check if a confirmation token is valid an update the "emailVerify" attribute, to activate the user
 exports.verifyEmail = (req, res) => {
+    const token = req.params.hash;
 
+    if(!token){
+        res.status(400).send({message: "bad request"});
+    } else {
+        User.verifyToken();
+    }
 
 };
 
