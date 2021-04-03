@@ -1,19 +1,30 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
 interface Props {
     message: string
     type: string
 }
 
-// TODO: Add an (x) to close the notification
-export default class NotificationBox extends Component<Props> {
+interface State {}
+
+// TODO: Add delete button functionality
+export default class NotificationBox extends Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {}
+    }
+
     render() {
-        //renders an errorBox with the current state of the error message
-        if(this.props.message === '') {
+        // Displays a notification to inform the user of something
+        if (this.props.message.length === 0) {
             return "";
-        } else{
-            return(
-                <div className={`notification ${this.props.type}`}>{this.props.message}</div>
+        } else {
+            return (
+                <div className={`notification ${this.props.type}`}>
+                    <button type="button" className="delete" />
+                    {this.props.message}
+                </div>
             );
         }
     }

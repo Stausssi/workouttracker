@@ -1,10 +1,11 @@
 import React, {Component} from "react";
-import {faCheck, faTimes, IconDefinition} from "@fortawesome/free-solid-svg-icons";
+import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import NotificationBox from "./notificationBox";
 
 interface Props {
+    sports: {[key: string]: number}
 }
 
 interface State {
@@ -12,19 +13,22 @@ interface State {
 }
 
 const defaultActivityState = {
-    activity: 0,
-    activityClass: "",
+    sport: 0,
+    sportClass: "",
     duration: 0,
     durationClass: "",
     durationIcon: faTimes,
+    durationIconClass: "",
     durationMul: 60,
     distance: 0,
     distanceClass: "",
     distanceIcon: faTimes,
+    distanceIconClass: "",
     distanceMul: 10,
     heartRate: 0,
     heartRateClass: "",
-    heartRateIcon: faTimes
+    heartRateIcon: faTimes,
+    heartRateIconClass: ""
 }
 
 const defaultNotifyState = {
@@ -37,7 +41,7 @@ const defaultState = Object.assign({}, defaultActivityState, defaultNotifyState)
 
 // represents [min, max] values for the corresponding input field
 const validValues: { [key: string]: any[] } = {
-    "activity": [0, null],
+    "sport": [0, null],
     "duration": [0, null],
     "distance": [0, null],
     "heartRate": [25, 250],
@@ -69,7 +73,6 @@ export default class AddActivity extends Component<Props, State> {
 
     handleChange(event: any) {
         const target = event.target;
-        const parent = target.parentElement;
         const value = target.value;
         const name = target.name;
 
@@ -90,11 +93,17 @@ export default class AddActivity extends Component<Props, State> {
 
             if (valid) {
                 if (icon) {
-                    this.setState({[name + "Icon"]: faCheck});
+                    this.setState({
+                        [name + "Icon"]: faCheck,
+                        [name + "IconClass"]: "has-text-success"
+                    });
                 }
             } else {
                 if (icon) {
-                    this.setState({[name + "Icon"]: faTimes});
+                    this.setState({
+                        [name + "Icon"]: faTimes,
+                        [name + "IconClass"]: ""
+                    });
                 }
             }
         }
@@ -103,12 +112,28 @@ export default class AddActivity extends Component<Props, State> {
     handleSubmit(event: any) {
         // Prevent page refresh
         event.preventDefault();
+
+        if (this.state.submitButton.hasAttribute("disabled")) return;
+
         console.log("Submit:", this.state);
 
         // TODO: Filter params and insert into database
 
+        // fetch("http://localhost:9000/backend/activity/add", {
+        //     method: "POST",
+        //     headers: {
+        //         Accept: 'application/json',
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify({
+        //         test: "test"
+        //     })
+        // }).then((response) => {
+        //     if(response.ok) {
+        //         this.setState({notifyMessage: "Activity submitted", notifyType: "is-success"});
+        //     }
+        // });
         this.setState({notifyMessage: "Activity submitted", notifyType: "is-success"});
-
         // Disable submit button and reset form
         this.allowSubmit(false);
         this.resetState(RESET_TYPES.ACTIVITY);
@@ -129,10 +154,9 @@ export default class AddActivity extends Component<Props, State> {
                 <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType}/>
 
                 <label className="label">Art der Aktivität</label>
-                <div className={`select is-fullwidth mb-5 ${this.state.activityClass}`}>
-                    <select name="activity" onChange={this.handleChange} value={this.state.activity}>
-                        <option value="0"/>
-                        <option value="1">Testsportart</option>
+                <div className={`select is-fullwidth mb-5 ${this.state.sportClass}`}>
+                    <select name="sport" onChange={this.handleChange} value={this.state.sport}>
+                        {this.createSportSelect()}
                     </select>
                 </div>
 
@@ -149,7 +173,7 @@ export default class AddActivity extends Component<Props, State> {
                                     value={Number(this.state.duration) === 0 ? "" : this.state.duration}
                                     onChange={this.handleChange}
                                 />
-                                <span className="icon is-right">
+                                <span className={`icon is-right ${this.state.durationIconClass}`}>
                                     <FontAwesomeIcon icon={this.state.durationIcon}/>
                                 </span>
                             </div>
@@ -179,7 +203,7 @@ export default class AddActivity extends Component<Props, State> {
                                     value={Number(this.state.distance) === 0 ? "" : this.state.distance}
                                     onChange={this.handleChange}
                                 />
-                                <span className="icon is-right">
+                                <span className={`icon is-right ${this.state.distanceIconClass}`}>
                                     <FontAwesomeIcon icon={this.state.distanceIcon}/>
                                 </span>
                             </div>
@@ -207,7 +231,7 @@ export default class AddActivity extends Component<Props, State> {
                             value={Number(this.state.heartRate) === 0 ? "" : this.state.heartRate}
                             onChange={this.handleChange}
                         />
-                        <span className="icon is-right">
+                        <span className={`icon is-right ${this.state.heartRateIconClass}`}>
                             <FontAwesomeIcon icon={this.state.heartRateIcon}/>
                         </span>
                     </div>
@@ -216,13 +240,19 @@ export default class AddActivity extends Component<Props, State> {
         );
     }
 
-    grabActivities() {
-        return "test";
+    createSportSelect() {
+        let sports = [];
+        sports.push(<option value="0" key="0" />);
+        for (let key in this.props.sports) {
+            sports.push(<option value={key} key={key}>{key}</option>);
+        }
+
+        return sports;
     }
 
     validateInput() {
         let valid =
-            this.isValid("activity", this.state.activity) &&
+            this.isValid("sport", this.state.sport) &&
             this.isValid("distance", this.state.distance) &&
             this.isValid("duration", this.state.duration) &&
             this.isValid("heartRate", this.state.heartRate);
@@ -235,8 +265,9 @@ export default class AddActivity extends Component<Props, State> {
     isValid(type: string, value: number) {
         let min = validValues[type][0];
         let max = validValues[type][1];
+        value = Number(value);
 
-        return min < value && (max ? value < max : true);
+        return (min < value && (max ? value < max : true)) || isNaN(value);
     }
 
     allowSubmit(state: boolean) {
