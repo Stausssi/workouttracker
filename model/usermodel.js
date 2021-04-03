@@ -12,6 +12,7 @@ const User = function(user) {
     this.weight = user.weight;
     this.email = user.email;
     this.emailVerify = user.emailVerify;
+    this.confirmationToken = user.confirmationToken;
 }
 
 //status is true if user was created and false if user was not created --> Status

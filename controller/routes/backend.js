@@ -14,5 +14,4 @@ router.post('/signup', users.signup );
 router.get('/verify/:hash', users.verifyEmail ); 
 
 
-
 module.exports = router;
