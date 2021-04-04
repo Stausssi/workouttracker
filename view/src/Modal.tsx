@@ -39,6 +39,8 @@ export default class Modal extends React.Component<Props, State> {
             fetch("http://localhost:9000/backend/sports/fetch").then((response) => {
                 if (response.ok) {
                     return response.json();
+                } else {
+                    console.log(response);
                 }
             }).then((response) => {
                 this.setState({sports: JSON.parse(response.body)});
