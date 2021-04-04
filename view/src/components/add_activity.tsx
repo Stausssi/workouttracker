@@ -5,7 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import NotificationBox from "./notificationBox";
 
 interface Props {
-    sports: {[key: string]: number}
+    sports: { [key: string]: number }
 }
 
 interface State {
@@ -54,6 +54,11 @@ enum RESET_TYPES {
     NOTIFICATION
 }
 
+const notifyMessages: { [ident: string]: [message: string, type: string] } = {
+    "fetchFailed":
+        ["Die Sportarten konnten nicht abgerufen werden!<br /> Versuche es später erneut, oder kontaktiere einen Administrator.", "is-danger"],
+}
+
 export default class AddActivity extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -68,6 +73,18 @@ export default class AddActivity extends Component<Props, State> {
         let submit = document.getElementById("submit-activity");
         if (submit) {
             this.setState({submitButton: submit});
+        }
+    }
+
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+        // Check for prop changes
+        if (prevProps.sports !== this.props.sports) {
+            if (Object.keys(this.props.sports).length === 0) {
+                this.setState({
+                    notifyMessage: notifyMessages["fetchFailed"][0],
+                    notifyType: notifyMessages["fetchFailed"][1]
+                });
+            }
         }
     }
 
@@ -156,7 +173,9 @@ export default class AddActivity extends Component<Props, State> {
                 <label className="label">Art der Aktivität</label>
                 <div className={`select is-fullwidth mb-5 ${this.state.sportClass}`}>
                     <select name="sport" onChange={this.handleChange} value={this.state.sport}>
-                        {this.createSportSelect()}
+                        {this.state.notifyMessage !== notifyMessages["fetchFailed"][0] ?
+                            this.createSportSelect() :
+                            <option key="-1" value="-1">Es ist ein Fehler aufgetreten!</option>}
                     </select>
                 </div>
 
@@ -242,11 +261,11 @@ export default class AddActivity extends Component<Props, State> {
 
     createSportSelect() {
         let sports = [];
-        sports.push(<option value="0" key="0" />);
+        sports.push(<option value="0" key="0"/>);
+
         for (let key in this.props.sports) {
             sports.push(<option value={key} key={key}>{key}</option>);
         }
-
         return sports;
     }
 
