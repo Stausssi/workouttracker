@@ -2,6 +2,8 @@ import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 
+//Search component
+
 class Search extends React.Component {
   render() {
     return (

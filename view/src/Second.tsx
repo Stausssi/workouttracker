@@ -2,6 +2,8 @@ import React from 'react';
 import Head from './Head';
 import Foot from './Foot';
 
+//Deprecated, not used -> Delete
+
 class Second extends React.Component<any, any> {
     constructor(props: any) {
         super(props);

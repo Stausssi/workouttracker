@@ -2,6 +2,8 @@ import React from 'react';
 import Head from './Head';
 import Foot from './Foot';
 
+//Login Page 
+
 class Login extends React.Component<any, any> {
     constructor(props: any) {
         super(props);

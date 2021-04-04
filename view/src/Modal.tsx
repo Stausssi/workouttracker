@@ -10,6 +10,8 @@ interface State {
   active:boolean
 }
 
+//PopUp Component. Use to create Activity
+
 export default class Modal extends React.Component<Props,State> {
     constructor(props: Props) {
         super(props);
@@ -75,6 +77,10 @@ export default class Modal extends React.Component<Props,State> {
                     placeholder="e.g John Smith"
                   />
                 </div>
+                <h1>Test2</h1>
+                <p>{this.props.children}</p>
+                <div>
+</div>
 </div>
           </section>
         <footer className="modal-card-foot">

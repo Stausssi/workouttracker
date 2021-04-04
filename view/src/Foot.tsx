@@ -1,3 +1,5 @@
+//Foot of React app. Used on every page
+
 export const Footer = () =>
 <footer className="footer">
   <div className="content has-text-centered">

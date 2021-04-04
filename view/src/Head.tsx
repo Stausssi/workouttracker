@@ -4,13 +4,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faSignInAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
 
+//Head of React app. Used on every page. Integration of Modal to create Activity and Search 
+
 export const Head = () =>
-<section className="hero is-dark is-small">
+<div id="head">
+<section className="hero is-dark ">
   <div className="hero-head">
     <nav className="navbar">
         <div className="navbar-brand">
           <a className="navbar-item" href="/Second">
-            <img src={Logo}alt="Logo"/>
+            <img src={Logo}alt="Logo" width={150}/>
           </a>
         </div>
         <div id="navbarMenuHeroA" className="navbar-menu">
@@ -35,7 +38,7 @@ export const Head = () =>
               <Modal> </Modal>
             </div>
             <span className="navbar-item">
-              <a className="button is-primary is-inverted" href='/Login' >
+              <a className="button is-primary is-inverted" href='/Login'>
                 <span className="icon">
                   <FontAwesomeIcon icon={faSignInAlt}/>
                 </span>
@@ -55,18 +58,7 @@ export const Head = () =>
       </p>
     </div>
   </div>
-  <div className="hero-foot">
-    <nav className="tabs">
-        <ul>
-          <li className="is-active"><a href="/#">Overview</a></li>
-          <li><a href="/#">Modifiers</a></li>
-          <li><a href="/#">Grid</a></li>
-          <li><a href="/#">Elements</a></li>
-          <li><a href="/#">Components</a></li>
-          <li><a href="/#">Layout</a></li>
-        </ul>
-    </nav>
-  </div>
 </section>
+</div>
 export default Head;
 
