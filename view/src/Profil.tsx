@@ -2,6 +2,8 @@ import React from 'react';
 import Head from './Head';
 import Foot from './Foot';
 
+//Profile page
+
 class Profil extends React.Component<any, any> {
     constructor(props: any) {
         super(props);

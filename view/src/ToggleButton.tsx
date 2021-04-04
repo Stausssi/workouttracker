@@ -2,6 +2,8 @@ import React from 'react';
 import './css/App.css';
 import 'bulma-extensions'
 
+//Create button and pages to switch between both
+
 interface Props {
 }
 interface State {
@@ -10,6 +12,7 @@ interface State {
 
 class OwnFeed extends React.Component<Props> {
 	render() {
+	//	const { } = this.props;
 		return (
 			<>
                 <div>Hier kommt die eigene Aktivität hin</div>
@@ -21,6 +24,7 @@ class OwnFeed extends React.Component<Props> {
 
 class FriendsFeed extends React.Component<Props> {
 	render() {
+		//const { } = this.props;
 		return (
 			<>
                 <div>Hier kommt die Aktivitäten der Freunde hin</div>
@@ -40,7 +44,7 @@ export default class ToggleButton extends React.Component<Props,State> {
 
 toswitch() {
   console.log("test")
-    this.setState((state) =>({switch:!state.switch}))
+    this.setState((state) =>({switch:!state.switch}))   //switch between Own feed and friend feed. If swith is true, FriendsFeed is show. Else, Ownfeed can be see
     console.log(this.state.switch)
 }
 
@@ -51,7 +55,7 @@ toswitch() {
   <input id="switchRoundedSuccess" type="checkbox" className="switch is-rounded is-success" onChange={()=>this.toswitch()} />
   <label htmlFor="switchRoundedSuccess">Switch rounded success</label>
 </div>
-<div>{this.state.switch ? <FriendsFeed /> : <OwnFeed />}</div>
+<div>{this.state.switch ? <FriendsFeed /> : <OwnFeed />}</div>      
 </section>
     )
   }
