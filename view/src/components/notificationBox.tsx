@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import parse from 'html-react-parser';
 
 interface Props {
     message: string
@@ -23,7 +24,7 @@ export default class NotificationBox extends Component<Props, State> {
             return (
                 <div className={`notification ${this.props.type}`}>
                     <button type="button" className="delete" />
-                    {this.props.message}
+                    {parse(this.props.message)}
                 </div>
             );
         }
