@@ -1,17 +1,29 @@
 const sql = require("./createConnection");
 
-const Activity = function(activity) {
+const Activity = function (activity) {
     this.sport = activity.sport;
 }
 
-Activity.add = (isAdded) => {
-    sql.query("SELECT * FROM sport;",
-        function (error, result) {
-            if(error) {
-                isAdded(error, null);
-            } else {
-                isAdded(null, true);
-            }
+Activity.add = (activity, isAdded) => {
+    let valueKeys = "";
+    let values = "";
+
+    for (let key in activity) {
+        if (activity.hasOwnProperty(key)) {
+            valueKeys +=  key + ", ";
+            values += "'" + activity[key] + "', ";
+        }
+    }
+
+    valueKeys = valueKeys.substring(0, valueKeys.length - 2);
+    values = values.substring(0, values.length - 2);
+
+    sql.query(`INSERT INTO activity (PKuser, ${valueKeys}) VALUES ('0', ${values});`, function (error, result) {
+        if (error) {
+            isAdded(error, false);
+        } else {
+            isAdded(null, true);
+        }
     });
 }
 

@@ -25,14 +25,14 @@ const defaultActivityState = {
     distanceIcon: faTimes,
     distanceIconClass: "",
     distanceMul: 10,
-    heartRate: 0,
-    heartRateClass: "",
-    heartRateIcon: faTimes,
-    heartRateIconClass: "",
-    altitude: 0,
-    altitudeClass: "",
-    altitudeIcon: faTimes,
-    altitudeIconClass: ""
+    averageHeartRate: 0,
+    averageHeartRateClass: "",
+    averageHeartRateIcon: faTimes,
+    averageHeartRateIconClass: "",
+    altitudeDifference: 0,
+    altitudeDifferenceClass: "",
+    altitudeDifferenceIcon: faTimes,
+    altitudeDifferenceIconClass: ""
 }
 
 const defaultNotifyState = {
@@ -49,11 +49,11 @@ const validValues: { [key: string]: any[] } = {
     "duration": [0, null],
     "distance": [0, null],
     "pace": [0, null],
-    "heartRate": [25, 250],
-    "altitude": [0, null]
+    "averageHeartRate": [25, 250],
+    "altitudeDifference": [0, null]
 }
 
-const hasIcon: string[] = ["duration", "distance", "heartRate", "altitude"];
+const hasIcon: string[] = ["duration", "distance", "averageHeartRate", "altitudeDifference"];
 
 enum RESET_TYPES {
     ACTIVITY,
@@ -68,11 +68,12 @@ const notifyMessages: { [ident: string]: [message: string, type: string] } = {
 }
 
 const NUM_FIELDS = 5;
-const inputFields: string[] = ["distance", "duration", "pace", "heartRate", "altitude"];
+const inputFields: string[] = ["distance", "duration", "pace", "averageHeartRate", "altitudeDifference"];
 
 export default class AddActivity extends Component<Props, State> {
     HTMLFields: { [field: string]: JSX.Element; } | undefined;
     mustParams: boolean[] = [];
+    optParams: boolean[] = [];
 
     constructor(props: Props) {
         super(props);
@@ -106,6 +107,7 @@ export default class AddActivity extends Component<Props, State> {
         if (prevState.sport !== this.state.sports) {
             if (!isNaN(this.state.sports)) {
                 this.mustParams = [];
+                this.optParams = [];
             }
         }
     }
@@ -121,7 +123,9 @@ export default class AddActivity extends Component<Props, State> {
         }
 
         // Update state
-        this.setState({[name]: value});
+        isNaN(value) ?
+            this.setState({[name]: value}) :
+            this.setState({[name]: Number(value)});
 
         // Check whether the property has a range of values
         if (Object.keys(validValues).includes(name)) {
@@ -155,30 +159,45 @@ export default class AddActivity extends Component<Props, State> {
         // Prevent false submits
         if (this.state.submitButton.hasAttribute("disabled")) return;
 
-        console.log("Submit:", this.state);
+        // Check whether all must-params are valid
+        if (this.validateInput(true)) {
+            // Create POST-request body content
+            // TODO: timestamp generation: https://stackoverflow.com/questions/5129624/convert-js-date-time-to-mysql-datetime/5133807
+            let bodyContent: { [key: string]: any } = {
+                "sport": this.state.sport,
+                "timeStamp": new Date().toISOString().slice(0, 19).replace("T", " ")
+            };
 
-        // TODO: Filter params and insert into database
-        // TODO: reset state params which are neither must nor optional
+            // Append must and valid optional params
+            for (let index in this.mustParams) {
+                let key = inputFields[index];
+                let value = this.state[key];
 
-        // fetch("http://localhost:9000/backend/activity/add", {
-        //     method: "POST",
-        //     headers: {
-        //         Accept: 'application/json',
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         test: "test"
-        //     })
-        // }).then((response) => {
-        //     if(response.ok) {
-        //         this.setState({notifyMessage: "Activity submitted", notifyType: "is-success"});
-        //     }
-        // });
-        this.setState({notifyMessage: notifyMessages["success"][0], notifyType: notifyMessages["success"][1]});
+                if (this.mustParams[index] || (this.optParams[index] && this.isValid(key, value))) {
+                    bodyContent = Object.assign({}, bodyContent, {[key]: value});
+                }
+            }
 
-        // Disable submit button and reset form
-        this.allowSubmit(false);
-        this.resetState(RESET_TYPES.ACTIVITY);
+            // Send post request
+            fetch("http://localhost:9000/backend/activity/add", {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bodyContent)
+            }).then((response) => {
+                // TODO: response filtering
+                console.log("Antwort von backend:", response);
+                if (response.ok) {
+                    this.setState({notifyMessage: notifyMessages["success"][0], notifyType: notifyMessages["success"][1]});
+
+                    // Disable submit button and reset form
+                    this.allowSubmit(false);
+                    this.resetState(RESET_TYPES.ACTIVITY);
+                }
+            });
+        }
     }
 
     handleReset(event: any) {
@@ -223,9 +242,9 @@ export default class AddActivity extends Component<Props, State> {
     }
 
     createFormFields() {
-        console.log("forms Select");
         // Create HTML Fields template
         // Executed on the client -> no performance problem for now
+        // TODO: Fix 'Each child in a list should habe a unique "key" prop.' warning
         this.HTMLFields = {
             "distance": <>
                 <label className="label">Distanz</label>
@@ -249,8 +268,12 @@ export default class AddActivity extends Component<Props, State> {
                     </div>
                     <div className="column is-2">
                         <div className="select is-fullwidth">
-                            <select className="select" name="distanceMul" onChange={this.handleChange}
-                                    value={this.state.distanceMul}>
+                            <select
+                                className="select"
+                                name="distanceMul"
+                                value={this.state.distanceMul}
+                                onChange={this.handleChange}
+                            >
                                 <option value="1" key="dist_m">m</option>
                                 <option value="1000" key="dist_km">km</option>
                             </select>
@@ -280,9 +303,14 @@ export default class AddActivity extends Component<Props, State> {
                     </div>
                     <div className="column is-2">
                         <div className="select is-fullwidth">
-                            <select name="durationMul" onChange={this.handleChange} value={this.state.durationMul}>
-                                <option value="1" key="dur_s">sec</option>
-                                <option value="60" key="dur_m">min</option>
+                            <select
+                                className="select"
+                                name="durationMul"
+                                value={this.state.durationMul}
+                                onChange={this.handleChange}
+                            >
+                                <option value="1" key="dur_s">s</option>
+                                <option value="60" key="dur_m">m</option>
                                 <option value="3600" key="dur_h">h</option>
                             </select>
                         </div>
@@ -292,38 +320,38 @@ export default class AddActivity extends Component<Props, State> {
             "pace": <>
                 <label className="label">Placeholder für Pace -&gt; Wird berechnet?</label>
             </>,
-            "heartRate": <>
+            "averageHeartRate": <>
                 <label className="label">Herzrate</label>
                 <div className="field">
                     <div className="control has-icons-right">
                         <input
-                            className={`input ${this.state.heartRateClass}`}
+                            className={`input ${this.state.averageHeartRateClass}`}
                             type="number"
-                            name="heartRate"
+                            name="averageHeartRate"
                             placeholder="Gebe hier deine durchschnittliche Herzrate ein"
-                            value={Number(this.state.heartRate) === 0 ? "" : this.state.heartRate}
+                            value={Number(this.state.averageHeartRate) === 0 ? "" : this.state.averageHeartRate}
                             onChange={this.handleChange}
                         />
-                        <span className={`icon is-right ${this.state.heartRateIconClass}`}>
-                            <FontAwesomeIcon icon={this.state.heartRateIcon}/>
+                        <span className={`icon is-right ${this.state.averageHeartRateIconClass}`}>
+                            <FontAwesomeIcon icon={this.state.averageHeartRateIcon}/>
                         </span>
                     </div>
                 </div>
             </>,
-            "altitude": <>
+            "altitudeDifference": <>
                 <label className="label">Höhenmeter</label>
                 <div className="field">
                     <div className="control has-icons-right">
                         <input
-                            className={`input ${this.state.altitudeClass}`}
+                            className={`input ${this.state.altitudeDifferenceClass}`}
                             type="number"
-                            name="altitude"
+                            name="altitudeDifference"
                             placeholder="Gebe hier deine Höhenmeter ein"
-                            value={Number(this.state.altitude) === 0 ? "" : this.state.altitude}
+                            value={Number(this.state.altitudeDifference) === 0 ? "" : this.state.altitudeDifference}
                             onChange={this.handleChange}
                         />
-                        <span className={`icon is-right ${this.state.altitudeClass}`}>
-                            <FontAwesomeIcon icon={this.state.altitudeIcon}/>
+                        <span className={`icon is-right ${this.state.altitudeDifferenceClass}`}>
+                            <FontAwesomeIcon icon={this.state.altitudeDifferenceIcon}/>
                         </span>
                     </div>
                 </div>
@@ -353,23 +381,30 @@ export default class AddActivity extends Component<Props, State> {
             let fieldsHTML = [<div className="divider">Plichtangaben</div>];
             for (let index in must) {
                 must[index] = Boolean(Number(must[index]));
+                optional[index] = Boolean(Number(optional[index]));
 
                 if (must[index]) {
                     fieldsHTML.push(this.HTMLFields[inputFields[index]]);
+
+                    // Remove param from optional to prevent double input
+                    if (optional[index]) {
+                        optional[index] = false;
+                    }
                 }
             }
 
-            // Update must params
+            // Update global params
             this.mustParams = must;
+            this.optParams = optional;
 
-            // TODO: Only have optional params that arent in must
+            // Only display optional params if there are any
+            if (optional.includes(true)) {
+                fieldsHTML.push(<div className="divider">Optional</div>);
 
-            fieldsHTML.push(<div className="divider">Optional</div>);
-            for (let index in optional) {
-                optional[index] = Boolean(Number(optional[index]));
-
-                if (optional[index]) {
-                    //fieldsHTML.push(this.HTMLFields[inputFields[index]]);
+                for (let index in optional) {
+                    if (optional[index]) {
+                        fieldsHTML.push(this.HTMLFields[inputFields[index]]);
+                    }
                 }
             }
 
@@ -378,7 +413,7 @@ export default class AddActivity extends Component<Props, State> {
         return <p>Bitte wähle eine Sportart aus.</p>;
     }
 
-    validateInput() {
+    validateInput(returnValue?: boolean) {
         let valid = false;
 
         if (this.mustParams.length === NUM_FIELDS) {
@@ -394,6 +429,10 @@ export default class AddActivity extends Component<Props, State> {
 
         if (this.state.submitButton) {
             this.allowSubmit(valid);
+        }
+
+        if (returnValue) {
+            return valid;
         }
     }
 
