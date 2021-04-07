@@ -8,7 +8,7 @@ const mail = require("./mail/confirmationEmail")
 
 //creates a new user if the email/username doesn´t already exist
 exports.signup = (req, res) => {
-    //validate request --> add more checks
+    //validate request --> add more checks !!!!!!!!!!!!!!!!!!!!!!!!!!
     console.log(req.body);
     if(!req.body && !req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password && !req.body.username){
         res.status(400).send({message: "bad request"});
@@ -78,13 +78,44 @@ exports.signup = (req, res) => {
     }
 }
 
-exports.login = (username, email, password) => {
+exports.login = (req, res) => {
+    const password = req.body.password;
+    const emailOrUsername = req.body.emailOrUsername;
 
+    if((!emailOrUsername && !password) || password.length < 5){
+        res.status(400).send({message: "bad request"});
+    } else {
+        //check if available --> Get user/email from database
+        User.getUserByUsernameOrEmail(emailOrUsername, (result) => {
+            if(result == null){
+                //no user found
+                res.status(401).send({message: "No account for username/email"});
+                return;
+            }else{
+                // user found
+                console.log(result);
+                res.status(200).send({message: "successfull login"});
+                return;
+            }
+        });
+
+        //compare password to database hash
+        //bcrypt.compareSync(result.password, hash); 
+
+
+        // send back jwt
+    }
 };
 
 //check if a confirmation token is valid an update the "emailVerify" attribute, to activate the user
 exports.verifyEmail = (req, res) => {
-
+    const token = req.params.hash;
+   
+    if(!token){
+        res.status(400).send({message: "bad request"});
+    } else {
+        User.verifyToken(token);
+    }
 
 };
 

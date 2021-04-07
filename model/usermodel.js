@@ -54,4 +54,37 @@ User.exists = (newUser, user_exists) => {
     });
 };
 
+User.verifyToken = (token, success) => {
+
+    sql.query("UPDATE user SET emailVerify = 1 WHERE confirmationToken = ?", [
+        token
+    ], function(error, results){
+        console.log(error);
+        console.log(results);
+    });
+}
+
+//returns a user of the database for a given username/email. If noone was found, return null
+// the emailVerify field has to be set
+
+User.getUserByUsernameOrEmail = (UsernameOrEmail, result) => {
+    sql.query("SELECT * FROM user WHERE emailVerify = 1 AND (username = ? OR email = ?)", [
+        UsernameOrEmail,
+        UsernameOrEmail
+    ], function(error, results){
+        if(error){
+            //if an error occurs, return null
+            result(null);
+        } else {
+            if(typeof(results[0]) == "undefined"){
+                //results are empty
+                result(null);
+            }else{
+                //a user with the corresponding username/ email was found!
+                result(results[0]);
+            }
+        }
+    });
+}
+
 module.exports = User;
