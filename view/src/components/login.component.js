@@ -35,33 +35,29 @@ export default class Login extends Component {
 
             //sends User credentials to API
 
-            fetch('http://localhost:3000/backend/login', {
+            fetch('http://localhost:9000/backend/login', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email,
+                    emailOrUsername: email,
                     password: pw
                 })
             }).then((response) => {
-                if(response.ok){
-                    if(response.status === 201){
-                        //update error message: --> success
-                        this.setState({errorMessage: "user was created!"});
+                if(response.status === 200){
+                    this.setState({errorMessage: "successfull login"});
 
-                        // redirect oder popup
-                        // handle token
-                        // Username in irgendeinen Storage zwischenspeichern
-                        // Speicherung Token in Cookie/ APP- State --> Session Storage
+                    // redirect oder popup
+                    // handle token
+                    // Username in irgendeinen Storage zwischenspeichern
+                    // Speicherung Token in Cookie/ APP- State --> Session Storage
 
-                    }else{
-                        //update error message: --> no success
-                        this.setState({errorMessage: "The given username or email already exist!"});
-                    }
-                }else{
-                    this.setState({errorMessage: "A server error occured!"});
+                } else if (response.status === 401){
+                    this.setState({errorMessage: "There is no user with this username/email"});
+                } else {
+                    this.setState({errorMessage: response.json().message});
                 }
             });
         } else {
