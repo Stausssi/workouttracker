@@ -1,13 +1,21 @@
-const { request } = require('express');
+const {request} = require('express');
 const Activity = require("../model/activityModel");
 
 exports.add = (req, res) => {
-    Activity.add(function (error, isAdded) {
-        if (error) {
-            console.log(error);
-            res.status(500).send({message: "Internal server error!"});
-        } else {
-            res.status(200).send({message: "Hello World!"});
-        }
-    });
+    if (!req.body) {
+        res.status(400).send({message: "Bad request"});
+    } else {
+        Activity.add(req.body, function (error, isAdded) {
+            if (error) {
+                console.log(error);
+                res.status(500).send({message: "Internal server error!"});
+            } else {
+                if (isAdded) {
+                    res.status(201).send({message: "Activity added!"});
+                } else {
+                    res.status(500).send({message: "Activity wasn't added!"})
+                }
+            }
+        });
+    }
 }
