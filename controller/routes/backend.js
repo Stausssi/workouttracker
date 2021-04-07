@@ -12,18 +12,19 @@ router.get('/', function (req, res, next) {
     res.render('index')
 });
 
-router.post('/login', function (req, res) {
-    res.send('Login Recieved!');
-    console.log(req);
-});
+router.post('/login', users.login );
+  
+router.post('/signup', users.signup );
+  
+router.get('/verify/:hash', function(req, res){
+  users.verifyEmail(req, res);
+  res.redirect('http://localhost:3000/sign-up');
+}); 
 
-router.post('/signup', users.signup);
-
-router.get('/verify/:hash', users.verifyEmail);
-
+module.exports = router;
+module.exports = router;
 router.post('/activity/add', activity.add);
 
-router.all('/sports/fetch', sport.getAll);
 /* Calendar routes */
 
 router.get('/events/get', event.findAll); 
@@ -54,3 +55,4 @@ router.get('/testConnection', function (req, res, next) {
 
 module.exports = router;
 module.exports = router;
+router.all('/sports/fetch', sport.getAll);
