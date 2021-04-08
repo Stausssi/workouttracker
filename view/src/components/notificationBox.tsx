@@ -4,6 +4,7 @@ import parse from 'html-react-parser';
 interface Props {
     message: string
     type: string
+    hasDelete: boolean
 }
 
 interface State {}
@@ -23,7 +24,7 @@ export default class NotificationBox extends Component<Props, State> {
         } else {
             return (
                 <div className={`notification ${this.props.type}`}>
-                    <button type="button" className="delete" />
+                    {(this.props.hasDelete ? <button type="button" className="delete" /> : "")}
                     {parse(this.props.message)}
                 </div>
             );

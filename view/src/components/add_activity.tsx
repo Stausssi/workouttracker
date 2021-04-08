@@ -60,11 +60,16 @@ enum RESET_TYPES {
     NOTIFICATION
 }
 
+const tryAgainLater = "Bitte versuche es später erneut, oder kontaktiere einen Administrator.";
 const notifyMessages: { [ident: string]: [message: string, type: string] } = {
     "fetchFailed":
-        ["Die Sportarten konnten nicht abgerufen werden!<br /> Versuche es später erneut, oder kontaktiere einen Administrator.", "is-danger"],
+        ["Die Sportarten konnten nicht abgerufen werden!<br />" + tryAgainLater, "is-danger"],
     "success":
-        ["Die Aktivität wurde erfolgreich gespeichert!", "is-success"]
+        ["Die Aktivität wurde erfolgreich gespeichert!", "is-success"],
+    "error":
+        ["Beim Speichern der Aktivität ist etwas schiefgelaufen!<br />" + tryAgainLater, "is-danger"],
+    "unknownUser":
+        ["Dein Benutzer wurde in der Datenbank nicht gefunden!<br />Bitte vergewissere dich, dass du angemeldet bist und kontaktiere einen Administrator.", "is-danger"]
 }
 
 const NUM_FIELDS = 5;
@@ -162,7 +167,7 @@ export default class AddActivity extends Component<Props, State> {
         // Check whether all must-params are valid
         if (this.validateInput(true)) {
             // Create POST-request body content
-            // TODO: timestamp generation: https://stackoverflow.com/questions/5129624/convert-js-date-time-to-mysql-datetime/5133807
+            // timestamp generation: https://stackoverflow.com/questions/5129624/convert-js-date-time-to-mysql-datetime/5133807
             let bodyContent: { [key: string]: any } = {
                 "sport": this.state.sport,
                 "timeStamp": new Date().toISOString().slice(0, 19).replace("T", " ")
@@ -187,14 +192,18 @@ export default class AddActivity extends Component<Props, State> {
                 },
                 body: JSON.stringify(bodyContent)
             }).then((response) => {
-                // TODO: response filtering
-                console.log("Antwort von backend:", response);
                 if (response.ok) {
                     this.setState({notifyMessage: notifyMessages["success"][0], notifyType: notifyMessages["success"][1]});
 
                     // Disable submit button and reset form
                     this.allowSubmit(false);
                     this.resetState(RESET_TYPES.ACTIVITY);
+                } else {
+                    return response.json().then((response) => {
+                        response.errno === 1 ?
+                            this.setState({notifyMessage: notifyMessages["unknownUser"][0], notifyType: notifyMessages["unknownUser"][1]}) :
+                            this.setState({notifyMessage: notifyMessages["error"][0], notifyType: notifyMessages["error"][1]});
+                    });
                 }
             });
         }
@@ -212,7 +221,7 @@ export default class AddActivity extends Component<Props, State> {
         this.validateInput();
         return (
             <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
-                <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType}/>
+                <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
 
                 <label className="label">Art der Aktivität</label>
                 <div className={`select is-fullwidth mb-5 ${this.state.sportClass}`}>
@@ -244,7 +253,7 @@ export default class AddActivity extends Component<Props, State> {
     createFormFields() {
         // Create HTML Fields template
         // Executed on the client -> no performance problem for now
-        // TODO: Fix 'Each child in a list should habe a unique "key" prop.' warning
+        // TODO: Fix 'Each child in a list should have a unique "key" prop.' warning
         this.HTMLFields = {
             "distance": <>
                 <label className="label">Distanz</label>

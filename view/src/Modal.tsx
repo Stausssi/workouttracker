@@ -10,7 +10,7 @@ interface Props {
 interface State {
     showPopup: boolean
     active: boolean
-    sports: {[name: string]: number}
+    sports: { [name: string]: number }
 }
 
 export default class Modal extends React.Component<Props, State> {
@@ -38,12 +38,15 @@ export default class Modal extends React.Component<Props, State> {
             // Fetch activities from database
             fetch("http://localhost:9000/backend/sports/fetch").then((response) => {
                 if (response.ok) {
-                    return response.json();
+                    return response.json().then((response) => {
+                        this.setState({sports: JSON.parse(response.body)});
+                    });
                 } else {
-                    console.log(response);
+                    return response.json().then((response) => {
+                        console.log("Sport Fetch failed:", response);
+                        this.setState({sports: {}});
+                    });
                 }
-            }).then((response) => {
-                this.setState({sports: JSON.parse(response.body)});
             });
         } else {
             // Reset input form on close
@@ -69,15 +72,16 @@ export default class Modal extends React.Component<Props, State> {
                         </section>
 
                         <footer className="modal-card-foot">
-                            <button className="button is-success" id="submit-activity" onClick={() => document.forms[0].requestSubmit()}>
+                            <button className="button is-success" id="submit-activity"
+                                    onClick={() => document.forms[0].requestSubmit()}>
                                 <span className="icon is-small">
-                                    <FontAwesomeIcon icon={faCheck} />
+                                    <FontAwesomeIcon icon={faCheck}/>
                                 </span>
                                 <span>Speichern</span>
                             </button>
                             <button className="button is-danger is-outlined" onClick={() => this.toggleActive()}>
                                 <span className="icon is-small">
-                                    <FontAwesomeIcon icon={faTimes} />
+                                    <FontAwesomeIcon icon={faTimes}/>
                                 </span>
                                 <span>Abbrechen</span>
                             </button>
