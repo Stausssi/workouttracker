@@ -3,7 +3,7 @@ const User = require('../model/usermodel');
 const jwt = require("jsonwebtoken");
 const config = require("./mail/emailConfirmation.config");
 const bcrypt = require("bcryptjs");
-const mail = require("./mail/confirmationEmail")
+const mail = require("./mail/confirmationEmail");
 
 
 //creates a new user if the email/username doesn´t already exist
@@ -88,26 +88,30 @@ exports.login = (req, res) => {
         //check if available --> Get user/email from database
         User.getUserByUsernameOrEmail(emailOrUsername, (result) => {
             if(result == null){
-                //no user found
-                res.status(401).send({message: "No account for username/email"});
+                //no user found (HTTP CODE: 401 - UNAUTHORIZED)
+                res.status(401).send({message: "Login failed"});
                 return;
             }else{
                 // user found
-                console.log(result);
-                res.status(200).send({message: "successfull login"});
-                return;
+                //compare password to database hash
+                if(bcrypt.compareSync(password, result.password)){
+                    //password matches database hash (HTTP CODE: 200 - OK)
+                    //generate JWT for user
+
+                    res.status(200).send({message: "Login successfull"});
+                    return;
+                }else{
+                    //passwords do not match (HTTP CODE: 401 - UNAUTHORIZED)
+                    res.status(401).send({message: "Login failed"});
+                    return;
+                }
             }
         });
-
-        //compare password to database hash
-        //bcrypt.compareSync(result.password, hash); 
-
-
-        // send back jwt
     }
 };
 
-//check if a confirmation token is valid an update the "emailVerify" attribute, to activate the user
+//check if a confirmation token (when a the link of a confirmation email is clicked) 
+//is valid and update the "emailVerify" attribute, to activate the users account
 exports.verifyEmail = (req, res) => {
     const token = req.params.hash;
    
