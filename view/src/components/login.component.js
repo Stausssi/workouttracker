@@ -55,7 +55,7 @@ export default class Login extends Component {
                     // Speicherung Token in Cookie/ APP- State --> Session Storage
 
                 } else if (response.status === 401){
-                    this.setState({errorMessage: "There is no user with this username/email"});
+                    this.setState({errorMessage: "You have entered an invalid username or password"});
                 } else {
                     this.setState({errorMessage: response.json().message});
                 }
