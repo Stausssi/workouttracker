@@ -8,6 +8,7 @@ Activity.add = (activity, isAdded) => {
     let valueKeys = "";
     let values = "";
 
+    // Dynamically create keys and values to insert into the database
     for (let key in activity) {
         if (activity.hasOwnProperty(key)) {
             valueKeys +=  key + ", ";
@@ -18,7 +19,8 @@ Activity.add = (activity, isAdded) => {
     valueKeys = valueKeys.substring(0, valueKeys.length - 2);
     values = values.substring(0, values.length - 2);
 
-    sql.query(`INSERT INTO activity (PKuser, ${valueKeys}) VALUES ('0', ${values});`, function (error, result) {
+    // TODO: Determine userPK
+    sql.query(`INSERT INTO activity (PKuser, ${valueKeys}) VALUES ('1', ${values});`, function (error, result) {
         if (error) {
             isAdded(error, false);
         } else {

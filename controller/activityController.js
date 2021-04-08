@@ -1,4 +1,3 @@
-const {request} = require('express');
 const Activity = require("../model/activityModel");
 
 exports.add = (req, res) => {
@@ -7,13 +6,23 @@ exports.add = (req, res) => {
     } else {
         Activity.add(req.body, function (error, isAdded) {
             if (error) {
-                console.log(error);
-                res.status(500).send({message: "Internal server error!"});
+                console.log("Error when saving activity to database:", error);
+                if (error.errno === 1452) {
+                    res.status(500).send({
+                        errno: 1,
+                        message: "PKUser not found!"
+                    });
+                } else {
+                    res.status(500).send({
+                        errno: 2,
+                        message: "Internal server error!"
+                    });
+                }
             } else {
                 if (isAdded) {
-                    res.status(201).send({message: "Activity added!"});
+                    res.status(200).send({message: "Activity added!"});
                 } else {
-                    res.status(500).send({message: "Activity wasn't added!"})
+                    res.status(500).send({message: "Activity not added!"});
                 }
             }
         });
