@@ -1,9 +1,10 @@
 const { request } = require('express');
-const User = require('../model/usermodel');
+const User = require('../../model/usermodel');
 const jwt = require("jsonwebtoken");
-const config = require("./mail/emailConfirmation.config");
+const config = require("../mail/emailConfirmation.config");
 const bcrypt = require("bcryptjs");
-const mail = require("./mail/confirmationEmail");
+const mail = require("../mail/confirmationEmail");
+const tokenGeneration = require("./AccessTokenSecret.config");
 
 
 //creates a new user if the email/username doesn´t already exist
@@ -96,9 +97,11 @@ exports.login = (req, res) => {
                 //compare password to database hash
                 if(bcrypt.compareSync(password, result.password)){
                     //password matches database hash (HTTP CODE: 200 - OK)
-                    //generate JWT for user
+                    //generate JWT for user with content: username ...
 
-                    res.status(200).send({message: "Login successfull"});
+                    const accessToken = jwt.sign({ username: result.username }, tokenGeneration.AccessTokenSecret);
+                    //send accesstoken back to user
+                    res.status(200).send({token: accessToken});
                     return;
                 }else{
                     //passwords do not match (HTTP CODE: 401 - UNAUTHORIZED)
