@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 //initialize the database controllers
-const users = require("../userController");
+const users = require("../Controllers/userController");
 
 router.post('/login', users.login );
   
