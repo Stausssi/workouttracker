@@ -1,5 +1,5 @@
 const { request } = require('express');
-const Event = require("../model/calendarModel");
+const Event = require("../model/models/calendarModel");
 
 exports.findAll = (request, response) => {
     Event.getAll((error, data) => {

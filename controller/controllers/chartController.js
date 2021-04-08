@@ -1,6 +1,6 @@
 const { request } = require('express');
-const Chart = require("../model/chartModel");
-const Data = require("../model/dataModel");
+const Chart = require("../model/models/chartModel");
+const Data = require("../model/models/dataModel");
 
 exports.findAll = (request, response) => {
     Chart.getAll((error, data) => {
