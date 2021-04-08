@@ -47,13 +47,24 @@ export default class Login extends Component {
                 })
             }).then((response) => {
                 if(response.status === 200){
-                    this.setState({errorMessage: "successfull login"});
+                    response.json().then((data) => {
+                        if(data.token){
+                            // handle Access token and save it to session storage
+                            sessionStorage.setItem('AccessToken', data.token); // if AccessToken != null --> User is logged in
+                            // save the username in Session Storage
+                            // JWT Has the following Syntax: XXXXXXXX.XXXXXXXX.XXXXXXXX where X is a Base64 encoded string
+                            // The middle part contains the username and other things in JSON format --> get middle part, decode it from
+                            // Base64 (with js function atob())
+                            const splitToken = data.token.split('.');
+                            const decodedJSON = JSON.parse(atob(splitToken[1]));
+                            sessionStorage.setItem('username', decodedJSON.username);
 
-                    // redirect oder popup
-                    // handle token
-                    // Username in irgendeinen Storage zwischenspeichern
-                    // Speicherung Token in Cookie/ APP- State --> Session Storage
-
+                            //update status message
+                            this.setState({errorMessage: "successfull login"});
+                        }else {
+                            this.setState({errorMessage: "Login Error Occured"});
+                        }
+                      });
                 } else if (response.status === 401){
                     this.setState({errorMessage: "You have entered an invalid username or password"});
                 } else {
