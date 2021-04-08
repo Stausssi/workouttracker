@@ -29,7 +29,7 @@ export default class Body extends React.Component<Props,State> {
 			.then(res => this.setState({ apiResponse: res }));
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		this.callAPI();
 	}
 

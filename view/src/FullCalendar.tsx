@@ -80,7 +80,20 @@ export default class CalendarDemo extends React.Component<Props,State> {
   }
   }
 
+  setEvents(){
+    /*Create call to backend route */
+  }
+
+  getEvents(){
+    fetch("http://localhost:9000/backend/events/get")
+    .then(res => res.text())
+    .then(res=>console.log(res))
+    /*map result to array*/ 
+}
+  
+
   componentDidMount(){
+    this.getEvents();
     this.updateCalendar(events)
   }
 
@@ -95,6 +108,7 @@ export default class CalendarDemo extends React.Component<Props,State> {
 
     this.calendar = new Calendar(canvas, {
         initialView:"dayGridMonth",         //set initial view (Month view)
+        firstDay:1,
         headerToolbar:{                     //set buttons for navigations/change views
           left: "prev,next",               
           center: "title",  
