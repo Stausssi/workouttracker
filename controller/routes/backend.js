@@ -32,6 +32,7 @@ router.put('/users/unblock', authenticateJWT, users.unblock);
 router.put('/users/follow', authenticateJWT, users.follow);
 router.put('/users/unfollow', authenticateJWT, users.unfollow);
 router.get('/users/getRelationship', authenticateJWT, users.getRelationship);
+router.post('/charts/remove', chart.create); 
 
 /* Calendar routes */
 
