@@ -180,30 +180,48 @@ export default class AddActivity extends Component<Props, State> {
         // Prevent false submits
         if (this.state.submitButton.hasAttribute("disabled")) return;
 
-        console.log("Submit:", this.state);
+        // Check whether all must-params are valid
+        if (this.validateInput(true)) {
+            // Create POST-request body content
+            let bodyContent: { [key: string]: any } = {
+                "sport": this.state.sport,
+            };
 
-        // TODO: Filter params and insert into database
-        // TODO: reset state params which are neither must nor optional
+            // Append must and valid optional params
+            for (let index in this.mustParams) {
+                let key = inputFields[index];
+                let value = this.state[key];
 
-        // fetch("http://localhost:9000/backend/activity/add", {
-        //     method: "POST",
-        //     headers: {
-        //         Accept: 'application/json',
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         test: "test"
-        //     })
-        // }).then((response) => {
-        //     if(response.ok) {
-        //         this.setState({notifyMessage: "Activity submitted", notifyType: "is-success"});
-        //     }
-        // });
-        this.setState({notifyMessage: notifyMessages["success"][0], notifyType: notifyMessages["success"][1]});
+                if (this.mustParams[index] || (this.optParams[index] && this.isValid(key, value))) {
+                    bodyContent = Object.assign({}, bodyContent, {[key]: value});
+                }
+            }
 
-        // Disable submit button and reset form
-        this.allowSubmit(false);
-        this.resetState(RESET_TYPES.ACTIVITY);
+            // Send post request
+            fetch("http://localhost:9000/backend/activity/add", {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + sessionStorage.getItem("token") //add this line to add Authorization to a request
+                },
+                body: JSON.stringify(bodyContent)
+            }).then((response) => {
+                if (response.ok) {
+                    this.setState({notifyMessage: notifyMessages["success"][0], notifyType: notifyMessages["success"][1]});
+
+                    // Disable submit button and reset form
+                    this.allowSubmit(false);
+                    this.resetState(RESET_TYPES.ACTIVITY);
+                } else {
+                    return response.json().then((response) => {
+                        response.errno === 1 ?
+                            this.setState({notifyMessage: notifyMessages["unknownUser"][0], notifyType: notifyMessages["unknownUser"][1]}) :
+                            this.setState({notifyMessage: notifyMessages["error"][0], notifyType: notifyMessages["error"][1]});
+                    });
+                }
+            });
+        }
     }
 
     handleReset(event: any) {
