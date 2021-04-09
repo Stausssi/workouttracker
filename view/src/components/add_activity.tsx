@@ -12,6 +12,8 @@ interface State {
     [key: string]: any
 }
 
+// TODO: Duration mit DatePicker ? Start- und Endzeitpunkt
+
 const defaultActivityState = {
     sport: 0,
     sportClass: "",
@@ -167,10 +169,8 @@ export default class AddActivity extends Component<Props, State> {
         // Check whether all must-params are valid
         if (this.validateInput(true)) {
             // Create POST-request body content
-            // timestamp generation: https://stackoverflow.com/questions/5129624/convert-js-date-time-to-mysql-datetime/5133807
             let bodyContent: { [key: string]: any } = {
                 "sport": this.state.sport,
-                "timeStamp": new Date().toISOString().slice(0, 19).replace("T", " ")
             };
 
             // Append must and valid optional params
@@ -387,7 +387,7 @@ export default class AddActivity extends Component<Props, State> {
             must = must.reverse();
             optional = optional.reverse();
 
-            let fieldsHTML = [<div className="divider">Plichtangaben</div>];
+            let fieldsHTML = [<div className="divider">Pflichtangaben</div>];
             for (let index in must) {
                 must[index] = Boolean(Number(must[index]));
                 optional[index] = Boolean(Number(optional[index]));
