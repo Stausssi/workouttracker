@@ -1,16 +1,19 @@
 export default class SessionHandler {
-    getAuthToken = () => {
+    static getAuthToken() {
         return "Bearer " + sessionStorage.getItem("AccessToken");
     }
 
-    isLoggedIn = () => {
-        console.log(sessionStorage.getItem("AccessToken"));
+    static isLoggedIn() {
         return sessionStorage.getItem("AccessToken") !== null;
     }
 
-    getUser = () => {
+    static getUser() {
         return ({
             username: sessionStorage.getItem("username")
         });
+    }
+
+    static logOut() {
+        sessionStorage.clear();
     }
 }
