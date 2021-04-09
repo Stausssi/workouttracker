@@ -5,6 +5,7 @@ var router = express.Router();
 const users = require("../Controllers/userController");
 const activity = require("../Controllers/activityController");
 const sport = require("../Controllers/sportController");
+
 const {authenticateJWT} = require("../Authentication/MiddlewareAuthentication");
 const event = require("../calendarController");
 const chart = require("../chartController");

@@ -8,7 +8,7 @@ import './css/App.css';
 import "bulma"
 import 'bulma-extensions/dist/css/bulma-extensions.min.css'
 import {Component} from "react";
-import SessionHandler from "./components/SessionHandler";
+import SessionHandler from "./SessionHandler";
 import LoginContainer from "./components/LoginContainer";
 
 interface Props {
@@ -18,13 +18,11 @@ interface Props {
 interface State {
 }
 
-const sessionHandler = new SessionHandler();
-
 export default class App extends Component<Props, State> {
     mainPage: any;
 
     render() {
-        if (sessionHandler.isLoggedIn()) {
+        if (SessionHandler.isLoggedIn()) {
             this.mainPage = Homepage;
         } else {
             this.mainPage = LoginContainer;
