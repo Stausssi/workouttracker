@@ -7,3 +7,6 @@ fetch('http://localhost:9000/backend/login', {
                 },
                 body: JSON.stringify(data)
             }); //Further response handling
+
+
+            //implementieren! + ausprobieren
