@@ -20,7 +20,7 @@ router.get('/verify/:hash', users.verifyEmail);
 
 router.get('/events/get', event.findAll); 
 
-router.post('/events/get', event.create); 
+router.post('/events/update', event.create); 
 
 router.get('/testConnection', function (req, res, next) {
     res.send('Connection to the backend established!');
