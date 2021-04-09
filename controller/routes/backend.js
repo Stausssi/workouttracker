@@ -2,9 +2,10 @@ var express = require('express');
 var router = express.Router();
 
 //initialize the database controllers
-const users = require("../userController");
-const activity = require("../activityController");
-const sport = require("../sportController");
+const users = require("../Controllers/userController");
+const activity = require("../Controllers/activityController");
+const sport = require("../Controllers/sportController");
+const {authenticateJWT} = require("../Authentication/MiddlewareAuthentication");
 const event = require("../calendarController");
 const chart = require("../chartController");
 
@@ -21,9 +22,7 @@ router.get('/verify/:hash', function(req, res){
   res.redirect('http://localhost:3000/sign-up');
 }); 
 
-module.exports = router;
-module.exports = router;
-router.post('/activity/add', activity.add);
+router.post('/activity/add', authenticateJWT, activity.add);
 
 /* Calendar routes */
 
@@ -48,6 +47,7 @@ router.get('/charts/update', chart.findAll);
 router.post('/charts/remove', chart.create); 
 */
 /* test connection */
+router.all('/sports/fetch', sport.getAll);
 
 router.get('/testConnection', function (req, res, next) {
     res.send('Connection to the backend established!');

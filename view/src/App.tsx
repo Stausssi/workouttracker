@@ -1,29 +1,47 @@
-import {Route,BrowserRouter} from 'react-router-dom'
+import {Route, BrowserRouter} from 'react-router-dom'
 import Homepage from './Homepage';
 import Second from './Second';
-import Login from './Login';
 import Profil from './Profil'
 import Charts from './Charts'
 import Calendar from './FullCalendar'
 import './css/App.css';
 import "bulma"
 import 'bulma-extensions/dist/css/bulma-extensions.min.css'
+import {Component} from "react";
+import SessionHandler from "./components/SessionHandler";
+import LoginContainer from "./components/LoginContainer";
 
-//Define all paths for pages inside of the React App and display components depending on URL
+interface Props {
 
-export const App = () =>
-<BrowserRouter>         
-<div className="App"> 
-    <div className="children">
-        <Route exact path="/" component={Homepage} />
-        <Route exact path="/Second" component={Second} />
-        <Route exact path="/Login" component={Login} />
-        <Route exact path="/Profil" component={Profil} />
-        <Route exact path="/Demo" component={Calendar} />
-        <Route exact path="/Charts" component={Charts} />
-    </div>
-</div>
-</BrowserRouter>;
+}
 
-export default App;
+interface State {
+}
 
+const sessionHandler = new SessionHandler();
+
+export default class App extends Component<Props, State> {
+    mainPage: any;
+
+    render() {
+        if (sessionHandler.isLoggedIn()) {
+            this.mainPage = Homepage;
+        } else {
+            this.mainPage = LoginContainer;
+        }
+
+        return (
+            <BrowserRouter>
+                <div className="App">
+                    <div className="children">
+                        <Route exact path="/" component={this.mainPage}/>
+                        <Route exact path="/Second" component={Second}/>
+                        <Route exact path="/login" component={LoginContainer}/>
+                        <Route exact path="/sign-up" component={LoginContainer}/>
+                        <Route exact path="/Profil" component={Profil}/>
+                    </div>
+                </div>
+            </BrowserRouter>
+        );
+    }
+}

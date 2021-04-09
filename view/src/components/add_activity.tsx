@@ -3,6 +3,7 @@ import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import NotificationBox from "./notificationBox";
+import SessionHandler from "./SessionHandler";
 
 interface Props {
     sports: { [key: string]: number }
@@ -76,6 +77,9 @@ const notifyMessages: { [ident: string]: [message: string, type: string] } = {
 
 const NUM_FIELDS = 5;
 const inputFields: string[] = ["distance", "duration", "pace", "averageHeartRate", "altitudeDifference"];
+
+
+const sessionHandler = new SessionHandler();
 
 export default class AddActivity extends Component<Props, State> {
     HTMLFields: { [field: string]: JSX.Element; } | undefined;
@@ -189,7 +193,7 @@ export default class AddActivity extends Component<Props, State> {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + sessionStorage.getItem("token") //add this line to add Authorization to a request
+                    'Authorization': sessionHandler.getAuthToken()
                 },
                 body: JSON.stringify(bodyContent)
             }).then((response) => {

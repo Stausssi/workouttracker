@@ -3,6 +3,7 @@ import Logo from './img/WorkoutLogo.png'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faHome, faSignInAlt, faUser} from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
+import { Link } from "react-router-dom";
 
 //Head of React app. Used on every page. Integration of Modal to create Activity and Search 
 

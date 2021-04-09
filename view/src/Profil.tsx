@@ -14,7 +14,6 @@ class Profil extends React.Component<any, any> {
     }
     render() {
         return (
-
             <section className='main'>
                 <Head></Head>
                 <Foot></Foot>
