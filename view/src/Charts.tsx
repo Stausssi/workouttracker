@@ -81,47 +81,36 @@ private drawSample() {
         },
     });
 }
-
-test () {
-//$(document).ready(function() {
-    var labels: any[] = [];
-    var dataXXX: any[] = [];
-    var dataYYY: any[] = [];
-    const canvas = document.getElementById('myChart2') as HTMLCanvasElement
-  /*  $.ajax({
-      type: 'GET',
-      url: 'https://api.myjson.com/bins/1igag',
-      dataType: 'json',
-      success: function(field) {
-        for (var i = 0; i < field.length; i++) {
-          labels.push(field[i].time);
-          dataXXX.push(field[i].xxx);
-          dataYYY.push(field[i].yyy);
-        }*/
-  //  }
-//})
+function() { 
+    //var ctx_$title = document.getElementById('canvas_$title').getContext('2d');                                    
+    //window.myBar = new Chart(ctx_$title).Bar(barChartData_$title, { responsive : true }); 
 }
 
-getChartData() {
-  /*  $("#loadingMessage").html('<img src="./giphy.gif" alt="" srcset="">');
-    $.ajax({
-        url: "http://localhost:3000/chartdata",
-        success: function (result) {
-            $("#loadingMessage").html("");
-            var data = [];
-            data.push(result.thisWeek);
-            data.push(result.lastWeek);
-            var labels = result.labels;
-            renderChart(data, labels);
-        },
-        error: function (err) {
-            $("#loadingMessage").html("Error");
-        }
-    });*/
+addElement () {
+    // erstelle ein neues div Element
+    // und gib ihm etwas Inhalt
+    var newDiv = document.createElement("div");
+    var newContent = document.createTextNode("Hi there and greetings!");
+    newDiv.appendChild(newContent); // füge den Textknoten zum neu erstellten div hinzu.
+  
+    // füge das neu erstellte Element und seinen Inhalt ins DOM ein
+    var currentDiv = document.getElementById("div1");
+    document.body.insertBefore(newDiv, currentDiv);
+
+    /*
+    var canvas = document.createElement("canvas");
+canvas.id = "my-id";
+specContainerNode.appendChild(canvas);*/
+  }
+
+empty(list: any[]) {
+    //empty your array
+    list.length = 0;
 }
 
 drawSample2() {
     const labels=["Januar","Februar","März","April","Mai","Juni"]
+    this.empty(this.data);
     this.data.push(30, 90, 60, 80, 20, 70, 50)
    // this.data.push(""+30,""+ 90,""+ 60,""+ 80,""+ 20,""+ 70,""+ 50)
   /*  const colors =  [
@@ -134,7 +123,8 @@ drawSample2() {
         'rgb(231,233,237)',
         'rgb(128,128,128)'
     ];*/
-    this.createchart(labels,this.data)
+    const colors=this.getRandomColor(this.data);
+    this.createchart(labels,this.data,colors)
 }
 
 getRandomColor(data: string | any[]) {
@@ -144,7 +134,7 @@ getRandomColor(data: string | any[]) {
     return this.colors
 }
 
-createchart(labels: string[],data: number[]) {
+createchart(labels: string[],data: number[],colors:string[]) {
     if(this.chart2)
     {
         console.log("chart already exist");
@@ -158,7 +148,7 @@ createchart(labels: string[],data: number[]) {
             datasets: [{                                                                 
                 label: "Datensatz Nummer1",          
                 data: data,
-                backgroundColor:this.getRandomColor(data),
+                backgroundColor:colors,
             }]
         },
         options: {

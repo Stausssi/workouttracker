@@ -3,7 +3,7 @@ import { Calendar } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid"; 
 import timeGridPlugin from "@fullcalendar/timegrid"; 
 import interactionPlugin from "@fullcalendar/interaction"; 
-import * as moment from 'moment'
+//import * as moment from 'moment'
 
 interface Props {
 }
@@ -12,6 +12,7 @@ interface State {
   active:boolean
   startDate:Date
   endDate:Date
+  eventsarray:[]
 }
 
 const events = [{ title: "Today",allDay:false, date: new Date()},
@@ -40,8 +41,8 @@ export default class CalendarDemo extends React.Component<Props,State> {
       showPopup: false,
       active: false,
       startDate: new Date(),
-      endDate: new Date()
-
+      endDate: new Date(),
+      eventsarray:[]
     };
   }
   
@@ -72,6 +73,8 @@ export default class CalendarDemo extends React.Component<Props,State> {
     }
     events.push(event);
     this.action();
+    console.log(event)
+    this.setEvents(event)
     this.updateCalendar(events)
     alert('Neues Event wurde erstellt!')
   }
@@ -80,15 +83,48 @@ export default class CalendarDemo extends React.Component<Props,State> {
   }
   }
 
-  setEvents(){
+  setEvents(data:any){
+    let test={
+      title: "foo",
+      start: "2021-05-10", 
+      end: "2021-05-10",
+      allDay: true
+    }
     /*Create call to backend route */
+    fetch("http://localhost:9000/backend/events/update",{
+      headers:{
+        "accept":"application/json",
+        "content-type":"application/json"
+      },
+      body: JSON.stringify(data),
+      method:"POST"
+    })
+    .then(test=>{return test.json()}) //convert to json
+    .then(res=>{console.log(res)})    //data in console
+    .then(function(data) {
+      console.log('Request succeeded with JSON response: ' + data);
+  })
+    .catch(error=>console.log(error)) //catch errors
   }
 
   getEvents(){
+    var items: any[]
     fetch("http://localhost:9000/backend/events/get")
-    .then(res => res.text())
-    .then(res=>console.log(res))
-    /*map result to array*/ 
+    //.then(res => res.text())
+    //.then(res=>console.log(res))
+    .then(res => {return res.json()})
+    .then((data)=>{
+      items: data.map((item: any) => ({
+        title:item.title,
+        startdate:item.startdate,
+        enddate:item.enddate
+      }));
+      console.log(data)
+    })
+}
+
+updateevent(event:any){
+  console.log(event)
 }
   
 
@@ -130,7 +166,8 @@ export default class CalendarDemo extends React.Component<Props,State> {
       height:"500px",             //set height for table --> use auto?
        //selection                
       selectable: true,           //enable selection of dates
-      select: (info)=>this.create(info,"SelectEvent") //function on select --> run create function
+      select: (info)=>this.create(info,"SelectEvent"), //function on select --> run create function
+      eventClick: (event)=>this.updateevent(event)
       }
     )
        this.calendar.render()   //render calendar on document
