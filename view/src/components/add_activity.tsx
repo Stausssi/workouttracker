@@ -130,11 +130,6 @@ export default class AddActivity extends Component<Props, State> {
             return;
         }
 
-        // Update state
-        isNaN(value) ?
-            this.setState({[name]: value}) :
-            this.setState({[name]: Number(value)});
-
         // Check whether the property has a range of values
         if (Object.keys(validValues).includes(name)) {
             let valid = this.isValid(name, value);
@@ -157,7 +152,20 @@ export default class AddActivity extends Component<Props, State> {
                     });
                 }
             }
+        } else {
+            // Check if a multiplier was changed
+            if (name.includes("Mul")) {
+                // Calculate property depending on multiplier
+                let multiplyWith = this.state[name] / value;
+                let param = name.replace("Mul", "");
+                this.setState({[param]: this.state[param] * multiplyWith})
+            }
         }
+
+        // Update state
+        isNaN(value) ?
+            this.setState({[name]: value}) :
+            this.setState({[name]: Number(value)});
     }
 
     handleSubmit(event: any) {
@@ -195,7 +203,10 @@ export default class AddActivity extends Component<Props, State> {
                 body: JSON.stringify(bodyContent)
             }).then((response) => {
                 if (response.ok) {
-                    this.setState({notifyMessage: notifyMessages["success"][0], notifyType: notifyMessages["success"][1]});
+                    this.setState({
+                        notifyMessage: notifyMessages["success"][0],
+                        notifyType: notifyMessages["success"][1]
+                    });
 
                     // Disable submit button and reset form
                     this.allowSubmit(false);
@@ -203,8 +214,14 @@ export default class AddActivity extends Component<Props, State> {
                 } else {
                     return response.json().then((response) => {
                         response.errno === 1 ?
-                            this.setState({notifyMessage: notifyMessages["unknownUser"][0], notifyType: notifyMessages["unknownUser"][1]}) :
-                            this.setState({notifyMessage: notifyMessages["error"][0], notifyType: notifyMessages["error"][1]});
+                            this.setState({
+                                notifyMessage: notifyMessages["unknownUser"][0],
+                                notifyType: notifyMessages["unknownUser"][1]
+                            }) :
+                            this.setState({
+                                notifyMessage: notifyMessages["error"][0],
+                                notifyType: notifyMessages["error"][1]
+                            });
                     });
                 }
             });
@@ -259,26 +276,22 @@ export default class AddActivity extends Component<Props, State> {
         this.HTMLFields = {
             "distance": <>
                 <label className="label">Distanz</label>
-                <div className="columns">
-                    <div className="column">
-                        <div className="field">
-                            <div className="control has-icons-right">
-                                <input
-                                    className={`input ${this.state.distanceClass}`}
-                                    type="number"
-                                    name="distance"
-                                    placeholder="Gebe hier die zurückgelegte Distanz ein"
-                                    value={Number(this.state.distance) === 0 ? "" : this.state.distance}
-                                    onChange={this.handleChange}
-                                />
-                                <span className={`icon is-right ${this.state.distanceIconClass}`}>
-                                    <FontAwesomeIcon icon={this.state.distanceIcon}/>
-                                </span>
-                            </div>
-                        </div>
+                <div className="field has-addons">
+                    <div className="control has-icons-right is-expanded">
+                        <input
+                            className={`input ${this.state.distanceClass}`}
+                            type="number"
+                            name="distance"
+                            placeholder="Gebe hier die zurückgelegte Distanz ein"
+                            value={Number(this.state.distance) === 0 ? "" : this.state.distance}
+                            onChange={this.handleChange}
+                        />
+                        <span className={`icon is-right ${this.state.distanceIconClass}`}>
+                            <FontAwesomeIcon icon={this.state.distanceIcon}/>
+                        </span>
                     </div>
-                    <div className="column is-2">
-                        <div className="select is-fullwidth">
+                    <div className="control">
+                        <div className="select">
                             <select
                                 className="select"
                                 name="distanceMul"
@@ -294,25 +307,21 @@ export default class AddActivity extends Component<Props, State> {
             </>,
             "duration": <>
                 <label className="label">Dauer</label>
-                <div className="columns">
-                    <div className="column">
-                        <div className="field">
-                            <div className="control has-icons-right">
-                                <input
-                                    className={`input ${this.state.durationClass}`}
-                                    type="number"
-                                    name="duration"
-                                    placeholder="Gebe hier die Dauer der Aktivität ein"
-                                    value={Number(this.state.duration) === 0 ? "" : this.state.duration}
-                                    onChange={this.handleChange}
-                                />
-                                <span className={`icon is-right ${this.state.durationIconClass}`}>
-                                    <FontAwesomeIcon icon={this.state.durationIcon}/>
-                                </span>
-                            </div>
-                        </div>
+                <div className="field has-addons">
+                    <div className="control has-icons-right is-expanded">
+                        <input
+                            className={`input ${this.state.durationClass}`}
+                            type="number"
+                            name="duration"
+                            placeholder="Gebe hier die Dauer der Aktivität ein"
+                            value={Number(this.state.duration) === 0 ? "" : this.state.duration}
+                            onChange={this.handleChange}
+                        />
+                        <span className={`icon is-right ${this.state.durationIconClass}`}>
+                            <FontAwesomeIcon icon={this.state.durationIcon}/>
+                        </span>
                     </div>
-                    <div className="column is-2">
+                    <div className="control">
                         <div className="select is-fullwidth">
                             <select
                                 className="select"
@@ -328,9 +337,7 @@ export default class AddActivity extends Component<Props, State> {
                     </div>
                 </div>
             </>,
-            "pace": <>
-                <label className="label">Placeholder für Pace -&gt; Wird berechnet?</label>
-            </>,
+            "pace": <></>,
             "averageHeartRate": <>
                 <label className="label">Herzrate</label>
                 <div className="field">
@@ -351,8 +358,8 @@ export default class AddActivity extends Component<Props, State> {
             </>,
             "altitudeDifference": <>
                 <label className="label">Höhenmeter</label>
-                <div className="field">
-                    <div className="control has-icons-right">
+                <div className="field has-addons">
+                    <div className="control has-icons-right is-expanded">
                         <input
                             className={`input ${this.state.altitudeDifferenceClass}`}
                             type="number"
@@ -364,6 +371,19 @@ export default class AddActivity extends Component<Props, State> {
                         <span className={`icon is-right ${this.state.altitudeDifferenceClass}`}>
                             <FontAwesomeIcon icon={this.state.altitudeDifferenceIcon}/>
                         </span>
+                    </div>
+                    <div className="control">
+                        <div className="select">
+                            <select
+                                className="select"
+                                name="altitudeDifferenceMul"
+                                value={this.state.distanceMul}
+                                onChange={this.handleChange}
+                            >
+                                <option value="1" key="alt_m">m</option>
+                                <option value="1000" key="alt_km">km</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </>
