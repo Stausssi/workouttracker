@@ -188,6 +188,12 @@ export default class AddActivity extends Component<Props, State> {
                 let value = this.state[key];
 
                 if (this.mandatoryParams[index] || (this.optParams[index] && this.isValid(key, value))) {
+                    // Apply multiplier
+                    let mul = this.state[key + "Mul"];
+                    if (mul > 1) {
+                        value *= mul;
+                    }
+
                     bodyContent = Object.assign({}, bodyContent, {[key]: value});
                 }
             }
@@ -386,6 +392,10 @@ export default class AddActivity extends Component<Props, State> {
                         </div>
                     </div>
                 </div>
+            </>,
+            "date": <>
+                <label className="label">Date</label>
+                <p className="tag is-danger is-light">Kein Plan was ich hierfür nehmen soll...</p>
             </>
         };
 
@@ -439,6 +449,8 @@ export default class AddActivity extends Component<Props, State> {
                     }
                 }
             }
+
+            fieldsHTML.push(this.HTMLFields["date"]);
 
             return fieldsHTML;
         }
