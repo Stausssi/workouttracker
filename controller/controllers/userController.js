@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const config = require("../mail/emailConfirmation.config");
 const bcrypt = require("bcryptjs");
 const mail = require("../mail/confirmationEmail");
-const tokenGeneration = require("./AccessTokenSecret.config");
+const tokenGeneration = require("../Authentication/AccessTokenSecret.config");
 
 
 //creates a new user if the email/username doesn´t already exist

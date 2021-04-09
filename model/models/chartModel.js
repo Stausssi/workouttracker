@@ -1,6 +1,6 @@
-const sql = require("./createConnection");
+const sql = require("../createConnection");
 
-const Chart = function (chart) {
+const Chart = function(chart) {
     this.name = chart.name
     this.type = chart.type
     this.category = chart.category

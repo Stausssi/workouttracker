@@ -1,15 +1,14 @@
-const sql = require("./createConnection");
+const sql = require("../createConnection");
 
 const Event = function(event) {
     this.title = event.title;
     this.start= event.start;
     this.end = event.end;
     this.allDay = event.allDay;
-    this.user = event.user;
 }
 
 Event.getAll = (response) => {
-    sql.query("SELECT * FROM events;",  //Where user = ?
+    sql.query("SELECT * FROM events;",
         function (error, result) {
             if(error) {
                 response(error, null)
@@ -32,28 +31,41 @@ Event.getAll = (response) => {
 
 
 Event.create = (newEvent, result) => {
-    sql.query("INSERT INTO events SET ?", [newEvent], (error, res) => {
+    sql.query("INSERT INTO events SET ?", newEvent, (error, res) => {
       if (error) {
         console.log("error: ", error);
-        result(error, false);
+        result(error, null);
       }
       else {
       console.log("created event: ", { newEvent });
-      result(null, true);
+      result(null, newEvent);
       }
     });
   };
 
-  Event.remove = (id, result)=>{
-    sql.query("DELETE FROM events WHERE id = ?", [id], (error, res) => {
-               if(error) {
-                   console.log("error: ", error);
-                   result(error, null);
-               }
-               else{
-             result(null, true);
-               }
-           }); 
+Event.updateById = function(id, Event, result){
+  sql.query("UPDATE Events SET Event = ? WHERE id = ?", [Event.Event, id], function (err, res) {
+          if(err) {
+              console.log("error: ", err);
+                result(null, err);
+             }
+           else{   
+             result(null, res);
+                }
+            }); 
+};
+Event.remove = function(id, result){
+     sql.query("DELETE FROM Events WHERE id = ?", [id], function (err, res) {
+
+                if(err) {
+                    console.log("error: ", err);
+                    result(null, err);
+                }
+                else{
+               
+                 result(null, res);
+                }
+            }); 
 };
 
 module.exports = Event;

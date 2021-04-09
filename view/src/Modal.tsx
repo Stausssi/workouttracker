@@ -1,11 +1,9 @@
 import {faPlusCircle, faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import React, {ReactNode} from "react";
+import React from "react";
 import AddActivity from "./components/add_activity";
 
-interface Props {
-    children: ReactNode;
-}
+interface Props {}
 
 interface State {
     showPopup: boolean
