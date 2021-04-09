@@ -3,6 +3,7 @@ import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import NotificationBox from "./notificationBox";
+import SessionHandler from "../SessionHandler";
 
 interface Props {
     sports: { [key: string]: number }
@@ -170,7 +171,7 @@ export default class AddActivity extends Component<Props, State> {
         if (this.validateInput(true)) {
             // Create POST-request body content
             let bodyContent: { [key: string]: any } = {
-                "sport": this.state.sport,
+                "sport": this.state.sport
             };
 
             // Append must and valid optional params
@@ -188,7 +189,8 @@ export default class AddActivity extends Component<Props, State> {
                 method: "POST",
                 headers: {
                     Accept: 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: SessionHandler.getAuthToken()
                 },
                 body: JSON.stringify(bodyContent)
             }).then((response) => {

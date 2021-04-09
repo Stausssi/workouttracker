@@ -3,6 +3,7 @@ import Logo from './img/WorkoutLogo.png'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faHome, faSignInAlt, faUser} from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
+import { Link } from "react-router-dom";
 
 export const Head = () =>
     <section className="hero is-dark is-small">
@@ -35,12 +36,12 @@ export const Head = () =>
                         <Modal> </Modal>
                     </div>
                     <span className="navbar-item">
-                        <a className="button is-primary is-inverted" href='/Login'>
+                        <Link className="button is-primary is-inverted" to={'/login'}>
                             <span className="icon">
                               <FontAwesomeIcon icon={faSignInAlt}/>
                             </span>
                             <span>Login</span>
-                        </a>
+                        </Link>
                     </span>
                 </div>
             </nav>
@@ -68,5 +69,6 @@ export const Head = () =>
             </nav>
         </div>
     </section>
+
 export default Head;
 
