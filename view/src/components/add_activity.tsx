@@ -188,7 +188,8 @@ export default class AddActivity extends Component<Props, State> {
                 method: "POST",
                 headers: {
                     Accept: 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + sessionStorage.getItem("token") //add this line to add Authorization to a request
                 },
                 body: JSON.stringify(bodyContent)
             }).then((response) => {
