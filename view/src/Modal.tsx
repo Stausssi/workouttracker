@@ -59,7 +59,7 @@ export default class Modal extends React.Component<Props, State> {
                     <div className="modal-background"/>
                     <div className="modal-card">
                         <header className="modal-card-head">
-                            <p className="modal-card-title">Aktivität hinzufügen</p>
+                            <p className="modal-card-title">Add Activity</p>
                             <button className="delete" aria-label="close" onClick={() => this.toggleActive()}/>
                         </header>
 
@@ -75,13 +75,13 @@ export default class Modal extends React.Component<Props, State> {
                                 <span className="icon is-small">
                                     <FontAwesomeIcon icon={faCheck}/>
                                 </span>
-                                <span>Speichern</span>
+                                <span>Save</span>
                             </button>
                             <button className="button is-danger is-outlined" onClick={() => this.toggleActive()}>
                                 <span className="icon is-small">
                                     <FontAwesomeIcon icon={faTimes}/>
                                 </span>
-                                <span>Abbrechen</span>
+                                <span>Cancel</span>
                             </button>
                         </footer>
                     </div>

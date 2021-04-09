@@ -63,16 +63,16 @@ enum RESET_TYPES {
     NOTIFICATION
 }
 
-const tryAgainLater = "Bitte versuche es später erneut, oder kontaktiere einen Administrator.";
+const tryAgainLater = "Please try again later and contact an administrator.";
 const notifyMessages: { [ident: string]: [message: string, type: string] } = {
     "fetchFailed":
-        ["Die Sportarten konnten nicht abgerufen werden!<br />" + tryAgainLater, "is-danger"],
+        ["No sports found!<br />" + tryAgainLater, "is-danger"],
     "success":
-        ["Die Aktivität wurde erfolgreich gespeichert!", "is-success"],
+        ["Your activity was saved successfully ", "is-success"],
     "error":
-        ["Beim Speichern der Aktivität ist etwas schiefgelaufen!<br />" + tryAgainLater, "is-danger"],
+        ["Something went wrong!<br />" + tryAgainLater, "is-danger"],
     "unknownUser":
-        ["Dein Benutzer wurde in der Datenbank nicht gefunden!<br />Bitte vergewissere dich, dass du angemeldet bist und kontaktiere einen Administrator.", "is-danger"]
+        ["Your username wasn't found!<br />Please log-in or contact an administrator if you believe this is an error.", "is-danger"]
 }
 
 const NUM_FIELDS = 5;
@@ -80,7 +80,7 @@ const inputFields: string[] = ["distance", "duration", "pace", "averageHeartRate
 
 export default class AddActivity extends Component<Props, State> {
     HTMLFields: { [field: string]: JSX.Element; } | undefined;
-    mustParams: boolean[] = [];
+    mandatoryParams: boolean[] = [];
     optParams: boolean[] = [];
 
     constructor(props: Props) {
@@ -114,7 +114,7 @@ export default class AddActivity extends Component<Props, State> {
         // Check for state changes
         if (prevState.sport !== this.state.sports) {
             if (!isNaN(this.state.sports)) {
-                this.mustParams = [];
+                this.mandatoryParams = [];
                 this.optParams = [];
             }
         }
@@ -183,11 +183,11 @@ export default class AddActivity extends Component<Props, State> {
             };
 
             // Append must and valid optional params
-            for (let index in this.mustParams) {
+            for (let index in this.mandatoryParams) {
                 let key = inputFields[index];
                 let value = this.state[key];
 
-                if (this.mustParams[index] || (this.optParams[index] && this.isValid(key, value))) {
+                if (this.mandatoryParams[index] || (this.optParams[index] && this.isValid(key, value))) {
                     bodyContent = Object.assign({}, bodyContent, {[key]: value});
                 }
             }
@@ -242,13 +242,13 @@ export default class AddActivity extends Component<Props, State> {
             <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
                 <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
 
-                <label className="label">Art der Aktivität</label>
+                <label className="label">Sport</label>
                 <div className={`select is-fullwidth mb-5 ${this.state.sportClass}`}>
                     <select name="sport" onChange={this.handleChange} value={this.state.sport}>
                         {
                             this.state.notifyMessage !== notifyMessages["fetchFailed"][0] ?
                                 this.createSportSelect() :
-                                <option key="-1" value="-1">Es ist ein Fehler aufgetreten!</option>
+                                <option key="-1" value="-1">Something went wrong!</option>
                         }
                     </select>
                 </div>
@@ -275,14 +275,14 @@ export default class AddActivity extends Component<Props, State> {
         // TODO: Fix 'Each child in a list should have a unique "key" prop.' warning
         this.HTMLFields = {
             "distance": <>
-                <label className="label">Distanz</label>
+                <label className="label">Distance</label>
                 <div className="field has-addons">
                     <div className="control has-icons-right is-expanded">
                         <input
                             className={`input ${this.state.distanceClass}`}
                             type="number"
                             name="distance"
-                            placeholder="Gebe hier die zurückgelegte Distanz ein"
+                            placeholder="Please enter the covered distance"
                             value={Number(this.state.distance) === 0 ? "" : this.state.distance}
                             onChange={this.handleChange}
                         />
@@ -306,14 +306,14 @@ export default class AddActivity extends Component<Props, State> {
                 </div>
             </>,
             "duration": <>
-                <label className="label">Dauer</label>
+                <label className="label">Duration</label>
                 <div className="field has-addons">
                     <div className="control has-icons-right is-expanded">
                         <input
                             className={`input ${this.state.durationClass}`}
                             type="number"
                             name="duration"
-                            placeholder="Gebe hier die Dauer der Aktivität ein"
+                            placeholder="Please enter the duration of the activity"
                             value={Number(this.state.duration) === 0 ? "" : this.state.duration}
                             onChange={this.handleChange}
                         />
@@ -339,14 +339,14 @@ export default class AddActivity extends Component<Props, State> {
             </>,
             "pace": <></>,
             "averageHeartRate": <>
-                <label className="label">Herzrate</label>
+                <label className="label">Heart rate</label>
                 <div className="field">
                     <div className="control has-icons-right">
                         <input
                             className={`input ${this.state.averageHeartRateClass}`}
                             type="number"
                             name="averageHeartRate"
-                            placeholder="Gebe hier deine durchschnittliche Herzrate ein"
+                            placeholder="Please insert your average heart rate"
                             value={Number(this.state.averageHeartRate) === 0 ? "" : this.state.averageHeartRate}
                             onChange={this.handleChange}
                         />
@@ -357,14 +357,14 @@ export default class AddActivity extends Component<Props, State> {
                 </div>
             </>,
             "altitudeDifference": <>
-                <label className="label">Höhenmeter</label>
+                <label className="label">Altitude difference</label>
                 <div className="field has-addons">
                     <div className="control has-icons-right is-expanded">
                         <input
                             className={`input ${this.state.altitudeDifferenceClass}`}
                             type="number"
                             name="altitudeDifference"
-                            placeholder="Gebe hier deine Höhenmeter ein"
+                            placeholder="Please enter the altitude difference"
                             value={Number(this.state.altitudeDifference) === 0 ? "" : this.state.altitudeDifference}
                             onChange={this.handleChange}
                         />
@@ -393,12 +393,12 @@ export default class AddActivity extends Component<Props, State> {
             // Get bitfields and split them into their bitwise representation
             // reverse to fill zeros in the beginning
             let bitfieldArray: any = this.props.sports[this.state.sport];
-            let must: boolean[] = bitfieldArray[1].toString(2).split("").reverse();
+            let mandatory: boolean[] = bitfieldArray[1].toString(2).split("").reverse();
             let optional: boolean[] = bitfieldArray[0].toString(2).split("").reverse();
 
             // Fill missing zeros
-            for (let i = 0; i < NUM_FIELDS - must.length; i++) {
-                must.push(false);
+            for (let i = 0; i < NUM_FIELDS - mandatory.length; i++) {
+                mandatory.push(false);
             }
 
             for (let i = 0; i < NUM_FIELDS - optional.length; i++) {
@@ -406,15 +406,15 @@ export default class AddActivity extends Component<Props, State> {
             }
 
             // reverse back
-            must = must.reverse();
+            mandatory = mandatory.reverse();
             optional = optional.reverse();
 
-            let fieldsHTML = [<div className="divider">Pflichtangaben</div>];
-            for (let index in must) {
-                must[index] = Boolean(Number(must[index]));
+            let fieldsHTML = [<div className="divider">Mandatory</div>];
+            for (let index in mandatory) {
+                mandatory[index] = Boolean(Number(mandatory[index]));
                 optional[index] = Boolean(Number(optional[index]));
 
-                if (must[index]) {
+                if (mandatory[index]) {
                     fieldsHTML.push(this.HTMLFields[inputFields[index]]);
 
                     // Remove param from optional to prevent double input
@@ -425,11 +425,12 @@ export default class AddActivity extends Component<Props, State> {
             }
 
             // Update global params
-            this.mustParams = must;
+            this.mandatoryParams = mandatory;
             this.optParams = optional;
 
             // Only display optional params if there are any
             if (optional.includes(true)) {
+                fieldsHTML.push(<br />);
                 fieldsHTML.push(<div className="divider">Optional</div>);
 
                 for (let index in optional) {
@@ -441,17 +442,17 @@ export default class AddActivity extends Component<Props, State> {
 
             return fieldsHTML;
         }
-        return <p>Bitte wähle eine Sportart aus.</p>;
+        return <p className="tag is-info is-light">Please select a sport</p>;
     }
 
     validateInput(returnValue?: boolean) {
         let valid = false;
 
-        if (this.mustParams.length === NUM_FIELDS) {
+        if (this.mandatoryParams.length === NUM_FIELDS) {
             valid = this.isValid("sport", this.state.sport);
 
             for (let i = 0; i < NUM_FIELDS; ++i) {
-                if (this.mustParams[i]) {
+                if (this.mandatoryParams[i]) {
                     let param = inputFields[i];
                     valid = valid && this.isValid(param, this.state[param]);
                 }
