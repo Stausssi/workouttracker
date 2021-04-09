@@ -2,9 +2,10 @@ var express = require('express');
 var router = express.Router();
 
 //initialize the database controllers
-const users = require("../userController");
-const activity = require("../activityController");
-const sport = require("../sportController");
+const users = require("../Controllers/userController");
+const activity = require("../Controllers/activityController");
+const sport = require("../Controllers/sportController");
+const {authenticateJWT} = require("../Authentication/MiddlewareAuthentication");
 
 router.get('/', function (req, res, next) {
     res.render('index')
@@ -19,7 +20,7 @@ router.get('/verify/:hash', function(req, res){
   res.redirect('http://localhost:3000/sign-up');
 }); 
 
-router.post('/activity/add', activity.add);
+router.post('/activity/add', authenticateJWT, activity.add);
 
 router.all('/sports/fetch', sport.getAll);
 

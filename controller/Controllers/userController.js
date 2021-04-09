@@ -91,7 +91,6 @@ exports.login = (req, res) => {
             if(result == null){
                 //no user found (HTTP CODE: 401 - UNAUTHORIZED)
                 res.status(401).send({message: "Login failed"});
-                return;
             }else{
                 // user found
                 //compare password to database hash
@@ -102,11 +101,9 @@ exports.login = (req, res) => {
                     const accessToken = jwt.sign({ username: result.username }, tokenGeneration.AccessTokenSecret);
                     //send accesstoken back to user
                     res.status(200).send({token: accessToken});
-                    return;
                 }else{
                     //passwords do not match (HTTP CODE: 401 - UNAUTHORIZED)
                     res.status(401).send({message: "Login failed"});
-                    return;
                 }
             }
         });
