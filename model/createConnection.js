@@ -1,3 +1,6 @@
+
+// Create a connection to the database
+// Keep in mind that an SSH Tunnel is necessary to connect to the database from remote
 var mysql = require('mysql');
 const dbConfig = require("./db.config.js");
 
@@ -11,7 +14,11 @@ const connection = mysql.createConnection({
   
   // open the MySQL connection
   connection.connect(error => {
-    if (error) throw error;
+    if (error) {
+        console.log(error);
+        throw error;
+    }
+    
     console.log("Successfully connected to the database.");
   });
   

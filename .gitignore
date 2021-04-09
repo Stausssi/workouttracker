@@ -1,3 +1,6 @@
+# WebStorm IDE folder
+.idea
+
 # dependencies
 /node_modules
 /.pnp
