@@ -20,7 +20,7 @@ Activity.add = (activity, isAdded) => {
     values = values.substring(0, values.length - 2);
 
     // TODO: Determine userPK
-    sql.query(`INSERT INTO activity (PKuser, ${valueKeys}) VALUES ('1', ${values});`, function (error, result) {
+    sql.query(`INSERT INTO activity (user, ${valueKeys}) VALUES ('n-dro', ${values});`, function (error, result) {
         if (error) {
             isAdded(error, false);
         } else {
