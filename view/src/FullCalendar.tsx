@@ -12,28 +12,10 @@ interface State {
   active:boolean
   startDate:Date
   endDate:Date
-  eventsarray:[]
+  eventsarray:any[]
 }
 
-const events = [{ title: "Today",allDay:false, date: new Date()},
-  {     title: "Event 02",
-        start: new Date('2021-05-17'),
-        allDay: true,
-        end: new Date('2021-05-20')
-},
-  {     title: "Neues Event",
-        start: "2021-04-17",
-        allDay: true,
-        end: "2021-04-20"
-      },
-  {
-    title: "Event 01",
-    start: "2021-05-10",
-    allDay: true,
-    end: "2021-05-15",
-  }]; 
-
-export default class CalendarDemo extends React.Component<Props,State> {
+export default class FullCalendar extends React.Component<Props,State> {
   calendar:Calendar|undefined
   constructor(props: any) {
     super(props);
@@ -46,7 +28,7 @@ export default class CalendarDemo extends React.Component<Props,State> {
     };
   }
   
-  action = () => {
+  action = () => {                                      //open and close modal
     this.setState((state) =>({active:!state.active}))
   };
 
@@ -61,35 +43,36 @@ export default class CalendarDemo extends React.Component<Props,State> {
 
   createEvent(/*startDate: Date, title: string, endDate: Date*/) {    //get title value, create event, add it to array and call update function
     const title=document.getElementById('titleinput') as HTMLInputElement
+    //const titleinput=document.getElementById('titleinput') as HTMLInputElement
+    //const startinput=document.getElementById('startinput') as HTMLInputElement
+    //let title = titleinput.value ? "default"
     if(title.value)
     {
     console.log(title.value)
     const event = {
-      title: title.value,
+      title: title.value ? title.value : "Default",
       start: this.state.startDate,
       end:this.state.endDate,
-      allDay:true
+      allDay:1
+      //title: title.value,
+      //start: startinput.value ? startinput.value: this.state.startDate,
       //allDay: endDate ? endDate : true // If there's no end date, the event will be all day of start date
-    }
-    events.push(event);
+    }  
+    this.setState({
+      eventsarray: [ ...this.state.eventsarray,event],
+    });
+    console.log(this.state.eventsarray);
     this.action();
     console.log(event)
     this.setEvents(event)
-    this.updateCalendar(events)
-    alert('Neues Event wurde erstellt!')
+    alert('New event ' + title.value +' was added!')
   }
   else{
-    alert('Bitte geben Sie ein Wert für den Titel an')
+    alert('Please give a name for your event!')
   }
   }
 
   setEvents(data:any){
-    let test={
-      title: "foo",
-      start: "2021-05-10", 
-      end: "2021-05-10",
-      allDay: true
-    }
     /*Create call to backend route */
     fetch("http://localhost:9000/backend/events/update",{
       headers:{
@@ -100,41 +83,39 @@ export default class CalendarDemo extends React.Component<Props,State> {
       method:"POST"
     })
     .then(test=>{return test.json()}) //convert to json
-    .then(res=>{console.log(res)})    //data in console
-    .then(function(data) {
+    .then(res=>{console.log(res)})    //view response in console
+    .then((data) => {
       console.log('Request succeeded with JSON response: ' + data);
+      this.calendar?.removeAllEventSources()                    //remove old events
+      this.calendar?.addEventSource(this.state.eventsarray)     //add new events
   })
     .catch(error=>console.log(error)) //catch errors
   }
 
   getEvents(){
-    var items: any[]
     fetch("http://localhost:9000/backend/events/get")
-    //.then(res => res.text())
-    //.then(res=>console.log(res))
     .then(res => {return res.json()})
     .then((data)=>{
-      items: data.map((item: any) => ({
-        title:item.title,
-        startdate:item.startdate,
-        enddate:item.enddate
-      }));
-      console.log(data)
-    })
+    this.setState({eventsarray:data})
+      console.log(this.state.eventsarray)
+      this.calendar?.removeAllEventSources()                    //remove old events
+      this.calendar?.addEventSource(this.state.eventsarray)     //add new events
+      });
 }
 
-updateevent(event:any){
-  console.log(event)
+updateevent(properties:any){          //Update & deleted already created events --> TODO(optional)
+  console.log(properties.event)
+  console.log(properties.event.title)
+  console.log(properties.event.id)
 }
   
 
   componentDidMount(){
+    this.initCalendar()
     this.getEvents();
-    this.updateCalendar(events)
   }
 
-  updateCalendar(events:any) {    //create calendar/ update if exists
-    console.log(events)
+  initCalendar() {    //create calendar
     if(typeof this.calendar !== "undefined")    //check if calendar already exists. If exits: destroy old calendar and create new
     {
         console.log("Calendar already exist. Creating a new Calendar...");
@@ -145,6 +126,7 @@ updateevent(event:any){
     this.calendar = new Calendar(canvas, {
         initialView:"dayGridMonth",         //set initial view (Month view)
         firstDay:1,
+        timeZone: 'local', 
         headerToolbar:{                     //set buttons for navigations/change views
           left: "prev,next",               
           center: "title",  
@@ -161,13 +143,13 @@ updateevent(event:any){
           hour12:false,
         },
       plugins:[dayGridPlugin, timeGridPlugin,interactionPlugin], //add plugins to fullcalendar 
-      events:events,              //eventsList
+      events:this.state.eventsarray,              //eventsList
       editable:true,              //editing events
       height:"500px",             //set height for table --> use auto?
        //selection                
       selectable: true,           //enable selection of dates
       select: (info)=>this.create(info,"SelectEvent"), //function on select --> run create function
-      eventClick: (event)=>this.updateevent(event)
+      eventClick: (properties)=>this.updateevent(properties)
       }
     )
        this.calendar.render()   //render calendar on document
