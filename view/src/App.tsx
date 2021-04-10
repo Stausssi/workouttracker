@@ -4,10 +4,10 @@ import Second from './Second';
 import Login from './Login';
 import Profil from './Profil'
 import Charts from './Charts'
+import Calendar from './FullCalendar'
 import './css/App.css';
 import "bulma"
 import 'bulma-extensions/dist/css/bulma-extensions.min.css'
-import CalendarDemo from './FullCalendar'
 
 //Define all paths for pages inside of the React App and display components depending on URL
 
@@ -19,7 +19,7 @@ export const App = () =>
         <Route exact path="/Second" component={Second} />
         <Route exact path="/Login" component={Login} />
         <Route exact path="/Profil" component={Profil} />
-        <Route exact path="/Demo" component={CalendarDemo} />
+        <Route exact path="/Demo" component={Calendar} />
         <Route exact path="/Charts" component={Charts} />
     </div>
 </div>

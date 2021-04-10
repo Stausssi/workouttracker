@@ -3,7 +3,6 @@ import './css/App.css';
 import ToggleButton from'./ToggleButton'
 import 'bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css'
 import Calendar1 from './FullCalendar';
-import SmallCalendar from './SmallCalendar';
 import Graphs from './Charts';
 
 interface Props {
@@ -38,15 +37,11 @@ export default class Body extends React.Component<Props,State> {
     return(
     <section id="body-content">
     <div id="col-1">
-    <h1>This is half of a page</h1>
-    
+    <h1>This part is for the own and the user feed</h1>
     <ToggleButton />
-    <div>
-    <SmallCalendar />
-    </div>
     </div>
     <div id="col-2">
-    <h1>Hier kommen Statistiken, Analytik, Charts und Kalender</h1>
+    <h1>This part is for calendar to view events and for charts to see analytics infomation</h1>
     <div id="testcal">
       <Calendar1/>
     </div>
