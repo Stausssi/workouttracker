@@ -9,11 +9,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import NotificationBox from "./notificationBox";
 import SessionHandler from "../SessionHandler";
 
-// Set default language of the date picker to german
-// -> Weeks start on Mondays
-registerLocale("de", de);
-setDefaultLocale("de");
-
 interface Props {
     sports: { [key: string]: number }
 }
@@ -415,6 +410,7 @@ export default class AddActivity extends Component<Props, State> {
                     timeFormat="HH:mm"
                     maxDate={this.getMaxValidDate()}
                     selected={this.state.date}
+                    locale={de}
                     onChange={(date) => this.setState({date: date})}
                     filterTime={(time) => {
                         let maxTime = this.getMaxValidDate();
