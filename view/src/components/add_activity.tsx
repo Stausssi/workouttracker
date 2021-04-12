@@ -2,8 +2,17 @@ import React, {Component} from "react";
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
+import DatePicker, {registerLocale, setDefaultLocale} from "react-datepicker";
+import de from "date-fns/locale/de";
+import "react-datepicker/dist/react-datepicker.css";
+
 import NotificationBox from "./notificationBox";
 import SessionHandler from "../SessionHandler";
+
+// Set default language of the date picker to german
+// -> Weeks start on Mondays
+registerLocale("de", de);
+setDefaultLocale("de");
 
 interface Props {
     sports: { [key: string]: number }
@@ -12,8 +21,6 @@ interface Props {
 interface State {
     [key: string]: any
 }
-
-// TODO: Duration mit DatePicker ? Start- und Endzeitpunkt
 
 const defaultActivityState = {
     sport: 0,
@@ -35,7 +42,8 @@ const defaultActivityState = {
     altitudeDifference: 0,
     altitudeDifferenceClass: "",
     altitudeDifferenceIcon: faTimes,
-    altitudeDifferenceIconClass: ""
+    altitudeDifferenceIconClass: "",
+    date: new Date()
 }
 
 const defaultNotifyState = {
@@ -196,6 +204,11 @@ export default class AddActivity extends Component<Props, State> {
 
                     bodyContent = Object.assign({}, bodyContent, {[key]: value});
                 }
+            }
+
+            // Filter date
+            if (this.state.date < this.getMaxValidDate()) {
+                bodyContent = Object.assign({}, bodyContent, {startedAt: this.state.date.toISOString().slice(0, 19).replace("T", " ")});
             }
 
             // Send post request
@@ -394,8 +407,25 @@ export default class AddActivity extends Component<Props, State> {
                 </div>
             </>,
             "date": <>
-                <label className="label">Date</label>
-                <p className="tag is-danger is-light">Kein Plan was ich hierfür nehmen soll...</p>
+                <label className="label">Date and Time</label>
+                <DatePicker
+                    dateFormat="dd.MM.yyyy HH:mm"
+                    showTimeSelect
+                    timeIntervals={15}
+                    timeFormat="HH:mm"
+                    maxDate={this.getMaxValidDate()}
+                    selected={this.state.date}
+                    onChange={(date) => this.setState({date: date})}
+                    filterTime={(time) => {
+                        let maxTime = this.getMaxValidDate();
+                        let selected = new Date(this.state.date);
+                        selected.setHours(time.getHours());
+                        selected.setMinutes(time.getMinutes());
+
+                        return selected < maxTime;
+                    }}
+                    inline
+                />
             </>
         };
 
@@ -440,7 +470,7 @@ export default class AddActivity extends Component<Props, State> {
 
             // Only display optional params if there are any
             if (optional.includes(true)) {
-                fieldsHTML.push(<br />);
+                fieldsHTML.push(<br/>);
                 fieldsHTML.push(<div className="divider">Optional</div>);
 
                 for (let index in optional) {
@@ -496,5 +526,9 @@ export default class AddActivity extends Component<Props, State> {
 
     resetState(type: RESET_TYPES) {
         this.setState(defaultStates[type]);
+    }
+
+    getMaxValidDate() {
+        return new Date(Date.now() - this.state.duration * this.state.durationMul * 1000);
     }
 }
