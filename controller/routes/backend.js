@@ -27,6 +27,8 @@ router.post('/activity/add', authenticateJWT, activity.add);
 
 /* Calendar routes */
 
+/* Calendar routes */
+
 router.get('/events/get', event.findAll); 
 
 router.post('/events/add', event.create); 
@@ -55,5 +57,3 @@ router.get('/testConnection', function (req, res, next) {
 })
 
 module.exports = router;
-module.exports = router;
-router.all('/sports/fetch', sport.getAll);
