@@ -1,13 +1,13 @@
 import React, {Component} from "react";
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-import DatePicker, {registerLocale, setDefaultLocale} from "react-datepicker";
+import DatePicker from "react-datepicker";
 import de from "date-fns/locale/de";
 import "react-datepicker/dist/react-datepicker.css";
 
 import NotificationBox from "./notificationBox";
 import SessionHandler from "../SessionHandler";
+import {InputWithIcon, InputWithIconAndMul} from "./InputComponents";
 
 interface Props {
     sports: { [key: string]: number }
@@ -29,7 +29,7 @@ const defaultActivityState = {
     distanceClass: "",
     distanceIcon: faTimes,
     distanceIconClass: "",
-    distanceMul: 10,
+    distanceMul: 1,
     averageHeartRate: 0,
     averageHeartRateClass: "",
     averageHeartRateIcon: faTimes,
@@ -287,120 +287,73 @@ export default class AddActivity extends Component<Props, State> {
         // Create HTML Fields template
         // Executed on the client -> no performance problem for now
         // TODO: Fix 'Each child in a list should have a unique "key" prop.' warning
+
+        let createInputField = (label: string, identifier: string, type: string, placeholder: string, multiplier?: { [key: string]: [number, string] }) => {
+            return (multiplier ?
+                    <InputWithIconAndMul
+                        labelText={label}
+                        inputClass={this.state[identifier + "Class"]}
+                        inputType={type}
+                        inputName={identifier}
+                        inputValue={this.state[identifier]}
+                        inputPlaceholder={placeholder}
+                        icon={this.state[identifier + "Icon"]}
+                        iconClass={this.state[identifier + "IconClass"]}
+                        onChange={this.handleChange}
+                        mulValue={this.state[identifier + "Mul"]}
+                        mulItems={multiplier}
+                    />
+                    :
+                    <InputWithIcon
+                        labelText={label}
+                        inputClass={this.state[identifier + "Class"]}
+                        inputType={type}
+                        inputName={identifier}
+                        inputValue={this.state[identifier]}
+                        inputPlaceholder={placeholder}
+                        icon={this.state[identifier + "Icon"]}
+                        iconClass={this.state[identifier + "IconClass"]}
+                        onChange={this.handleChange}
+                    />
+            );
+        }
+
         this.HTMLFields = {
-            "distance": <>
-                <label className="label">Distance</label>
-                <div className="field has-addons">
-                    <div className="control has-icons-right is-expanded">
-                        <input
-                            className={`input ${this.state.distanceClass}`}
-                            type="number"
-                            name="distance"
-                            placeholder="Please enter the covered distance"
-                            value={Number(this.state.distance) === 0 ? "" : this.state.distance}
-                            onChange={this.handleChange}
-                        />
-                        <span className={`icon is-right ${this.state.distanceIconClass}`}>
-                            <FontAwesomeIcon icon={this.state.distanceIcon}/>
-                        </span>
-                    </div>
-                    <div className="control">
-                        <div className="select">
-                            <select
-                                className="select"
-                                name="distanceMul"
-                                value={this.state.distanceMul}
-                                onChange={this.handleChange}
-                            >
-                                <option value="1" key="dist_m">m</option>
-                                <option value="1000" key="dist_km">km</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </>,
-            "duration": <>
-                <label className="label">Duration</label>
-                <div className="field has-addons">
-                    <div className="control has-icons-right is-expanded">
-                        <input
-                            className={`input ${this.state.durationClass}`}
-                            type="number"
-                            name="duration"
-                            placeholder="Please enter the duration of the activity"
-                            value={Number(this.state.duration) === 0 ? "" : this.state.duration}
-                            onChange={this.handleChange}
-                        />
-                        <span className={`icon is-right ${this.state.durationIconClass}`}>
-                            <FontAwesomeIcon icon={this.state.durationIcon}/>
-                        </span>
-                    </div>
-                    <div className="control">
-                        <div className="select is-fullwidth">
-                            <select
-                                className="select"
-                                name="durationMul"
-                                value={this.state.durationMul}
-                                onChange={this.handleChange}
-                            >
-                                <option value="1" key="dur_s">s</option>
-                                <option value="60" key="dur_m">m</option>
-                                <option value="3600" key="dur_h">h</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </>,
+            "distance": createInputField(
+                "Distance",
+                "distance",
+                "number",
+                "Please enter the covered distance",
+                {
+                    "dist_m": [1, "m"],
+                    "dist_km": [1000, "km"]
+                }),
+            "duration": createInputField(
+                "Duration",
+                "duration",
+                "number",
+                "Please enter the duration of the activity",
+                {
+                    "dur_s": [1, "s"],
+                    "dur_m": [60, "m"],
+                    "dur_h": [3600, "h"]
+                }),
             "pace": <></>,
-            "averageHeartRate": <>
-                <label className="label">Heart rate</label>
-                <div className="field">
-                    <div className="control has-icons-right">
-                        <input
-                            className={`input ${this.state.averageHeartRateClass}`}
-                            type="number"
-                            name="averageHeartRate"
-                            placeholder="Please insert your average heart rate"
-                            value={Number(this.state.averageHeartRate) === 0 ? "" : this.state.averageHeartRate}
-                            onChange={this.handleChange}
-                        />
-                        <span className={`icon is-right ${this.state.averageHeartRateIconClass}`}>
-                            <FontAwesomeIcon icon={this.state.averageHeartRateIcon}/>
-                        </span>
-                    </div>
-                </div>
-            </>,
-            "altitudeDifference": <>
-                <label className="label">Altitude difference</label>
-                <div className="field has-addons">
-                    <div className="control has-icons-right is-expanded">
-                        <input
-                            className={`input ${this.state.altitudeDifferenceClass}`}
-                            type="number"
-                            name="altitudeDifference"
-                            placeholder="Please enter the altitude difference"
-                            value={Number(this.state.altitudeDifference) === 0 ? "" : this.state.altitudeDifference}
-                            onChange={this.handleChange}
-                        />
-                        <span className={`icon is-right ${this.state.altitudeDifferenceClass}`}>
-                            <FontAwesomeIcon icon={this.state.altitudeDifferenceIcon}/>
-                        </span>
-                    </div>
-                    <div className="control">
-                        <div className="select">
-                            <select
-                                className="select"
-                                name="altitudeDifferenceMul"
-                                value={this.state.distanceMul}
-                                onChange={this.handleChange}
-                            >
-                                <option value="1" key="alt_m">m</option>
-                                <option value="1000" key="alt_km">km</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </>,
+            "averageHeartRate": createInputField(
+                "Heart Rate",
+                "averageHeartRate",
+                "number",
+                "Please insert your average heart rate"
+            ),
+            "altitudeDifference": createInputField(
+                "Altitude Difference",
+                "altitudeDifference",
+                "number",
+                "Please enter the altitude difference of the activity",
+                {
+                    "alt_m": [1, "m"],
+                    "alt_km": [1000, "km"]
+                }),
             "date": <>
                 <label className="label">Date and Time</label>
                 <DatePicker
@@ -411,8 +364,8 @@ export default class AddActivity extends Component<Props, State> {
                     maxDate={this.getMaxValidDate()}
                     selected={this.state.date}
                     locale={de}
-                    onChange={(date) => this.setState({date: date})}
-                    filterTime={(time) => {
+                    onChange={(date: Date) => this.setState({date: date})}
+                    filterTime={(time: Date) => {
                         let maxTime = this.getMaxValidDate();
                         let selected = new Date(this.state.date);
                         selected.setHours(time.getHours());
