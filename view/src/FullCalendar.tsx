@@ -74,7 +74,7 @@ export default class FullCalendar extends React.Component<Props,State> {
 
   setEvents(data:any){
     /*Create call to backend route */
-    fetch("http://localhost:9000/backend/events/update",{
+    fetch("http://localhost:9000/backend/events/add",{
       headers:{
         "accept":"application/json",
         "content-type":"application/json"
@@ -107,6 +107,25 @@ updateevent(properties:any){          //Update & deleted already created events 
   console.log(properties.event)
   console.log(properties.event.title)
   console.log(properties.event.id)
+  /*fetch("http://localhost:9000/backend/events/update",{
+    headers:{
+      "accept":"application/json",
+      "content-type":"application/json"
+    },
+    body: JSON.stringify(data),
+    method:"POST"
+  })*/
+}
+
+removeevent() {
+  /*fetch("http://localhost:9000/backend/events/remove",{
+    headers:{
+      "accept":"application/json",
+      "content-type":"application/json"
+    },
+    body: JSON.stringify(data),
+    method:"POST"
+  })*/
 }
   
 

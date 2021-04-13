@@ -22,8 +22,7 @@ Event.getAll = (response) => {
                         let allDay = item.allDay
                         events = Object.assign({}, events, {[event]: [title, start,end,allDay]});
                     })
-    
-                    //request(null, events);
+  
                     console.log("events: ", result);
                     response(null,result)
             }
@@ -43,20 +42,6 @@ Event.create = (newEvent, result) => {
       }
     });
   };
-
-Event.createEvent = function (newEvent, result) {    
-        sql.query("INSERT INTO events set ?", newEvent, function (err, res) {
-                
-                if(err) {
-                    console.log("error: ", err);
-                    result(err, null);
-                }
-                else{
-                    console.log(res.insertId);
-                    result(null, res.insertId);
-                }
-            });           
-};
 
 Event.updateById = function(id, Event, result){
   sql.query("UPDATE Events SET Event = ? WHERE id = ?", [Event.Event, id], function (err, res) {

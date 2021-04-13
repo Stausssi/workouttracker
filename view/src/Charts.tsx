@@ -14,8 +14,11 @@ interface Props {
 
 interface State {
     type:string
+    newtype:string
     secondtype:string //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
 }
+
+const labels = ["Jan.","Feb.","Mar.","Apr.","May.","Jun.","Jul.","Aug.","Sep.","Oct.","Nov.","Dec."]
 
 export default class Graphs extends React.Component<Props,State> {
     chart1: Chart | undefined;
@@ -26,27 +29,32 @@ export default class Graphs extends React.Component<Props,State> {
         super(props);
         this.state = {
           type:"line",
+          newtype:"line",
           secondtype:"line"
         };
       }
 
-   /*   componentDidMount() {
-        fetch(title_URL)
-            .then(response => {
-                return response.json();
-            })
-            .then(data => {
-                // Here you need to use an temporary array to store NeededInfo only 
-                let tmpArray = []
-                for (var i = 0; i < data.results.length; i++) {
-                    tmpArray.push(data.results[i].NeededInfo)
-                }
-    
-                this.setState({
-                    other: tmpArray
-                })
-            });
-    }*/
+testapi() {
+    this.getdatasets()
+    this.getcharts()
+}
+
+getdatasets() {
+    fetch("http://localhost:9000/backend/charts/test")
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+
+getcharts() {
+    fetch("http://localhost:9000/backend/charts/get")
+    //.then(res => {return res.json()})
+    .then(response => response.json())
+    .then(data => console.log(data));
+}
+
+setcharts() {
+
+}
 
 private drawSample() {
     //Destroy previous chart if exists before create a new chart
@@ -86,21 +94,15 @@ function() {
     //window.myBar = new Chart(ctx_$title).Bar(barChartData_$title, { responsive : true }); 
 }
 
-addElement () {
-    // erstelle ein neues div Element
-    // und gib ihm etwas Inhalt
-    var newDiv = document.createElement("div");
-    var newContent = document.createTextNode("Hi there and greetings!");
-    newDiv.appendChild(newContent); // füge den Textknoten zum neu erstellten div hinzu.
-  
-    // füge das neu erstellte Element und seinen Inhalt ins DOM ein
-    var currentDiv = document.getElementById("div1");
-    document.body.insertBefore(newDiv, currentDiv);
-
-    /*
+addElement (title:string) {
+    // erstelle ein neues div Element für jedes neues Chart
+    //if(!document.getElementById("canvas"+title) --> check if element exists
     var canvas = document.createElement("canvas");
-canvas.id = "my-id";
-specContainerNode.appendChild(canvas);*/
+    canvas.id = "chartID"+title;
+    // füge das neu erstellte Element und seinen Inhalt ins DOM ein
+    var container = document.getElementById("charts");
+    document.body.insertBefore(canvas, container);
+
   }
 
 empty(list: any[]) {
@@ -148,7 +150,9 @@ createchart(labels: string[],data: number[],colors:string[]) {
             datasets: [{                                                                 
                 label: "Datensatz Nummer1",          
                 data: data,
+                type:"line",
                 backgroundColor:colors,
+                fill:false
             }]
         },
         options: {
@@ -213,13 +217,15 @@ updateChartType = (charttype:any) => {
     <button onClick={()=>this.getrandomData()}>Randomize Data!</button>
     <button onClick={()=>this.drawSample()}>Draw</button>
     <button onClick={()=>this.drawSample2()}>Draw with Config</button>
+    <button onClick={()=>this.testapi()}>Test Api</button>
   </div>
   <div className="chart-container">
     <canvas id="myChart"></canvas>
   </div> 
   <div className="chart-container2">
     <canvas id="myChart2"></canvas>
-  </div>   
+  </div> 
+  <div className="charts"/>  
 </div>
         )
     }
