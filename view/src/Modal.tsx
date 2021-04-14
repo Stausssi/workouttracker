@@ -2,6 +2,7 @@ import {faPlusCircle, faCheck, faTimes} from "@fortawesome/free-solid-svg-icons"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import AddActivity from "./components/add_activity";
+import {BACKEND_URL} from "./App";
 
 interface Props {}
 
@@ -34,7 +35,7 @@ export default class Modal extends React.Component<Props, State> {
 
         if (active) {
             // Fetch activities from database
-            fetch("http://localhost:9000/backend/sports/fetch").then((response) => {
+            fetch(BACKEND_URL + "sports/fetch").then((response) => {
                 if (response.ok) {
                     return response.json().then((response) => {
                         this.setState({sports: JSON.parse(response.body)});
