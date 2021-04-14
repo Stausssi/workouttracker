@@ -13,48 +13,110 @@ interface Props {
 }
 
 interface State {
+    active:boolean
     type:string
     newtype:string
     secondtype:string //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
+    /*
+    charts:{
+        id,
+        label,
+        title,
+        type,
+        data
+    }
+    */
 }
 
-const labels = ["Jan.","Feb.","Mar.","Apr.","May.","Jun.","Jul.","Aug.","Sep.","Oct.","Nov.","Dec."]
 
 export default class Graphs extends React.Component<Props,State> {
+    labels = ["Jan.","Feb.","Mar.","Apr.","May.","Jun.","Jul.","Aug.","Sep.","Oct.","Nov.","Dec."]
     chart1: Chart | undefined;
     chart2: Chart | undefined;
+    charts: string[] = [];
     colors: string[] = [];
     data:number[] = [];
     constructor(props: Props) {
         super(props);
         this.state = {
-          type:"line",
-          newtype:"line",
-          secondtype:"line"
+            type:"line",
+            newtype:"line",
+            secondtype:"line",
+            active:false
         };
-      }
+    }
+    
+    action = () => {                                      //open and close modal
+        this.setState((state) =>({active:!state.active}))
+      };
 
 testapi() {
     this.getdatasets()
     this.getcharts()
 }
 
+getcombinefetch() {
+    var post:any;
+// Call the API
+fetch('http://localhost:9000/backend/charts/get').then(function (response) {
+	if (response.ok) {
+		return response.json();
+	} else {
+		return Promise.reject(response);
+	}
+}).then(function (data) {
+
+	// Store the post data to a variable
+	post = data;
+
+	// Fetch another API
+	return fetch('http://localhost:9000/backend/charts/test' + data.id); //TODO: update route to filter ID/function  
+
+}).then(function (response) {
+	if (response.ok) {
+		return response.json();
+	} else {
+		return Promise.reject(response);
+	}
+}).then(function (chartsData) {
+	console.log(post, chartsData);
+}).catch(function (error) {
+	console.warn(error);
+});
+}
+
 getdatasets() {
     fetch("http://localhost:9000/backend/charts/test")
     .then(response => response.json())
-    .then(data => console.log(data));
+    .then(data => console.log(data))
+    .catch(error=>console.warn(error))
 }
 
 getcharts() {
+    /* fetch charts, extract params from chart */
     fetch("http://localhost:9000/backend/charts/get")
     //.then(res => {return res.json()})
     .then(response => response.json())
     .then(data => console.log(data));
 }
 
-setcharts() {
-
-}
+setcharts(data: any) {
+ /*   fetch("http://localhost:9000/backend/charts/add",{
+        headers:{
+          "accept":"application/json",
+          "content-type":"application/json"
+        },
+        body: JSON.stringify(data),
+        method:"POST"
+      })
+      .then(test=>{return test.json()}) //convert to json
+      .then(res=>{console.log(res)})    //view response in console
+      .then((data) => {
+        console.log('Request succeeded with JSON response: ' + data);
+    })
+      .catch(error=>console.log(error)) //catch errors
+      */
+    }
 
 private drawSample() {
     //Destroy previous chart if exists before create a new chart
@@ -90,23 +152,75 @@ private drawSample() {
     });
 }
 function() { 
-    //var ctx_$title = document.getElementById('canvas_$title').getContext('2d');                                    
-    //window.myBar = new Chart(ctx_$title).Bar(barChartData_$title, { responsive : true }); 
+//var ctx_$title = document.getElementById('canvas_$title').getContext('2d');                                    
+  //window.myBar = new Chart(ctx_$title).Bar(barChartData_$title, { responsive : true }); 
+  const title=document.getElementById('titleinput2') as HTMLInputElement
+  const type=document.getElementById('typeinput') as HTMLInputElement
+  if(title.value && type.value)
+  {
+    console.log(title.value)
+    this.addElement(title.value,type.value)
+    alert('New chart ' + title.value +' is currently being created!')
+  }
+  else {
+    alert('Please give a name and a type for your chart!')
+  }
 }
 
-addElement (title:string) {
+addElement (title:string,type:string) {
+    var chartnode = document.getElementById("chartID_"+title)
+    if (!this.charts.includes(title)&& !chartnode)
+    {
+    this.charts.push()
     // erstelle ein neues div Element für jedes neues Chart
     //if(!document.getElementById("canvas"+title) --> check if element exists
     var canvas = document.createElement("canvas");
-    canvas.id = "chartID"+title;
+    canvas.id = "chartID_"+title;
     // füge das neu erstellte Element und seinen Inhalt ins DOM ein
-    var container = document.getElementById("charts");
-    document.body.insertBefore(canvas, container);
+    var parent = document.getElementById("charts");
+    parent?.appendChild(canvas);
+    console.log(document.getElementById(canvas.id))
+    alert("new canvas: "+canvas + " witch id " +canvas.id)
+    this.addcharts(canvas,type)
+    }
+    else {
+        alert("Der ausgewählte Name existiert bereits. bitte wählen Sie in ein anderer Name aus!")
+    }
+}
 
-  }
+
+removeElement (title:string) {
+    /* When this function is call: check if chart on DB wa removed, then remove element on DOM and remove title as identifier from DB */
+}
+
+addcharts(canvas:HTMLCanvasElement,type:string) {
+    var newchart= new Chart(canvas, {
+        type: type,                                                  //Define chart type
+        data: {
+            labels: this.labels,
+            datasets: [{
+                label: "My First dataset",
+                //new option, type will default to bar as that what is used to create the scale
+               // type: "line",
+                backgroundColor: "rgba(220,220,220,0.2)",
+                borderColor: "rgba(220,220,220,1)",
+                data: [65, 59, 4, 81, 56, 55, 40],
+                fill:false
+            }, {
+                label: "My second dataset",
+                //new option, type will default to bar as that what is used to create the scale
+                //type: "bar",
+                backgroundColor: "rgba(220,20,220,0.2)",
+                borderColor: "rgba(220,20,220,1)",
+                data: [32, 25, 33, 88, 12, 92, 33]
+            }]
+        },
+
+    })
+}
 
 empty(list: any[]) {
-    //empty your array
+    //empty array
     list.length = 0;
 }
 
@@ -198,6 +312,7 @@ updateChartType = (charttype:any) => {
   };
 
     render() {
+        const active = this.state.active ? "is-active" : ""; 
         return (
 <div className="container">
   <div className = "title">
@@ -218,6 +333,7 @@ updateChartType = (charttype:any) => {
     <button onClick={()=>this.drawSample()}>Draw</button>
     <button onClick={()=>this.drawSample2()}>Draw with Config</button>
     <button onClick={()=>this.testapi()}>Test Api</button>
+    <button onClick={()=>this.action()}>Open Modal</button>
   </div>
   <div className="chart-container">
     <canvas id="myChart"></canvas>
@@ -225,8 +341,42 @@ updateChartType = (charttype:any) => {
   <div className="chart-container2">
     <canvas id="myChart2"></canvas>
   </div> 
-  <div className="charts"/>  
+  <div id="charts"/>  
+  <div className={`modal ${active}`} id="ChartModal">
+            <div className="modal-background"></div>
+                <div className="modal-card">
+                <header className="modal-card-head">
+                    <p className="modal-card-title">Chart Modal</p>
+                    <button className="delete" aria-label="close" onClick={()=>this.action()}></button>   
+                </header>
+                <section className = "modal-card-body">
+                    <div className = "content">
+                <h1>Chart Name</h1>
+                <label className="label">Chart</label>
+                <div className="control">
+                  <input
+                    className="input"
+                    id="titleinput2"
+                    type="text"
+                    placeholder="e.g Neues Chart"
+                  />
+                    <input
+                    className="input"
+                    id="typeinput"
+                    type="text"
+                    placeholder="e.g line"
+                  />
 </div>
+</div>
+</section>
+        <footer className="modal-card-foot">
+            <button className="button is-success" onClick={()=>this.function()}>Save changes</button>
+            <button className="button" onClick={()=>this.action()} >Cancel</button>
+        </footer>
+    </div>
+    </div>
+</div>
+
         )
     }
 }

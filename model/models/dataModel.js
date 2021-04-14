@@ -1,4 +1,4 @@
-const sql = require("./createConnection");
+const sql = require("../createConnection");
 
 const Data = () => {
 }

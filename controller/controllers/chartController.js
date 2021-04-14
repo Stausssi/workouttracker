@@ -17,9 +17,20 @@ exports.test = (request, response) => {
     Data.getdurationpermonth((error, data) => {
         if (error) {
             console.log(error);
-            response.status(500).send({message: "Internal server error!"});
+            response.status(500).send({message: "Internal server error!" + error});
         } else{
             response.send(data);
         } 
       });
+};
+
+exports.create = (request, response) => {
+   /* Chart.create((error, data) => {
+        if (error) {
+            console.log(error);
+            response.status(500).send({message: "Internal server error!" + error});
+        } else{
+            response.send(data);
+        } 
+      });*/
 };

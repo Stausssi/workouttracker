@@ -179,7 +179,7 @@ removeevent() {
         return (  
 <div className="container">
   <div id='calendarFull'></div>
-         <div className={`modal ${active}`} id="myModal">
+         <div className={`modal ${active}`} id="CalendarModal">
             <div className="modal-background"></div>
                 <div className="modal-card">
                 <header className="modal-card-head">
