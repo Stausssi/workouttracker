@@ -42,8 +42,8 @@ router.get('/charts/get', chart.findAll);
 
 router.get('/charts/test', chart.test); 
 
-/*
 router.post('/charts/add', chart.create); 
+/*
 
 router.get('/charts/update', chart.findAll); 
 
