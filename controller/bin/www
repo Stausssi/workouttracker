@@ -5,8 +5,7 @@
  */
 const app = require('../app');
 const debug = require('debug')('controller:server');
-const https = require('https');
-const fs = require('fs');
+const http = require('http');
 
 /**
  * Get port from environment and store in Express.
@@ -16,13 +15,10 @@ const port = normalizePort(process.env.PORT || '9000');
 app.set('port', port);
 
 /**
- * Create HTTPS server.
+ * Create HTTP server.
  */
 
-const server = https.createServer({
-	key: fs.readFileSync('/etc/letsencrypt/live/workouttracker.server-welt.com/privkey.pem'),
-	cert: fs.readFileSync('/etc/letsencrypt/live/workouttracker.server-welt.com/fullchain.pem')
-}, app);
+const server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -53,7 +49,7 @@ function normalizePort(val) {
 }
 
 /**
- * Event listener for HTTPS server "error" event.
+ * Event listener for HTTP server "error" event.
  */
 
 function onError(error) {
