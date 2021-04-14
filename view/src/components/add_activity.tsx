@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import NotificationBox from "./notificationBox";
 import SessionHandler from "../SessionHandler";
-import {InputWithIcon, InputWithIconAndMul} from "./InputComponents";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 interface Props {
     sports: { [key: string]: number }
@@ -49,18 +49,6 @@ const defaultNotifyState = {
 const defaultStates: any[] = [defaultActivityState, defaultNotifyState];
 const defaultState = Object.assign({}, defaultActivityState, defaultNotifyState);
 
-// represents [min, max] values for the corresponding input field
-const validValues: { [key: string]: any[] } = {
-    "sport": [0, null],
-    "duration": [0, null],
-    "distance": [0, null],
-    "pace": [0, null],
-    "averageHeartRate": [25, 250],
-    "altitudeDifference": [0, null]
-}
-
-const hasIcon: string[] = ["duration", "distance", "averageHeartRate", "altitudeDifference"];
-
 enum RESET_TYPES {
     ACTIVITY,
     NOTIFICATION
@@ -78,11 +66,83 @@ const notifyMessages: { [ident: string]: [message: string, type: string] } = {
         ["Your username wasn't found!<br />Please log-in or contact an administrator if you believe this is an error.", "is-danger"]
 }
 
-const NUM_FIELDS = 5;
-const inputFields: string[] = ["distance", "duration", "pace", "averageHeartRate", "altitudeDifference"];
+interface selectOptions {
+    [key: string]: [number, string]
+}
+
+interface inputConfig {
+    identifier: string,
+    validValues: [min: any, max: any],
+    hasIcon: boolean,
+    inputLabel?: string,
+    inputType?: string,
+    inputPlaceholder?: string,
+    multiplier?: selectOptions
+}
+
+const inputFields: inputConfig[] = [
+    {
+        identifier: "distance",
+        validValues: [0, null],
+        hasIcon: true,
+        inputLabel: "Distance",
+        inputType: "number",
+        inputPlaceholder: "Please enter the covered distance",
+        multiplier: {
+            "dist_m": [1, "m"],
+            "dist_km": [1000, "km"]
+        }
+    },
+    {
+        identifier: "duration",
+        validValues: [0, null],
+        hasIcon: true,
+        inputLabel: "Duration",
+        inputType: "number",
+        inputPlaceholder: "Please enter the duration of the activity",
+        multiplier: {
+            "dur_s": [1, "s"],
+            "dur_m": [60, "m"],
+            "dur_h": [3600, "h"]
+        }
+    },
+    {
+        identifier: "pace",
+        validValues: [0, null],
+        hasIcon: false
+    },
+    {
+        identifier: "averageHeartRate",
+        validValues: [25, 250],
+        hasIcon: true,
+        inputLabel: "Heart Rate",
+        inputType: "number",
+        inputPlaceholder: "Please insert your average heart rate"
+    },
+    {
+        identifier: "altitudeDifference",
+        validValues: [0, null],
+        hasIcon: true,
+        inputLabel: "Altitude Difference",
+        inputType: "number",
+        inputPlaceholder: "Please enter the altitude difference of the activity",
+        multiplier: {
+            "alt_m": [1, "m"],
+            "alt_km": [1000, "km"]
+        }
+    },
+    /*
+     * !! IT'S IMPORTANT TO LEAVE SPORTS AS THE LAST ENTRY IN THIS LIST !!
+     */
+    {
+        identifier: "sport",
+        validValues: [0, null],
+        hasIcon: false
+    }
+];
+const NUM_FIELDS = inputFields.length - 1;
 
 export default class AddActivity extends Component<Props, State> {
-    HTMLFields: { [field: string]: JSX.Element; } | undefined;
     mandatoryParams: boolean[] = [];
     optParams: boolean[] = [];
 
@@ -133,27 +193,28 @@ export default class AddActivity extends Component<Props, State> {
             return;
         }
 
+        // Retrieve params
+        let inputParams = null;
+        for (let index in inputFields) {
+            let inputIndex = inputFields[index];
+            if (inputIndex.identifier === name) {
+                inputParams = inputIndex;
+                break;
+            }
+        }
+
         // Check whether the property has a range of values
-        if (Object.keys(validValues).includes(name)) {
-            let valid = this.isValid(name, value);
-            let icon = hasIcon.includes(name);
+        if (inputParams) {
+            let valid = this.isValid(value, inputParams.validValues);
+            let icon = inputParams.hasIcon;
 
             this.setState({[name + "Class"]: valid ? "is-success" : ""});
 
-            if (valid) {
-                if (icon) {
-                    this.setState({
-                        [name + "Icon"]: faCheck,
-                        [name + "IconClass"]: "has-text-success"
-                    });
-                }
-            } else {
-                if (icon) {
-                    this.setState({
-                        [name + "Icon"]: faTimes,
-                        [name + "IconClass"]: ""
-                    });
-                }
+            if (icon) {
+                this.setState({
+                    [name + "Icon"]: (valid ? faCheck : faTimes),
+                    [name + "IconClass"]: (valid ? "has-text-success" : "")
+                });
             }
         } else {
             // Check if a multiplier was changed
@@ -187,17 +248,17 @@ export default class AddActivity extends Component<Props, State> {
 
             // Append must and valid optional params
             for (let index in this.mandatoryParams) {
-                let key = inputFields[index];
-                let value = this.state[key];
+                let inputParams = inputFields[index];
+                let value = this.state[inputParams.identifier];
 
-                if (this.mandatoryParams[index] || (this.optParams[index] && this.isValid(key, value))) {
+                if (this.mandatoryParams[index] || (this.optParams[index] && this.isValid(value, inputParams.validValues))) {
                     // Apply multiplier
-                    let mul = this.state[key + "Mul"];
+                    let mul = this.state[inputParams.identifier + "Mul"];
                     if (mul > 1) {
                         value *= mul;
                     }
 
-                    bodyContent = Object.assign({}, bodyContent, {[key]: value});
+                    bodyContent = Object.assign({}, bodyContent, {[inputParams.identifier]: value});
                 }
             }
 
@@ -287,95 +348,77 @@ export default class AddActivity extends Component<Props, State> {
         // Create HTML Fields template
         // Executed on the client -> no performance problem for now
         // TODO: Fix 'Each child in a list should have a unique "key" prop.' warning
+        let createInputField = (params: inputConfig) => {
+            function createSelectOptions(dict: selectOptions) {
+                let options = [];
+                for (let key in dict) {
+                    if (dict.hasOwnProperty(key)) {
+                        options.push(<option value={dict[key][0]} key={key}>{dict[key][1]}</option>);
+                    }
+                }
 
-        let createInputField = (label: string, identifier: string, type: string, placeholder: string, multiplier?: { [key: string]: [number, string] }) => {
-            return (multiplier ?
-                    <InputWithIconAndMul
-                        labelText={label}
-                        inputClass={this.state[identifier + "Class"]}
-                        inputType={type}
-                        inputName={identifier}
-                        inputValue={this.state[identifier]}
-                        inputPlaceholder={placeholder}
-                        icon={this.state[identifier + "Icon"]}
-                        iconClass={this.state[identifier + "IconClass"]}
-                        onChange={this.handleChange}
-                        mulValue={this.state[identifier + "Mul"]}
-                        mulItems={multiplier}
-                    />
-                    :
-                    <InputWithIcon
-                        labelText={label}
-                        inputClass={this.state[identifier + "Class"]}
-                        inputType={type}
-                        inputName={identifier}
-                        inputValue={this.state[identifier]}
-                        inputPlaceholder={placeholder}
-                        icon={this.state[identifier + "Icon"]}
-                        iconClass={this.state[identifier + "IconClass"]}
-                        onChange={this.handleChange}
-                    />
-            );
-        }
+                return options;
+            }
 
-        this.HTMLFields = {
-            "distance": createInputField(
-                "Distance",
-                "distance",
-                "number",
-                "Please enter the covered distance",
-                {
-                    "dist_m": [1, "m"],
-                    "dist_km": [1000, "km"]
-                }),
-            "duration": createInputField(
-                "Duration",
-                "duration",
-                "number",
-                "Please enter the duration of the activity",
-                {
-                    "dur_s": [1, "s"],
-                    "dur_m": [60, "m"],
-                    "dur_h": [3600, "h"]
-                }),
-            "pace": <></>,
-            "averageHeartRate": createInputField(
-                "Heart Rate",
-                "averageHeartRate",
-                "number",
-                "Please insert your average heart rate"
-            ),
-            "altitudeDifference": createInputField(
-                "Altitude Difference",
-                "altitudeDifference",
-                "number",
-                "Please enter the altitude difference of the activity",
-                {
-                    "alt_m": [1, "m"],
-                    "alt_km": [1000, "km"]
-                }),
-            "date": <>
-                <label className="label">Date and Time</label>
-                <DatePicker
-                    dateFormat="dd.MM.yyyy HH:mm"
-                    showTimeSelect
-                    timeIntervals={15}
-                    timeFormat="HH:mm"
-                    maxDate={this.getMaxValidDate()}
-                    selected={this.state.date}
-                    locale={de}
-                    onChange={(date: Date) => this.setState({date: date})}
-                    filterTime={(time: Date) => {
-                        let maxTime = this.getMaxValidDate();
-                        let selected = new Date(this.state.date);
-                        selected.setHours(time.getHours());
-                        selected.setMinutes(time.getMinutes());
-
-                        return selected < maxTime;
-                    }}
-                    inline
-                />
-            </>
+            let identifier = params.identifier;
+            if (identifier !== "pace") {
+                return (
+                    params.multiplier ?
+                        <>
+                            <label className="label">{params.inputLabel}</label>
+                            <div className="field has-addons">
+                                <div className="control has-icons-right is-expanded">
+                                    <input
+                                        className={`input ${this.state[identifier + "Class"]}`}
+                                        type={params.inputType}
+                                        name={identifier}
+                                        placeholder={params.inputPlaceholder}
+                                        value={Number(this.state[identifier]) === 0 ? "" : this.state[identifier]}
+                                        onChange={this.handleChange}
+                                    />
+                                    <span className={`icon is-right ${this.state[identifier + "IconClass"]}`}>
+                                    <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
+                                </span>
+                                </div>
+                                <div className="control">
+                                    <div className="select is-fullwidth">
+                                        <select
+                                            className="select"
+                                            name={identifier + "Mul"}
+                                            value={this.state[identifier + "Mul"]}
+                                            onChange={this.handleChange}
+                                        >
+                                            {createSelectOptions(params.multiplier)}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                        :
+                        <>
+                            <label className="label">{params.inputLabel}</label>
+                            <div className="field">
+                                <div className="control has-icons-right">
+                                    <input
+                                        className={`input ${this.state[identifier + "Class"]}`}
+                                        type={params.inputType}
+                                        name={identifier}
+                                        placeholder={params.inputPlaceholder}
+                                        value={Number(this.state[identifier]) === 0 ? "" : this.state[identifier]}
+                                        onChange={this.handleChange}
+                                    />
+                                    <span className={`icon is-right ${this.state[identifier + "IconClass"]}`}>
+                                    <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
+                                </span>
+                                </div>
+                            </div>
+                        </>
+                );
+            } else {
+                return (
+                    <></>
+                );
+            }
         };
 
         if (this.state.sportClass === "is-success") {
@@ -403,8 +446,9 @@ export default class AddActivity extends Component<Props, State> {
                 mandatory[index] = Boolean(Number(mandatory[index]));
                 optional[index] = Boolean(Number(optional[index]));
 
+                let inputParams = inputFields[index];
                 if (mandatory[index]) {
-                    fieldsHTML.push(this.HTMLFields[inputFields[index]]);
+                    fieldsHTML.push(createInputField(inputParams));
 
                     // Remove param from optional to prevent double input
                     if (optional[index]) {
@@ -419,17 +463,37 @@ export default class AddActivity extends Component<Props, State> {
 
             // Only display optional params if there are any
             if (optional.includes(true)) {
-                fieldsHTML.push(<br/>);
                 fieldsHTML.push(<div className="divider">Optional</div>);
 
                 for (let index in optional) {
                     if (optional[index]) {
-                        fieldsHTML.push(this.HTMLFields[inputFields[index]]);
+                        fieldsHTML.push(createInputField(inputFields[index]));
                     }
                 }
             }
 
-            fieldsHTML.push(this.HTMLFields["date"]);
+            fieldsHTML.push(<>
+                <label className="label">Date and Time</label>
+                <DatePicker
+                    dateFormat="dd.MM.yyyy HH:mm"
+                    showTimeSelect
+                    timeIntervals={15}
+                    timeFormat="HH:mm"
+                    maxDate={this.getMaxValidDate()}
+                    selected={this.state.date}
+                    locale={de}
+                    onChange={(date: Date) => this.setState({date: date})}
+                    filterTime={(time: Date) => {
+                        let maxTime = this.getMaxValidDate();
+                        let selected = new Date(this.state.date);
+                        selected.setHours(time.getHours());
+                        selected.setMinutes(time.getMinutes());
+
+                        return selected < maxTime;
+                    }}
+                    inline
+                />
+            </>);
 
             return fieldsHTML;
         }
@@ -438,14 +502,13 @@ export default class AddActivity extends Component<Props, State> {
 
     validateInput(returnValue?: boolean) {
         let valid = false;
-
         if (this.mandatoryParams.length === NUM_FIELDS) {
-            valid = this.isValid("sport", this.state.sport);
+            valid = this.isValid(this.state.sport, inputFields[NUM_FIELDS].validValues);
 
-            for (let i = 0; i < NUM_FIELDS; ++i) {
-                if (this.mandatoryParams[i]) {
-                    let param = inputFields[i];
-                    valid = valid && this.isValid(param, this.state[param]);
+            for (let index in this.mandatoryParams) {
+                if (this.mandatoryParams[index]) {
+                    let inputParams = inputFields[index];
+                    valid = valid && this.isValid(this.state[inputParams.identifier], inputParams.validValues);
                 }
             }
         }
@@ -459,9 +522,9 @@ export default class AddActivity extends Component<Props, State> {
         }
     }
 
-    isValid(type: string, value: number) {
-        let min = validValues[type][0];
-        let max = validValues[type][1];
+    isValid(value: number, validValues: any[]) {
+        let min = validValues[0];
+        let max = validValues[1];
         value = Number(value);
 
         return (min < value && (max ? value < max : true)) || isNaN(value);
