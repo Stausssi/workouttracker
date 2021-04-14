@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import NotificationBox from "./notificationBox";
 import SessionHandler from "../SessionHandler";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {BACKEND_URL} from "../App";
 
 interface Props {
     sports: { [key: string]: number }
@@ -274,7 +275,7 @@ export default class AddActivity extends Component<Props, State> {
             }
 
             // Send post request
-            fetch("http://localhost:9000/backend/activity/add", {
+            fetch(BACKEND_URL + "activity/add", {
                 method: "POST",
                 headers: {
                     Accept: 'application/json',
