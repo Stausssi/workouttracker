@@ -262,6 +262,12 @@ export default class AddActivity extends Component<Props, State> {
                 }
             }
 
+            // Calculate pace
+            // Distance is in m, duration in s
+            if (bodyContent["distance"] > 0 && bodyContent["duration"] > 0) {
+                bodyContent["pace"] = bodyContent["distance"] / bodyContent["duration"] * 3.6;
+            }
+
             // Filter date
             if (this.state.date < this.getMaxValidDate()) {
                 bodyContent = Object.assign({}, bodyContent, {startedAt: this.state.date.toISOString().slice(0, 19).replace("T", " ")});
