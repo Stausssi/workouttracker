@@ -95,8 +95,8 @@ export default class FullCalendar extends React.Component<Props,State> {
   getEvents(){
     fetch("http://localhost:9000/backend/events/get")
     .then(res => {return res.json()})
-    .then((data)=>{
-    this.setState({eventsarray:data})
+    .then((response)=>{
+    this.setState({eventsarray:JSON.parse(response.body)})
       console.log(this.state.eventsarray)
       this.calendar?.removeAllEventSources()                    //remove old events
       this.calendar?.addEventSource(this.state.eventsarray)     //add new events

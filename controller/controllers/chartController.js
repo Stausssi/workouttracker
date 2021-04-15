@@ -28,6 +28,35 @@ exports.test = (request, response) => {
     Set params into url
 */
 
+exports.getdataset = (request,response) => {
+    const user=request.query.user
+    const sport=request.query.user
+    Data.all(user,sport,(error, data) => {
+        if (error) {
+            console.log(error);
+            response.status(500).send({message: "Internal server error!" + error});
+        } else{
+            response.status(200).send({body: JSON.stringify(data)});
+        } 
+      });
+};    
+
+
+exports.paramdataset = (request,response) => {
+    const user= request.params.user;
+    const sport= request.params.sport;
+    /*if(request.params.dataset /*wenn Parameter = all oder wenn nicht definiert) {
+
+    }
+    else if (request.params.dataset /*wenn Parameter definiert) {
+
+    }
+    else {
+
+    }
+ */       
+}
+
 exports.create = (request, response) => {
     if (!request.body) {
         response.status(400).send({

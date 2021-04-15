@@ -62,15 +62,30 @@ fetch('http://localhost:9000/backend/charts/get').then(function (response) {
 	if (response.ok) {
 		return response.json();
 	} else {
-		return Promise.reject(response);
+        return response.json().then((response) => {
+            console.log("Failed to get charts: ", response);
+        })
 	}
-}).then(function (data) {
-
+}).then((data) => {
+    post= JSON.parse(data.body)
+    console.log(post)
 	// Store the post data to a variable
 	post = data;
-
+    console.log(data.body)
+    /* Check if user/sport are defined and */
+    /* query over all charts */
 	// Fetch another API
-	return fetch('http://localhost:9000/backend/charts/test' + data.id); //TODO: update route to filter ID/function  
+    if(data.dataset.param_user && data.dataset.param_sport) 
+    {
+        var sport=data.dataset.param_sport
+        var user=data.dataset.param_user
+    }
+    else {
+        console.log("Not found")
+    }
+    const params = new URLSearchParams({ user: user,sport:sport })
+    //Alternative: encodeURIComponent
+	return fetch('http://localhost:9000/backend/charts/data?' + params); //TODO: update route to filter ID/function  
 
 }).then(function (response) {
 	if (response.ok) {
@@ -88,16 +103,15 @@ fetch('http://localhost:9000/backend/charts/get').then(function (response) {
 getdatasets() {
     fetch("http://localhost:9000/backend/charts/test")
     .then(response => response.json())
-    .then(data => console.log(data))
+    .then(data => console.log(JSON.parse(data.body)))
     .catch(error=>console.warn(error))
 }
 
 getcharts() {
     /* fetch charts, extract params from chart */
     fetch("http://localhost:9000/backend/charts/get")
-    //.then(res => {return res.json()})
     .then(response => response.json())
-    .then(data => console.log(data));
+    .then((data) => console.log(JSON.parse(data.body)));
 }
 
 setcharts(data: any,name: string,type: string) {
@@ -160,10 +174,12 @@ function() {
         name: title.value,
         type: type.value,
         dataset:"Default",//TODO: add wanted dataset to modal
-        fill:true //TODO: add option to modal
+        fill:true, //TODO: add option to modal
+        sport:null,
+        user:null
       } 
     this.action()
-    this.setcharts(chart,chart.name,chart.type) 
+    this.setcharts(chart,chart.name,chart.type)
   }
   else {
     alert('Please give a name and a type for your chart!')
@@ -337,6 +353,7 @@ updateChartType = (charttype:any) => {
     <button onClick={()=>this.drawSample2()}>Draw with Config</button>
     <button onClick={()=>this.testapi()}>Test Api</button>
     <button onClick={()=>this.action()}>Open Modal</button>
+    <button onClick={()=>this.getcombinefetch()}>get combine</button>
   </div>
   <div className="chart-container">
     <canvas id="myChart"></canvas>
@@ -344,15 +361,15 @@ updateChartType = (charttype:any) => {
   <div className="chart-container2">
     <canvas id="myChart2"></canvas>
   </div> 
-  <div id="charts"/>  
+  <div id="charts"/> 
   <div className={`modal ${active}`} id="ChartModal">
-            <div className="modal-background"></div>
-                <div className="modal-card">
-                <header className="modal-card-head">
-                    <p className="modal-card-title">Chart Modal</p>
-                    <button className="delete" aria-label="close" onClick={()=>this.action()}></button>   
-                </header>
-                <section className = "modal-card-body">
+                    <div className="modal-background"></div>
+                    <div className="modal-card">
+                    <header className="modal-card-head">
+                        <p className="modal-card-title">Chart Modal</p>
+                        <button className="delete" aria-label="close" onClick={()=>this.action()}></button>   
+                    </header>
+                    <section className = "modal-card-body">
                     <div className = "content">
                 <h1>Chart Name</h1>
                 <label className="label">Chart</label>
@@ -369,17 +386,16 @@ updateChartType = (charttype:any) => {
                     type="text"
                     placeholder="e.g line"
                   />
+                  </div>
+                  </div>
+                    </section>
+                    <footer className="modal-card-foot">
+                        <button className="button is-success" onClick={()=>this.function()}>Save changes</button>
+                        <button className="button" onClick={()=>this.action()} >Cancel</button>
+                    </footer>
+                    </div>
+                </div>
 </div>
-</div>
-</section>
-        <footer className="modal-card-foot">
-            <button className="button is-success" onClick={()=>this.function()}>Save changes</button>
-            <button className="button" onClick={()=>this.action()} >Cancel</button>
-        </footer>
-    </div>
-    </div>
-</div>
-
         )
     }
 }
