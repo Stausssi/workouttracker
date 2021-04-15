@@ -28,11 +28,11 @@ export default class LoginContainer extends React.Component<any, any> {
                 </nav>
 
                 <div className="hero is-fullheight-with-navbar">
-                            <Switch>
-                                <Route exact path='/' component={Login}/>
-                                <Route path="/login" component={Login}/>
-                                <Route path="/sign-up" component={SignUp}/>
-                            </Switch>
+                                <Switch>
+                                    <Route exact path='/' component={Login}/>
+                                    <Route path="/login" component={Login}/>
+                                    <Route path="/sign-up" component={SignUp}/>
+                                </Switch>
                 </div>
             </div>
         );
