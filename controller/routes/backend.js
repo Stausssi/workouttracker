@@ -42,11 +42,14 @@ router.get('/charts/get', chart.findAll);
 
 router.get('/charts/test', chart.test); 
 
+router.get('charts/data', chart.getdataset) // oder user oder sport, zum filtrieren
+
+router.get('charts/data/:user/:sport', chart.paramdataset)
+
 router.post('/charts/add', chart.create); 
 /*
 
 
-router.get('charts/data/:id') // oder user oder sport, zum filtrieren
 
 router.get('/charts/update', chart.findAll); 
 

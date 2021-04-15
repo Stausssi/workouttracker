@@ -7,7 +7,7 @@ exports.findAll = (request, response) => {
             console.log(error);
             response.status(500).send({message: "Internal server error!"});
         } else{
-            response.send(data);
+            response.status(200).send({body: JSON.stringify(data)});
         } 
       });
 };

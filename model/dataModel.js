@@ -2,16 +2,24 @@ const sql = require("./createConnection");
 
 class Data {
     /**/
-    static all() {
+    static all(user,sport,response) {
         /* Alle Funktionen unten zusammnefassen */
         /*Attribute als Variable, durch switch case bestimmen*/
         /* zwischen count und sum unterscheiden */
+                sql.query("SELECT SUM(duration) AS amount FROM activity WHERE sport = COALESCE(?,sport) AND user = COALESCE(?, user)", [sport, user],
+                function (error, results) {
+                    if (error) {
+                        response(error, null);
+                    } else {
+                        response(null, results);
+                    }
+                });
     }
 
-    static all
     static getdurationpermonth(response /*sport,user*/) {
         /* Where user condition hinzufügen. If null: Wert ignorieren (User benachrichtigen) */
         sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity GROUP BY year(startedAt), month(startedAt)",
+        //sql.query(""SELECT SUM(duration) AS amount FROM activity WHERE sport = COALESCE(?,sport) AND user = COALESCE(?, user)", [sport, user]")
             function (error, results) {
                 if (error) {
                     response(error, null);
