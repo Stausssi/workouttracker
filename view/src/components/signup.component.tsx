@@ -8,6 +8,11 @@ function validateEmail(email: string)
     return /^[^@]+@\w+(\.\w+)+\w$/.test(email);
 }
 
+function validatePassword(password: string){
+    // regex for: min 8 letter password, with at least a symbol, upper and lower case letters and a number
+    return /^(?=.*\d)(?=.*[!@#$%^&_*-])(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(password);
+}
+
 interface State {
     firstname: string,
     lastname: string,
@@ -79,8 +84,8 @@ export default class SignUp extends Component<{},State> {
                         if(weight >= 10 && weight <= 250) {
                             if (pw1 === pw2) {
                                 //the passwords must be equal
-                                if (pw1.length > 4) {
-                                    //password must be longer than 4 characters
+                                if (validatePassword(pw1)) {
+                                    // password must have at least 8 letters, a symbol, upper case letters and a number
 
                                     // set date to date string
                                     const dateString = this.state.date.toISOString().slice(0, 10);
@@ -119,7 +124,7 @@ export default class SignUp extends Component<{},State> {
                                         }
                                     });
                                 } else {
-                                    this.setState({errorMessage: 'The passwords must have at least 5 characters!'});
+                                    this.setState({errorMessage: 'Your password must have at least 8 letters, a symbol, upper case letters and a number'});
                                 }
                             } else {
                                 this.setState({errorMessage: 'The passwords must be equal!'});
