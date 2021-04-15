@@ -34,7 +34,7 @@ export default class Modal extends React.Component<Props, State> {
         this.setState({active: active});
 
         if (active) {
-            // Fetch activities from database
+            // Fetch sports from database
             fetch(BACKEND_URL + "sports/fetch").then((response) => {
                 if (response.ok) {
                     return response.json().then((response) => {

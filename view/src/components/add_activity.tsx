@@ -68,7 +68,7 @@ const notifyMessages: { [ident: string]: [message: string, type: string] } = {
 }
 
 interface selectOptions {
-    [key: string]: [number, string]
+    [key: string]: [value: number, text: string]
 }
 
 interface inputConfig {
@@ -149,6 +149,7 @@ export default class AddActivity extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
+        // Use Object.assign to copy the defaultState and prevent changes to default values
         this.state = Object.assign({}, defaultState);
 
         // bind this to event handlers
@@ -158,6 +159,7 @@ export default class AddActivity extends Component<Props, State> {
     }
 
     componentDidMount() {
+        // Find submit button of the Modal
         let submit = document.getElementById("submit-activity");
         if (submit) {
             this.setState({submitButton: submit});
@@ -167,6 +169,7 @@ export default class AddActivity extends Component<Props, State> {
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
         // Check for prop changes
         if (prevProps.sports !== this.props.sports) {
+            // Display warning if sports couldn't be fetched
             if (Object.keys(this.props.sports).length === 0) {
                 this.setState({
                     notifyMessage: notifyMessages["fetchFailed"][0],
@@ -177,6 +180,7 @@ export default class AddActivity extends Component<Props, State> {
 
         // Check for state changes
         if (prevState.sport !== this.state.sports) {
+            // Reset params if sport was deselected
             if (!isNaN(this.state.sports)) {
                 this.mandatoryParams = [];
                 this.optParams = [];
@@ -204,12 +208,12 @@ export default class AddActivity extends Component<Props, State> {
             }
         }
 
-        // Check whether the property has a range of values
+        // Check whether the property has inputParams
         if (inputParams) {
             let valid = this.isValid(value, inputParams.validValues);
             let icon = inputParams.hasIcon;
 
-            this.setState({[name + "Class"]: valid ? "is-success" : ""});
+            this.setState({[name + "Class"]: (valid ? "is-success" : "")});
 
             if (icon) {
                 this.setState({
@@ -259,19 +263,20 @@ export default class AddActivity extends Component<Props, State> {
                         value *= mul;
                     }
 
-                    bodyContent = Object.assign({}, bodyContent, {[inputParams.identifier]: value});
+                    bodyContent[inputParams.identifier] = value;
                 }
             }
 
             // Calculate pace
-            // Distance is in m, duration in s
             if (bodyContent["distance"] > 0 && bodyContent["duration"] > 0) {
+                // Distance is in m, duration in s
+                // Pace will be saved in km/h
                 bodyContent["pace"] = bodyContent["distance"] / bodyContent["duration"] * 3.6;
             }
 
-            // Filter date
+            // Check if date is valid
             if (this.state.date < this.getMaxValidDate()) {
-                bodyContent = Object.assign({}, bodyContent, {startedAt: this.state.date.toISOString().slice(0, 19).replace("T", " ")});
+                bodyContent.startedAt = this.state.date.toISOString().slice(0, 19).replace("T", " ");
             }
 
             // Send post request
@@ -368,6 +373,8 @@ export default class AddActivity extends Component<Props, State> {
             }
 
             let identifier = params.identifier;
+
+            // Pace doesn't have an input field
             if (identifier !== "pace") {
                 return (
                     params.multiplier ?
@@ -428,6 +435,7 @@ export default class AddActivity extends Component<Props, State> {
             }
         };
 
+        // Only create elements if a valid sport is selected
         if (this.state.sportClass === "is-success") {
             // Get bitfields and split them into their bitwise representation
             // reverse to fill zeros in the beginning
@@ -479,6 +487,7 @@ export default class AddActivity extends Component<Props, State> {
                 }
             }
 
+            // Create date picker
             fieldsHTML.push(<>
                 <label className="label">Date and Time</label>
                 <DatePicker
@@ -534,6 +543,7 @@ export default class AddActivity extends Component<Props, State> {
         let max = validValues[1];
         value = Number(value);
 
+        // Check whether the value is in range of the params or is NaN (sports)
         return (min < value && (max ? value < max : true)) || isNaN(value);
     }
 
