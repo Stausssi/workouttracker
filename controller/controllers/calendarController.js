@@ -29,14 +29,16 @@ exports.create = (request, response) => {
     });
     //response.status(200).send("test")
     // Save event in the database
-    Event.create(event, (error, data) => {
+    Event.create(event, (error, added) => {
       if (error) {
             console.log(error);
-            console.log(data)
             response.status(500).send({message: "Internal server error!"});
-        } else {
-          response.send(data);
-      }
+        } else if(!added)
+          {
+            response.status(500).send({message: "Event could not be added"});
+          } else {
+            response.status(200).send({message: "New event was successfully be added!"});
+          }
     });
 }   
   };
