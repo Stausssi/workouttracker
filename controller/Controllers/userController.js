@@ -1,51 +1,51 @@
-const { request } = require('express');
-const User = require('../model/usermodel');
+const {request} = require('express');
+const User = require('../../model/userModel');
 
 //create a new user
 exports.signup = (req, res) => {
     //validate request --> add more checks
     console.log(req.body);
-    if(!req.body && !req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password){
+    if (!req.body && !req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password) {
         res.status(400).send({message: "bad request"});
     } else {
 
         //create a user object
         const newuser = new User({
-            username : req.body.username,
-            password : req.body.password,
-            firstname : req.body.firstname,
-            lastname : req.body.lastname,
-            age : req.body.age,
-            weight : req.body.weight,
-            email : req.body.email,
-            emailVerify : 0 
+            username: req.body.username,
+            password: req.body.password,
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            age: req.body.age,
+            weight: req.body.weight,
+            email: req.body.email,
+            emailVerify: 0
         });
 
         //check if the user already exists in the database: Attention: async !!!
-        User.exists(newuser, function(err, exists){
-            if(err){
+        User.exists(newuser, function (err, exists) {
+            if (err) {
                 // Internal Server Error, could not check if user already exists
                 console.log(err);
                 res.status(500).send({message: "internal server error"});
             } else {
                 // no error occured
 
-                if(exists){
+                if (exists) {
                     res.status(200).send({
                         message: "user exists"
                     });
                 } else {
                     //user does not exist in the database
                     //save user to the database
-        
-                    User.create(newuser, function(err, status){
-                        if(err){
+
+                    User.create(newuser, function (err, status) {
+                        if (err) {
                             // Internal Server Error, user could not be saved to db
                             console.log(err);
                             res.status(500).send({message: "internal server error"});
                         } else {
                             // user was created
-                            if(!status){
+                            if (!status) {
                                 res.status(500).send({
                                     message: "user could not be created"
                                 });
@@ -73,4 +73,17 @@ exports.verifyEmail = () => {
 
 };
 
-//This is a controller file, not a modell file --> Move
+exports.search = (req, res) => {
+    const query = req.query.query;
+    if (!query) {
+        res.status(400).send({message: "Bad Request"});
+    } else {
+        console.log(query);
+        // TODO: Database query
+        res.status(200).send({
+            body: JSON.stringify({
+                message: "users " + query
+            })
+        });
+    }
+}

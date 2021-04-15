@@ -14,6 +14,8 @@ interface State {
 }
 
 export default class SearchBar extends React.Component<Props, State> {
+    private searchDelay: any;
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -26,43 +28,49 @@ export default class SearchBar extends React.Component<Props, State> {
     }
 
     updateSearch(event: any) {
-        let value = event.target.value;
+        let value: string = String(event.target.value).replaceAll(" ", "");
 
         this.setState({
-            searchQuery: value,
-            displayLoading: true
-        }, () => this.searchFor(value));
+                searchQuery: value,
+                searchResults: <></>,
+                displayLoading: true
+            }, () => {
+                // TODO: Input filtering
+                clearTimeout(this.searchDelay);
+
+                if (value !== "") {
+                    this.searchDelay = setTimeout(() => {
+                        this.searchFor(value);
+                    }, 1000);
+                }
+            }
+        );
     }
 
     searchFor(query: string) {
         console.log(`Searching for user ${query} in the database`);
 
-        fetch(BACKEND_URL + "users/get", {
-            method: "GET",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                //Authorization: SessionHandler.getAuthToken()
-            }
-        }).then((response) => {
-            if (response.ok) {
-                this.setState({displayLoading: false});
-
-                return response.json().then((response) => {
-                    console.log("users received:", response);
-                })
-            }
-        });
-
         this.setState({
+            displayLoading: false,
             searchResults: <>
                 <SearchResult username="@username"/>
                 <SearchResult username="@extremlangerusername"/>
                 <SearchResult username="1"/>
                 <SearchResult username="@12345678901234567890"/>
-                <SearchResult username="@username"/>
             </>
-        })
+        });
+
+        fetch(BACKEND_URL + "users/search?query=" + query).then((response) => {
+            if (response.ok) {
+                return response.json().then((response) => {
+                    console.log("users received:", response);
+                });
+            } else {
+                console.log(response);
+            }
+        });
+
+
     }
 
     render() {
@@ -74,7 +82,9 @@ export default class SearchBar extends React.Component<Props, State> {
                             <input
                                 className="input is-primary"
                                 type="search"
+                                value={this.state.searchQuery}
                                 placeholder="Search for other users"
+                                maxLength={20}
                                 onChange={this.updateSearch}/>
                             <span className="icon is-small is-right">
                                 <FontAwesomeIcon icon={faSearch}/>
@@ -87,10 +97,10 @@ export default class SearchBar extends React.Component<Props, State> {
                         {this.state.searchResults}
                         {this.state.displayLoading ?
                             <>
-                                <hr className="dropdown-divider" />
                                 <div className="dropdown-item">
                                     <div className="control is-loading">
-                                        <input className="input is-static" type="text" placeholder="Searching..." readOnly={true}/>
+                                        <input className="input is-static" type="text" placeholder="Searching..."
+                                               readOnly={true}/>
                                     </div>
                                 </div>
                             </>
