@@ -1,9 +1,16 @@
 import React, {Component} from "react";
 import NotificationBox from "./notificationBox";
 
-export default class Login extends Component {
-    constructor(props) {
+interface State {
+    email: string,
+    password: string,
+    errorMessage: string
+}
+
+export default class Login extends Component<{}, State> {
+    constructor(props: any) {
         super(props);
+
         this.state = {
             email: '',
             password: '',
@@ -14,17 +21,17 @@ export default class Login extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleChange(event) {
+    handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         const target = event.target;
         const value = target.value;
         const name = target.name;
 
         this.setState({
             [name]: value
-        });
+        }as Pick<State, keyof State>);
     }
 
-    handleSubmit(event) {
+    handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
         const email = this.state.email;
         const pw = this.state.password;
         event.preventDefault();
@@ -69,7 +76,7 @@ export default class Login extends Component {
                 } else if (response.status === 401) {
                     this.setState({errorMessage: "You have entered an invalid username or password"});
                 } else {
-                    this.setState({errorMessage: response.json().message});
+                    this.setState({errorMessage: "Error!"});
                 }
             });
         } else {

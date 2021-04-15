@@ -1,16 +1,28 @@
 import React, {Component} from "react";
 import NotificationBox from "./notificationBox";
-import DatePicker from "react-datepicker";
+import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
-function validateEmail(email)
+function validateEmail(email: string)
 {
     return /^[^@]+@\w+(\.\w+)+\w$/.test(email);
 }
 
-export default class SignUp extends Component {
+interface State {
+    firstname: string,
+    lastname: string,
+    email: string,
+    password1: string,
+    password2: string,
+    errorMessage: string,
+    username: string,
+    weight: number,
+    date: Date,
+    dateChange: Boolean
+}
 
-    constructor(props) {
+export default class SignUp extends Component<{},State> {
+    constructor(props: any) {
         super(props);
         this.state = {
             firstname: '',
@@ -20,7 +32,7 @@ export default class SignUp extends Component {
             password2: '',
             errorMessage: '',
             username: '',
-            weight: null,
+            weight: 0,
             date: new Date(),
             dateChange: false
         };
@@ -31,7 +43,7 @@ export default class SignUp extends Component {
         this.handleDateChange = this.handleDateChange.bind(this);
     }
 
-    handleChange(event) {
+    handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         // makes all input attributes "controlled components"
         const target = event.target;
         const value = target.value;
@@ -39,14 +51,14 @@ export default class SignUp extends Component {
 
         this.setState({
             [name]: value
-        });
+        } as unknown as Pick<State, keyof State>);
     }
 
-    handleDateChange(date) {
+    handleDateChange(date: Date) {
         this.setState({date:date, dateChange:true});
     }
 
-    handleSubmit(event) {
+    handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
         const email = this.state.email;
         const pw1 = this.state.password1;
         const pw2 = this.state.password2;
@@ -56,7 +68,7 @@ export default class SignUp extends Component {
         const weight = this.state.weight;
         event.preventDefault();
 
-        if (!(email === '' || pw1 === '' || pw2 === '' || firstname === '' || lastname === '' || username === '' || weight === 0 || this.state.dateChange === false)) {
+        if (!(email === '' || pw1 === '' || pw2 === '' || firstname === '' || lastname === '' || username === '' || weight === 0 || !this.state.dateChange)) {
             //all inputs must be filled
             if(firstname.length <= 30 && lastname.length <= 30) {
                 //firstname/Lastname max 30 characters
