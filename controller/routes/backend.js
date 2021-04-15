@@ -32,6 +32,24 @@ router.put('/users/unblock', authenticateJWT, users.unblock);
 router.put('/users/follow', authenticateJWT, users.follow);
 router.put('/users/unfollow', authenticateJWT, users.unfollow);
 router.get('/users/getRelationship', authenticateJWT, users.getRelationship);
+
+/* Calendar routes */
+
+router.get('/events/get', event.findAll); 
+
+router.post('/events/add', event.create); 
+
+router.post('/events/update', event.update); //put?
+
+router.post('/events/remove', event.remove);  //delete?
+
+/* charts routes */
+router.get('/charts/get', chart.findAll); 
+
+router.get('/charts/test', chart.test); 
+
+router.post('/charts/add', chart.create); 
+
 router.post('/charts/remove', chart.create); 
 
 /* Calendar routes */
@@ -61,5 +79,4 @@ router.get('/testConnection', function (req, res, next) {
     res.send('Connection to the backend established!');
 })
 
-module.exports = router;
 module.exports = router;
