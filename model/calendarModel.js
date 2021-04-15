@@ -34,11 +34,11 @@ Event.create = (newEvent, result) => {
     sql.query("INSERT INTO events SET ?", newEvent, (error, res) => {
       if (error) {
         console.log("error: ", error);
-        result(error, null);
+        result(error, false);
       }
       else {
       console.log("created event: ", { newEvent });
-      result(null, newEvent);
+      result(null, true);
       }
     });
   };

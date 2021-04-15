@@ -33,6 +33,7 @@ export default class App extends Component<Props, State> {
                 <div className="App">
                     <div className="children">
                         <Route exact path="/" component={this.mainPage}/>
+                        <Route exact path="/dev" component={Homepage}/>
                         <Route exact path="/Second" component={Second}/>
                         <Route exact path="/login" component={LoginContainer}/>
                         <Route exact path="/sign-up" component={LoginContainer}/>

@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 
 export const Head = () =>
 <div id="head">
-<section className="hero is-dark is-small">
+<section className="hero is-dark">
     <div className="hero-head">
       <nav className="navbar">
         <div className="navbar-brand">
