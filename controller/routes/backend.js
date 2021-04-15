@@ -27,8 +27,6 @@ router.post('/activity/add', authenticateJWT, activity.add);
 
 /* Calendar routes */
 
-/* Calendar routes */
-
 router.get('/events/get', event.findAll); 
 
 router.post('/events/add', event.create); 
@@ -42,9 +40,13 @@ router.get('/charts/get', chart.findAll);
 
 router.get('/charts/test', chart.test); 
 
-router.get('charts/data', chart.getdataset) // oder user oder sport, zum filtrieren
+router.get('/charts/dataset', chart.getdataset); 
 
-router.get('charts/data/:user/:sport', chart.paramdataset)
+/*router.get('/charts/dataset', function(request, res){
+  console.warn(request)
+  console.warn(response)
+}); */
+
 
 router.post('/charts/add', chart.create); 
 /*

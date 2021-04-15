@@ -70,22 +70,15 @@ fetch('http://localhost:9000/backend/charts/get').then(function (response) {
     post= JSON.parse(data.body)
     console.log(post)
 	// Store the post data to a variable
-	post = data;
-    console.log(data.body)
     /* Check if user/sport are defined and */
     /* query over all charts */
 	// Fetch another API
-    if(data.dataset.param_user && data.dataset.param_sport) 
-    {
-        var sport=data.dataset.param_sport
-        var user=data.dataset.param_user
-    }
-    else {
-        console.log("Not found")
-    }
+    console.log("sport: "+ post[1].param_sport + " user: " + post[1].param_user)
+        var sport=post[1].param_sport
+        var user=post[1].param_user
     const params = new URLSearchParams({ user: user,sport:sport })
     //Alternative: encodeURIComponent
-	return fetch('http://localhost:9000/backend/charts/data?' + params); //TODO: update route to filter ID/function  
+	return fetch('http://localhost:9000/backend/charts/dataset?'+ params); //TODO: update route to filter ID/function  
 
 }).then(function (response) {
 	if (response.ok) {
@@ -94,7 +87,7 @@ fetch('http://localhost:9000/backend/charts/get').then(function (response) {
 		return Promise.reject(response);
 	}
 }).then(function (chartsData) {
-	console.log(post, chartsData);
+	console.log(post, JSON.parse(chartsData.body));
 }).catch(function (error) {
 	console.warn(error);
 });
@@ -126,7 +119,7 @@ setcharts(data: any,name: string,type: string) {
       .then(test=>{return test.json()}) //convert to json
       .then(res=>{console.log(res)})    //view response in console
       .then((data:any) => {
-        console.log('Request succeeded with JSON response: ' + data);
+        console.log('Request succeeded');
         this.addElement(name,type)
     })
       .catch(error=>console.log(error)) //catch errors
@@ -175,8 +168,8 @@ function() {
         type: type.value,
         dataset:"Default",//TODO: add wanted dataset to modal
         fill:true, //TODO: add option to modal
-        sport:null,
-        user:null
+        param_sport:'Joggen',
+        param_user:null
       } 
     this.action()
     this.setcharts(chart,chart.name,chart.type)

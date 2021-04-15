@@ -30,8 +30,9 @@ exports.test = (request, response) => {
 
 exports.getdataset = (request,response) => {
     const user=request.query.user
-    const sport=request.query.user
-    Data.all(user,sport,(error, data) => {
+    const sport=request.query.sport
+    Data.getspecificsportanduser(user,sport,(error, data) => {
+   //    Data.getall((error,data) =>{
         if (error) {
             console.log(error);
             response.status(500).send({message: "Internal server error!" + error});
@@ -41,21 +42,6 @@ exports.getdataset = (request,response) => {
       });
 };    
 
-
-exports.paramdataset = (request,response) => {
-    const user= request.params.user;
-    const sport= request.params.sport;
-    /*if(request.params.dataset /*wenn Parameter = all oder wenn nicht definiert) {
-
-    }
-    else if (request.params.dataset /*wenn Parameter definiert) {
-
-    }
-    else {
-
-    }
- */       
-}
 
 exports.create = (request, response) => {
     if (!request.body) {
@@ -68,7 +54,9 @@ exports.create = (request, response) => {
             name: request.body.name,
             type: request.body.type,
             dataset: request.body.dataset,
-            fill: request.body.fill
+            fill: request.body.fill,
+            param_sport: request.body.param_sport,
+            param_user: request.body.param_user
           });
     Chart.create(chart,(error, added) => {
         if (error) {

@@ -1,12 +1,39 @@
 const sql = require("./createConnection");
 
 class Data {
-    /**/
-    static all(user,sport,response) {
+    /*TODO: speicify column*/
+
+    buildConditions(sport,user) {
+        var params = [];
+        var values = [];
+        var conditionsStr;
+      
+        if (typeof sport !== 'undefined'  &&  sport !==null) {
+          conditions.push("sport = ?");
+          values.push(sport);
+        }
+      
+        if (typeof user !== 'undefined') {
+          conditions.push("user = ?");
+          values.push(user);
+        }
+//          var sql = 'SELECT * FROM table WHERE ' + conditions.where;
+         
+        connection.query(sql, params, (error, results, fields) => {
+            // handle results here...
+          }
+        );
+      };
+      
+
+    static getspecificsportanduser(users,sports,response) {
         /* Alle Funktionen unten zusammnefassen */
         /*Attribute als Variable, durch switch case bestimmen*/
         /* zwischen count und sum unterscheiden */
-                sql.query("SELECT SUM(duration) AS amount FROM activity WHERE sport = COALESCE(?,sport) AND user = COALESCE(?, user)", [sport, user],
+        //users=users.toString()
+        //sports=sports.toString()
+               // sql.query("SELECT SUM(duration) AS amount FROM activity WHERE sport = COALESCE(?,sport) AND user = COALESCE(?, user)", [sports, users],
+               sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity WHERE sport = ? GROUP BY year(startedAt), month(startedAt)",[sports],             
                 function (error, results) {
                     if (error) {
                         response(error, null);
@@ -15,6 +42,40 @@ class Data {
                     }
                 });
     }
+
+    static getspeicificsports(sport,response) {
+        sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity GROUP BY year(startedAt), month(startedAt) WHERE sport = ?",[sport],
+        function (error, results) {
+            if (error) {
+                response(error, null);
+            } else {
+                response(null, results);
+            }
+        });
+    };
+
+    static getspeicifcuser(user,response) {
+        sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity GROUP BY year(startedAt), month(startedAt) WHERE sport = ?",[sport],
+        function (error, results) {
+            if (error) {
+                response(error, null);
+            } else {
+                response(null, results);
+            }
+        });
+    }
+
+    static getall(response) {
+        sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity GROUP BY year(startedAt), month(startedAt)",
+        function (error, results) {
+            if (error) {
+                response(error, null);
+            } else {
+                response(null, results);
+            }
+        });
+    }
+
 
     static getdurationpermonth(response /*sport,user*/) {
         /* Where user condition hinzufügen. If null: Wert ignorieren (User benachrichtigen) */
@@ -42,12 +103,8 @@ class Data {
         }*/
     }
     static getdistancepermonth() {
-        sql.query("SELECT  sum(effort) as amount, month(startedAt) as month, year(startedAt) FROM activity GROUP BY year(startedAt), month(startedAt)");
-        /* Sport ausschließen, die kein distance haben */
     }
     static getamountforsportpermonth() {
-        sql.query("SELECT  count(sport) as amount, month(startedAt) as month, year(startedAt) FROM activity GROUP BY year(startedAt), month(startedAt)");
-        /* Summe, wie oft ein Sport in ein Monat ausgeführt wurde */
     }
     static getaveragespeedpermonth() {
     }

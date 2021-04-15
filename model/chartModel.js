@@ -5,6 +5,8 @@ const Chart = function(chart) {
     this.type=chart.type
     this.dataset=chart.dataset
     this.fill=chart.fill
+    this.param_sport=chart.param_sport
+    this.param_user=chart.param_user
       /*  optional: params:   
             user
             sport
