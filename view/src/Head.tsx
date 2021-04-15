@@ -1,4 +1,4 @@
-import Search from './Search';
+import SearchBar from './components/SearchBar';
 import Logo from './img/WorkoutLogo.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faSignInAlt, faUser } from '@fortawesome/free-solid-svg-icons';
@@ -17,7 +17,7 @@ export const Head = () =>
         </div>
           <div className="navbar-end">
           <div className="navbar-item">
-        <Search></Search>
+        <SearchBar/>
         </div>
             <a className="navbar-item" href="/">
             <span className="icon">
