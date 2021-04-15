@@ -1,6 +1,14 @@
 const sql = require("./createConnection");
 
 const Chart = function(chart) {
+    this.name=chart.name
+    this.type=chart.type
+    this.dataset=chart.dataset
+    this.fill=chart.fill
+      /*  optional: params:   
+            user
+            sport
+    */
 }
 
 Chart.getAll = (response) => {
@@ -12,6 +20,18 @@ Chart.getAll = (response) => {
                 response(null,results)
             }
     });
+}
+
+Chart.create = (newChart,response) => {
+    sql.query("INSERT INTO charts SET ?", newChart, (error,results) => {
+        if (error) {
+            console.log("There was an error during inserting new chart: ", error);
+            response(error, false);
+          }
+          else {      
+             response(null, true);
+    }
+});
 }
 
 

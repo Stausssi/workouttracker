@@ -100,8 +100,8 @@ getcharts() {
     .then(data => console.log(data));
 }
 
-setcharts(data: any) {
- /*   fetch("http://localhost:9000/backend/charts/add",{
+setcharts(data: any,name: string,type: string) {
+    fetch("http://localhost:9000/backend/charts/add",{
         headers:{
           "accept":"application/json",
           "content-type":"application/json"
@@ -111,11 +111,12 @@ setcharts(data: any) {
       })
       .then(test=>{return test.json()}) //convert to json
       .then(res=>{console.log(res)})    //view response in console
-      .then((data) => {
+      .then((data:any) => {
         console.log('Request succeeded with JSON response: ' + data);
+        this.addElement(name,type)
     })
       .catch(error=>console.log(error)) //catch errors
-      */
+      
     }
 
 private drawSample() {
@@ -134,7 +135,6 @@ private drawSample() {
             labels: ["January", "February", "March", "April", "May", "June", "July"],
             datasets: [{
                 label: "My First dataset",
-                //new option, type will default to bar as that what is used to create the scale
                // type: "line",
                 backgroundColor: "rgba(220,220,220,0.2)",
                 borderColor: "rgba(220,220,220,1)",
@@ -142,7 +142,6 @@ private drawSample() {
                 fill:false
             }, {
                 label: "My First dataset",
-                //new option, type will default to bar as that what is used to create the scale
                 //type: "bar",
                 backgroundColor: "rgba(220,20,220,0.2)",
                 borderColor: "rgba(220,20,220,1)",
@@ -152,15 +151,19 @@ private drawSample() {
     });
 }
 function() { 
-//var ctx_$title = document.getElementById('canvas_$title').getContext('2d');                                    
-  //window.myBar = new Chart(ctx_$title).Bar(barChartData_$title, { responsive : true }); 
   const title=document.getElementById('titleinput2') as HTMLInputElement
   const type=document.getElementById('typeinput') as HTMLInputElement
   if(title.value && type.value)
   {
     console.log(title.value)
-    this.addElement(title.value,type.value)
-    alert('New chart ' + title.value +' is currently being created!')
+    const chart = {
+        name: title.value,
+        type: type.value,
+        dataset:"Default",//TODO: add wanted dataset to modal
+        fill:true //TODO: add option to modal
+      } 
+    this.action()
+    this.setcharts(chart,chart.name,chart.type) 
   }
   else {
     alert('Please give a name and a type for your chart!')
@@ -180,8 +183,8 @@ addElement (title:string,type:string) {
     var parent = document.getElementById("charts");
     parent?.appendChild(canvas);
     console.log(document.getElementById(canvas.id))
-    alert("new canvas: "+canvas + " witch id " +canvas.id)
     this.addcharts(canvas,type)
+    alert("new canvas: "+canvas + " witch id " +canvas.id)
     }
     else {
         alert("Der ausgewählte Name existiert bereits. bitte wählen Sie in ein anderer Name aus!")

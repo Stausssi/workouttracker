@@ -45,6 +45,9 @@ router.get('/charts/test', chart.test);
 router.post('/charts/add', chart.create); 
 /*
 
+
+router.get('charts/data/:id') // oder user oder sport, zum filtrieren
+
 router.get('/charts/update', chart.findAll); 
 
 router.post('/charts/remove', chart.create); 

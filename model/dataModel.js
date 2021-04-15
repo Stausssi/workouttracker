@@ -1,11 +1,14 @@
 const sql = require("./createConnection");
 
 class Data {
+    /**/
     static all() {
         /* Alle Funktionen unten zusammnefassen */
         /*Attribute als Variable, durch switch case bestimmen*/
         /* zwischen count und sum unterscheiden */
     }
+
+    static all
     static getdurationpermonth(response /*sport,user*/) {
         /* Where user condition hinzufügen. If null: Wert ignorieren (User benachrichtigen) */
         sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity GROUP BY year(startedAt), month(startedAt)",
