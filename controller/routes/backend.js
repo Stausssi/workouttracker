@@ -19,7 +19,7 @@ router.post('/signup', users.signup );
 router.get('/verify/:hash', function(req, res){
   users.verifyEmail(req, res);
   res.redirect('http://localhost:3000/sign-up');
-}); 
+});
 
 router.post('/activity/add', authenticateJWT, activity.add);
 

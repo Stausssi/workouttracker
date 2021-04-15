@@ -8,7 +8,7 @@ const User = function(user) {
     this.password = user.password;
     this.firstname = user.firstname;
     this.lastname = user.lastname;
-    this.age = user.age;
+    this.date = user.date;
     this.weight = user.weight;
     this.email = user.email;
     this.emailVerify = user.emailVerify;
@@ -17,7 +17,7 @@ const User = function(user) {
 
 //status is true if user was created and false if user was not created --> Status
 User.create = (newUser, status) => {
-    sql.query("INSERT INTO user SET ?", newUser, (error, result) => {
+    sql.query("INSERT INTO user SET ? ", newUser, (error, result) => {
         if (error) {
             console.log("error: ", error);
             status(error, false);
