@@ -1,4 +1,4 @@
-import Search from './Search';
+import SearchBar from './components/search/SearchBar';
 import Logo from './img/WorkoutLogo.png'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faHome, faSignInAlt, faUser} from '@fortawesome/free-solid-svg-icons';
@@ -60,4 +60,5 @@ export const Head = () =>
         </div>
 </section>
 </div>
+export default Head;
 export default Head;
