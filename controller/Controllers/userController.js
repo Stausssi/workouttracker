@@ -79,7 +79,7 @@ exports.search = (req, res) => {
         res.status(400).send({message: "Bad Request"});
     } else {
         console.log(query);
-        // TODO: Database query
+        // TODO: Database query --> LIKE Statement
         res.status(200).send({
             body: JSON.stringify({
                 message: "users " + query

@@ -60,6 +60,7 @@ export default class SearchBar extends React.Component<Props, State> {
             </>
         });
 
+        // TODO: auth
         fetch(BACKEND_URL + "users/search?query=" + query).then((response) => {
             if (response.ok) {
                 return response.json().then((response) => {
@@ -98,9 +99,11 @@ export default class SearchBar extends React.Component<Props, State> {
                         {this.state.displayLoading ?
                             <>
                                 <div className="dropdown-item">
-                                    <div className="control is-loading">
-                                        <input className="input is-static" type="text" placeholder="Searching..."
-                                               readOnly={true}/>
+                                    <div className="field">
+                                        <div className="control is-loading">
+                                            <input className="input is-static" type="text" placeholder="Searching..."
+                                                   readOnly={true}/>
+                                        </div>
                                     </div>
                                 </div>
                             </>

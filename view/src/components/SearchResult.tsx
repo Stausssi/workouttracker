@@ -28,6 +28,7 @@ export default class SearchResult extends React.Component<Props, State> {
     }
 
     render() {
+        // TODO: link to user profile
         return (
             <>
             <div className="dropdown-item">
