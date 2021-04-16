@@ -1,17 +1,17 @@
 const { request } = require('express');
-const User = require('../../model/models/userModel');
+const User = require('../../model/usermodel');
 const jwt = require("jsonwebtoken");
-const config = require("../utilities/mail/emailConfirmation.config");
+const config = require("../mail/emailConfirmation.config");
 const bcrypt = require("bcryptjs");
-const mail = require("../utilities/mail/confirmationEmail");
-const tokenGeneration = require("../utilities/authentication/AccessTokenSecret.config");
+const mail = require("../mail/confirmationEmail");
+const tokenGeneration = require("../Authentication/AccessTokenSecret.config");
 
 
 //creates a new user if the email/username doesn´t already exist
 exports.signup = (req, res) => {
     //validate request --> add more checks !!!!!!!!!!!!!!!!!!!!!!!!!!
     console.log(req.body);
-    if(!req.body && !req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password && !req.body.username && !req.body.date && !req.body.weight){
+    if(!req.body && !req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password && !req.body.username){
         res.status(400).send({message: "bad request"});
     } else {
 
@@ -21,7 +21,7 @@ exports.signup = (req, res) => {
             password : bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10)), // hash password with bcrypt
             firstname : req.body.firstname,
             lastname : req.body.lastname,
-            date : req.body.date,
+            age : req.body.age,
             weight : req.body.weight,
             email : req.body.email,
             emailVerify : 0,
@@ -64,7 +64,9 @@ exports.signup = (req, res) => {
                                     message: "user could not be created"
                                 });
                             } else {
-                                res.status(201).send({message: "user created"});
+                                res.status(201).send({
+                                    message: "user was created"
+                                });
 
                                 //send confirmation email to user with generated confirmationToken
                                 mail.sendConfirmationEmail(newuser);
@@ -97,7 +99,7 @@ exports.login = (req, res) => {
                     //generate JWT for user with content: username ...
 
                     const accessToken = jwt.sign({ username: result.username }, tokenGeneration.AccessTokenSecret);
-                    //send access token back to user
+                    //send accesstoken back to user
                     res.status(200).send({token: accessToken});
                 }else{
                     //passwords do not match (HTTP CODE: 401 - UNAUTHORIZED)
@@ -121,17 +123,4 @@ exports.verifyEmail = (req, res) => {
 
 };
 
-exports.search = (req, res) => {
-    const query = req.query.query;
-    if (!query) {
-        res.status(400).send({message: "Bad Request"});
-    } else {
-        console.log(query);
-        // TODO: Database query --> LIKE Statement
-        res.status(200).send({
-            body: JSON.stringify({
-                message: "users " + query
-            })
-        });
-    }
-}
+//This is a controller file, not a modell file --> Move
