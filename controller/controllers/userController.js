@@ -1,10 +1,10 @@
 const { request } = require('express');
-const User = require('../../model/userModel');
+const User = require('../../model/models/userModel');
 const jwt = require("jsonwebtoken");
-const config = require("../mail/emailConfirmation.config");
+const config = require("../utilities/mail/emailConfirmation.config");
 const bcrypt = require("bcryptjs");
-const mail = require("../mail/confirmationEmail");
-const tokenGeneration = require("../Authentication/AccessTokenSecret.config");
+const mail = require("../utilities/mail/confirmationEmail");
+const tokenGeneration = require("../utilities/authentication/AccessTokenSecret.config");
 
 
 //creates a new user if the email/username doesn´t already exist

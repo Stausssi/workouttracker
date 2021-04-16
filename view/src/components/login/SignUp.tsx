@@ -1,8 +1,8 @@
 import React, {Component} from "react";
-import NotificationBox from "./notificationBox";
+import NotificationBox from "../NotificationBox";
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import {BACKEND_URL, FRONTEND_URL} from "../App";
+import {BACKEND_URL, FRONTEND_URL} from "../../App";
 
 function validateEmail(email: string)
 {

@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 //initialize the database controllers
-const users = require("../Controllers/userController");
-const activity = require("../Controllers/activityController");
-const sport = require("../Controllers/sportController");
+const users = require("../controllers/userController");
+const activity = require("../controllers/activityController");
+const sport = require("../controllers/sportController");
 
-const {authenticateJWT} = require("../Authentication/MiddlewareAuthentication");
+const {authenticateJWT} = require("../utilities/authentication/MiddlewareAuthentication");
 
 router.get('/', function (req, res, next) {
     res.render('index')

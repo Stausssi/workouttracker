@@ -1,8 +1,8 @@
 import {faPlusCircle, faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
-import AddActivity from "./components/add_activity";
-import {BACKEND_URL} from "./App";
+import AddActivity from "./AddActivity";
+import {BACKEND_URL} from "../../App";
 
 interface Props {}
 

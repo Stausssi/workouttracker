@@ -1,6 +1,6 @@
 import React from 'react';
 import './css/App.css';
-import ToggleButton from './ToggleButton'
+import ToggleButton from './components/ToggleButton'
 import 'bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css'
 
 interface Props {}

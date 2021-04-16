@@ -2,7 +2,7 @@ import {faSearch} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import SearchResult from "./SearchResult";
-import {BACKEND_URL} from "../App";
+import {BACKEND_URL} from "../../App";
 
 interface Props {
 }

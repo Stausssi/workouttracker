@@ -1,5 +1,5 @@
 import React from "react";
-import {FRONTEND_URL} from "../App";
+import {FRONTEND_URL} from "../../App";
 
 interface State {
     progress: number

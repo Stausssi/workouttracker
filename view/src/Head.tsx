@@ -1,10 +1,10 @@
-import SearchBar from './components/SearchBar';
+import SearchBar from './components/search/SearchBar';
 import Logo from './img/WorkoutLogo.png'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faHome, faSignInAlt, faUser} from '@fortawesome/free-solid-svg-icons';
-import Modal from './Modal';
+import Modal from './components/activity/Modal';
 import { Link } from "react-router-dom";
-import SessionHandler from "./SessionHandler";
+import SessionHandler from "./utilities/SessionHandler";
 
 export const Head = () =>
     <section className="hero is-dark is-small">

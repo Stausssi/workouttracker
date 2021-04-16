@@ -1,5 +1,5 @@
 //get connection to database
-const sql = require('./createConnection');
+const sql = require('../createConnection');
 
 //constructor for user model
 

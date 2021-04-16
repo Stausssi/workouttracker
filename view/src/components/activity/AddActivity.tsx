@@ -5,10 +5,10 @@ import DatePicker from "react-datepicker";
 import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
 
-import NotificationBox from "./notificationBox";
-import SessionHandler from "../SessionHandler";
+import NotificationBox from "../NotificationBox";
+import SessionHandler from "../../utilities/SessionHandler";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {BACKEND_URL} from "../App";
+import {BACKEND_URL} from "../../App";
 
 interface Props {
     sports: { [key: string]: number }

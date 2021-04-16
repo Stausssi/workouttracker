@@ -1,14 +1,14 @@
 import {BrowserRouter, Route} from 'react-router-dom'
-import Homepage from './Homepage';
+import Homepage from './pages/Homepage';
 import './css/App.css';
 import "bulma"
 import 'bulma-extensions/dist/css/bulma-extensions.min.css'
 import {Component} from "react";
-import SessionHandler from "./SessionHandler";
-import LoginContainer from "./components/LoginContainer";
+import SessionHandler from "./utilities/SessionHandler";
+import LoginContainer from "./pages/LoginContainer";
 import ProtectedRoute from "./utilities/Routing";
-import Verify from "./components/verify.component";
-import SuccessfulSignup from "./components/successfulSignup.component";
+import Verify from "./components/login/Verify";
+import SuccessfulSignup from "./components/login/SuccessfulSignUp";
 
 interface Props {}
 

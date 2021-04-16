@@ -1,6 +1,6 @@
 import React, {Component} from "react";
-import NotificationBox from "./notificationBox";
-import {BACKEND_URL, FRONTEND_URL} from "../App";
+import NotificationBox from "../NotificationBox";
+import {BACKEND_URL, FRONTEND_URL} from "../../App";
 
 interface State {
     email: string,

@@ -1,6 +1,6 @@
 import {Switch} from "react-router";
-import Login from "./login.component";
-import SignUp from "./signup.component";
+import Login from "../components/login/Login";
+import SignUp from "../components/login/SignUp";
 import {Route, Link} from "react-router-dom";
 import React from "react";
 
