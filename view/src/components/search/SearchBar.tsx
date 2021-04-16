@@ -4,6 +4,7 @@ import React from "react";
 import SearchResult from "./SearchResult";
 import {BACKEND_URL} from "../../App";
 import SessionHandler from "../../utilities/SessionHandler";
+import NotificationBox from "../NotificationBox";
 
 interface Props {
 }
@@ -57,7 +58,11 @@ export default class SearchBar extends React.Component<Props, State> {
         }).then((response) => {
             if (response.ok) {
                 return response.json().then((response) => {
-                    let foundUsers: any = <><p className="tag is-danger">No user with the name xxxx found!</p></>
+                    let foundUsers: any = <NotificationBox
+                        message={`No user with the name '${query}' was found!`}
+                        type={"is-danger is-light mx-2"}
+                        hasDelete={false}
+                    />
 
                     if (response.userFound) {
                         foundUsers = JSON.parse(response.users);
@@ -86,7 +91,7 @@ export default class SearchBar extends React.Component<Props, State> {
         return (
             <div className={`dropdown ${this.state.searchQuery !== "" ? "is-active" : ""}`}>
                 <div className="dropdown-trigger">
-                    <div className="field">
+                    <div className="field" aria-haspopup={"true"} aria-controls={"searchResults"}>
                         <div className="control is-expanded has-icons-right">
                             <input
                                 className="input is-primary"
@@ -101,21 +106,25 @@ export default class SearchBar extends React.Component<Props, State> {
                         </div>
                     </div>
                 </div>
-                <div className="dropdown-menu">
+                <div className="dropdown-menu is-fullwidth" id={"searchResults"} role={"menu"}>
                     <div className="dropdown-content">
-                        {this.state.searchResults}
-                        {this.state.displayLoading ?
-                            <div className="dropdown-item">
-                                <div className="field">
-                                    <div className="control is-loading">
-                                        <input className="input is-static" type="text"
-                                               placeholder="Searching for users..."
-                                               readOnly={true}/>
+                        {
+                            this.state.displayLoading ?
+                                <div className="dropdown-item">
+                                    <div className="field has-addons">
+                                        <div className="control">
+                                            <input className="input is-static"
+                                                   type="text"
+                                                   placeholder={`Searching...`}
+                                                   readOnly={true}/>
+                                        </div>
+                                        <div className="control">
+                                            <button className="button is-loading is-white" disabled={true} />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            :
-                            <></>
+                                :
+                                this.state.searchResults
                         }
                     </div>
                 </div>
