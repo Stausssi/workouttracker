@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 
 import DatePicker from "react-datepicker";
-import de from "date-fns/locale/de";
+import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
 
 import NotificationBox from "./notificationBox";
@@ -497,7 +497,7 @@ export default class AddActivity extends Component<Props, State> {
                     timeFormat="HH:mm"
                     maxDate={this.getMaxValidDate()}
                     selected={this.state.date}
-                    locale={de}
+                    locale={en}
                     onChange={(date: Date) => this.setState({date: date})}
                     filterTime={(time: Date) => {
                         let maxTime = this.getMaxValidDate();
