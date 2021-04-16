@@ -9,12 +9,9 @@ import {Component} from "react";
 import SessionHandler from "./SessionHandler";
 import LoginContainer from "./components/LoginContainer";
 
-interface Props {
+interface Props {}
 
-}
-
-interface State {
-}
+interface State {}
 
 export default class App extends Component<Props, State> {
     mainPage: any;

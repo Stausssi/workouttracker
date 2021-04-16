@@ -2,9 +2,9 @@ import React from 'react';
 import './css/App.css';
 import ToggleButton from './ToggleButton'
 import 'bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css'
+import {BACKEND_URL} from "./App";
 
-interface Props {
-}
+interface Props {}
 
 interface State {
     showPopup: boolean
