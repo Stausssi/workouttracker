@@ -52,11 +52,7 @@ export default class Graphs extends React.Component<Props,State> {
         this.setState((state) =>({active:!state.active}))
       };
 
-testapi() {
-    this.getdatasets()
-}
-
-getcombinefetch() {
+getcharts() {
     //setstate charts then make new fetch to get data for each charts
 // Call the API
 fetch('http://localhost:9000/backend/charts/get').then(function (response) {
@@ -71,12 +67,12 @@ fetch('http://localhost:9000/backend/charts/get').then(function (response) {
     console.log(post)
 	console.log(JSON.parse(post.body));
     this.setState({array:JSON.parse(post.body)})
-    this.getest()
+    this.loopOverData()
 }) .catch(error=>console.warn(error))
 }
 
-getest() {
-    for(let i=0;i<=this.state.array.length;i++){
+loopOverData() {
+    for(let i=0;i<this.state.array.length;i++){
         // Store the post data to a variable
         /* Check if user/sport are defined and query over all charts */ 
         //query parameter values from DB and set if not NULL. else, let values as undefined
@@ -98,11 +94,11 @@ getest() {
         const url='http://localhost:9000/backend/charts/dataset?'
         console.log(url+ params)
         this.addElement(this.state.array[i].name,this.state.array[i].type)
-        //this.getdataforcharts(url,params)
+        //this.getdatasets(url,params)
     }
 }
 
-getdataforcharts(url:string,params:any) { 
+getdatasets(url:string,params:any) { 
     fetch(url+ params) 
     .then((response) => {
         if (response.ok) {
@@ -116,14 +112,6 @@ getdataforcharts(url:string,params:any) {
         //this.addElement() => add dataset
     
     }) .catch(error=>console.warn(error))
-}
-
-getdatasets() {
-    fetch("http://localhost:9000/backend/charts/dataset?")
-    .then(response => response.json())
-    //.then(data => console.log(data))
-    .then(data => console.log(JSON.parse(data.body)))
-    .catch(error=>console.warn(error))
 }
 
 setcharts(data: any,name: string,type: string) {
@@ -145,6 +133,97 @@ setcharts(data: any,name: string,type: string) {
       
     }
 
+
+//Get inputs values then create charts
+configureChart() { 
+  const title=document.getElementById('titleinput2') as HTMLInputElement
+  const type=document.getElementById('typeinput') as HTMLInputElement
+  if(title.value && type.value)
+  {
+      console.log(title.value)
+      const chart = {
+          name: title.value,
+          type: type.value,
+          dataset:"Default",//TODO: add wanted dataset to modal
+          fill:true, //TODO: add option to modal
+          param_sport:'Joggen',
+          param_user:null
+        } 
+        this.action()
+        this.setcharts(chart,chart.name,chart.type)
+    }
+    else {
+        alert('Please give a name and a type for your chart!')
+    }
+}
+
+addElement (title:string,type:string) {
+    var chartnode = document.getElementById("chartID_"+title)
+    if (!this.charts.includes(title)&& !chartnode)
+    {
+        this.charts.push()
+        // erstelle ein neues div Element für jedes neues Chart
+        //if(!document.getElementById("canvas"+title) --> check if element exists
+        var canvas = document.createElement("canvas");
+        canvas.id = "chartID_"+title;
+        // füge das neu erstellte Element und seinen Inhalt ins DOM ein
+        var parent = document.getElementById("charts");
+        parent?.appendChild(canvas);
+        console.log(document.getElementById(canvas.id))
+        this.addcharts(canvas,type)
+        alert("new canvas: "+canvas + " witch id " +canvas.id)
+    }
+    else {
+        alert("Der ausgewählte Name existiert bereits. bitte wählen Sie in ein anderer Name aus!")
+    }
+}
+
+
+removeElement (title:string) {
+    /* When this function is call: check if chart on DB wa removed, then remove element on DOM and remove title as identifier from DB */
+}
+
+addcharts(canvas:HTMLCanvasElement,type:string) {
+    new Chart(canvas, {
+        type: type,                                                  //Define chart type
+        data: {
+            labels: this.labels,
+            datasets: [{
+                label: "My First dataset",
+                //new option, type will default to bar as that what is used to create the scale
+                // type: "line",
+                backgroundColor: "rgba(220,220,220,0.2)",
+                borderColor: "rgba(220,220,220,1)",
+                data: [65, 59, 4, 81, 56, 55, 40],
+                fill:false
+            }, {
+                label: "My second dataset",
+                //new option, type will default to bar as that what is used to create the scale
+                //type: "bar",
+                backgroundColor: "rgba(220,20,220,0.2)",
+                borderColor: "rgba(220,20,220,1)",
+                data: [32, 25, 33, 88, 12, 92, 33]
+            }]
+        },
+        
+    })
+}
+
+/*Utils*/
+empty(list: any[]) {
+    //empty array
+    list.length = 0;
+}
+
+updateChartType = (charttype:any) => {
+    this.setState({ type: charttype.target.value });
+    console.log(this.state.type)
+  };
+
+
+
+  /*##############################################################*/
+    /*OLD, Delete before merge*/
 private drawSample() {
     //Destroy previous chart if exists before create a new chart
     if(typeof this.chart1 !== "undefined")
@@ -176,86 +255,7 @@ private drawSample() {
         },
     });
 }
-//Get inputs values then create charts
-function() { 
-  const title=document.getElementById('titleinput2') as HTMLInputElement
-  const type=document.getElementById('typeinput') as HTMLInputElement
-  if(title.value && type.value)
-  {
-    console.log(title.value)
-    const chart = {
-        name: title.value,
-        type: type.value,
-        dataset:"Default",//TODO: add wanted dataset to modal
-        fill:true, //TODO: add option to modal
-        param_sport:'Joggen',
-        param_user:null
-      } 
-    this.action()
-    this.setcharts(chart,chart.name,chart.type)
-  }
-  else {
-    alert('Please give a name and a type for your chart!')
-  }
-}
-
-addElement (title:string,type:string) {
-    var chartnode = document.getElementById("chartID_"+title)
-    if (!this.charts.includes(title)&& !chartnode)
-    {
-    this.charts.push()
-    // erstelle ein neues div Element für jedes neues Chart
-    //if(!document.getElementById("canvas"+title) --> check if element exists
-    var canvas = document.createElement("canvas");
-    canvas.id = "chartID_"+title;
-    // füge das neu erstellte Element und seinen Inhalt ins DOM ein
-    var parent = document.getElementById("charts");
-    parent?.appendChild(canvas);
-    console.log(document.getElementById(canvas.id))
-    this.addcharts(canvas,type)
-    alert("new canvas: "+canvas + " witch id " +canvas.id)
-    }
-    else {
-        alert("Der ausgewählte Name existiert bereits. bitte wählen Sie in ein anderer Name aus!")
-    }
-}
-
-
-removeElement (title:string) {
-    /* When this function is call: check if chart on DB wa removed, then remove element on DOM and remove title as identifier from DB */
-}
-
-addcharts(canvas:HTMLCanvasElement,type:string) {
-    var newchart= new Chart(canvas, {
-        type: type,                                                  //Define chart type
-        data: {
-            labels: this.labels,
-            datasets: [{
-                label: "My First dataset",
-                //new option, type will default to bar as that what is used to create the scale
-               // type: "line",
-                backgroundColor: "rgba(220,220,220,0.2)",
-                borderColor: "rgba(220,220,220,1)",
-                data: [65, 59, 4, 81, 56, 55, 40],
-                fill:false
-            }, {
-                label: "My second dataset",
-                //new option, type will default to bar as that what is used to create the scale
-                //type: "bar",
-                backgroundColor: "rgba(220,20,220,0.2)",
-                borderColor: "rgba(220,20,220,1)",
-                data: [32, 25, 33, 88, 12, 92, 33]
-            }]
-        },
-
-    })
-}
-
-empty(list: any[]) {
-    //empty array
-    list.length = 0;
-}
-
+  
 drawSample2() {
     const labels=["Januar","Februar","März","April","Mai","Juni"]
     this.empty(this.data);
@@ -338,20 +338,17 @@ getrandomData() {
 
 }
 
-updateChartType = (charttype:any) => {
-    this.setState({ type: charttype.target.value });
-    console.log(this.state.type)
-  };
+/* END of TODELETE */
+/*##############################################################*/
+
+
 
     render() {
         const active = this.state.active ? "is-active" : ""; 
         return (
 <div className="container">
-  <div className = "title">
-    <h1>Chart 1</h1>
-  </div>
+  <div className="divider">Chart</div>
   <div className="controls">
-    <h5 className="label">Chart Type</h5>
     <select name="chartType" id="chartType" defaultValue={this.state.type} onChange={this.updateChartType}>
       <option value="line">Line</option>
       <option value="bar">Bar</option>
@@ -361,20 +358,19 @@ updateChartType = (charttype:any) => {
       <option value="doughnut">Doughnut</option>
       <option value="pie">Pie</option>
     </select>
-    <button onClick={()=>this.getrandomData()}>Randomize Data!</button>
-    <button onClick={()=>this.drawSample()}>Draw</button>
-    <button onClick={()=>this.drawSample2()}>Draw with Config</button>
-    <button onClick={()=>this.testapi()}>Test Api</button>
-    <button onClick={()=>this.action()}>Open Modal</button>
-    <button onClick={()=>this.getcombinefetch()}>get combine</button>
+    <button className='button' onClick={()=>this.getrandomData()}>Randomize Data!</button>
+    <button className='button' onClick={()=>this.drawSample()}>Draw</button>
+    <button className='button' onClick={()=>this.drawSample2()}>Draw with Config</button>
+    <button className='button' onClick={()=>this.action()}>Open Modal</button>
+    <button className='button' onClick={()=>this.getcharts()}>get combine</button>
   </div>
+  <div id="charts"/> 
   <div className="chart-container">
     <canvas id="myChart"></canvas>
   </div> 
   <div className="chart-container2">
     <canvas id="myChart2"></canvas>
   </div> 
-  <div id="charts"/> 
   <div className={`modal ${active}`} id="ChartModal">
                     <div className="modal-background"></div>
                     <div className="modal-card">
@@ -403,7 +399,7 @@ updateChartType = (charttype:any) => {
                   </div>
                     </section>
                     <footer className="modal-card-foot">
-                        <button className="button is-success" onClick={()=>this.function()}>Save changes</button>
+                        <button className="button is-success" onClick={()=>this.configureChart()}>Save changes</button>
                         <button className="button" onClick={()=>this.action()} >Cancel</button>
                     </footer>
                     </div>

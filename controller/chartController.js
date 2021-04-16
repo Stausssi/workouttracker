@@ -13,17 +13,6 @@ exports.findAll = (request, response) => {
       });
 };
 
-exports.test = (request, response) => {
-    Data.getdurationpermonth((error, data) => {
-        if (error) {
-            console.log(error);
-            response.status(500).send({message: "Internal server error!" + error});
-        } else{
-            response.status(200).send({body: JSON.stringify(data)});
-        } 
-      });
-};
-
 /* Get Data: check if value for user or sport was set and make call to DB depending on it
     Set params into url
 */
