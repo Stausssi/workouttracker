@@ -6,7 +6,7 @@ import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
 
 import NotificationBox from "./notificationBox";
-import SessionHandler from "../SessionHandler";
+import SessionHandler from "../utilities/SessionHandler";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {BACKEND_URL} from "../App";
 
