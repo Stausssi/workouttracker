@@ -11,7 +11,7 @@ const tokenGeneration = require("../Authentication/AccessTokenSecret.config");
 exports.signup = (req, res) => {
     //validate request --> add more checks !!!!!!!!!!!!!!!!!!!!!!!!!!
     console.log(req.body);
-    if(!req.body && !req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password && !req.body.username){
+    if(!req.body && !req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password && !req.body.username && !req.body.date && !req.body.weight){
         res.status(400).send({message: "bad request"});
     } else {
 
@@ -21,7 +21,7 @@ exports.signup = (req, res) => {
             password : bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10)), // hash password with bcrypt
             firstname : req.body.firstname,
             lastname : req.body.lastname,
-            age : req.body.age,
+            date : req.body.date,
             weight : req.body.weight,
             email : req.body.email,
             emailVerify : 0,
@@ -64,9 +64,7 @@ exports.signup = (req, res) => {
                                     message: "user could not be created"
                                 });
                             } else {
-                                res.status(201).send({
-                                    message: "user was created"
-                                });
+                                res.status(201).send({message: "user created"});
 
                                 //send confirmation email to user with generated confirmationToken
                                 mail.sendConfirmationEmail(newuser);
@@ -99,7 +97,7 @@ exports.login = (req, res) => {
                     //generate JWT for user with content: username ...
 
                     const accessToken = jwt.sign({ username: result.username }, tokenGeneration.AccessTokenSecret);
-                    //send accesstoken back to user
+                    //send access token back to user
                     res.status(200).send({token: accessToken});
                 }else{
                     //passwords do not match (HTTP CODE: 401 - UNAUTHORIZED)
@@ -123,4 +121,4 @@ exports.verifyEmail = (req, res) => {
 
 };
 
-//This is a controller file, not a modell file --> Move
+//This is a controller file, not a model file --> Move

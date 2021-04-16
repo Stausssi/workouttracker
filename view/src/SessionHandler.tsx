@@ -7,6 +7,10 @@ export default class SessionHandler {
         return sessionStorage.getItem("AccessToken") !== null;
     }
 
+    static isNotLoggedIn() {
+        return sessionStorage.getItem("AccessToken") === null;
+    }
+
     static getUser() {
         return ({
             username: sessionStorage.getItem("username")
