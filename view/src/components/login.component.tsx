@@ -1,9 +1,16 @@
 import React, {Component} from "react";
 import NotificationBox from "./notificationBox";
 
-export default class Login extends Component {
-    constructor(props) {
+interface State {
+    email: string,
+    password: string,
+    errorMessage: string
+}
+
+export default class Login extends Component<{}, State> {
+    constructor(props: any) {
         super(props);
+
         this.state = {
             email: '',
             password: '',
@@ -14,17 +21,17 @@ export default class Login extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleChange(event) {
+    handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         const target = event.target;
         const value = target.value;
         const name = target.name;
 
         this.setState({
             [name]: value
-        });
+        }as Pick<State, keyof State>);
     }
 
-    handleSubmit(event) {
+    handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
         const email = this.state.email;
         const pw = this.state.password;
         event.preventDefault();
@@ -61,7 +68,7 @@ export default class Login extends Component {
                             sessionStorage.setItem('username', decodedJSON.username);
 
                             // PROVISORISCHE LÖSUNG
-                            window.location.reload();
+                            window.location.href = "http://localhost:3000/";
                         } else {
                             this.setState({errorMessage: "Login Error Occured"});
                         }
@@ -69,7 +76,7 @@ export default class Login extends Component {
                 } else if (response.status === 401) {
                     this.setState({errorMessage: "You have entered an invalid username or password"});
                 } else {
-                    this.setState({errorMessage: response.json().message});
+                    this.setState({errorMessage: "Error!"});
                 }
             });
         } else {
@@ -80,34 +87,36 @@ export default class Login extends Component {
     //return rendered component
     render() {
         return (
-            <section className='section'>
-                <form className="box">
-                    <h3 className="title">Log in</h3>
+            <section className="section" >
+                <div className="columns is-centered">
+                    <div className="column is-5-tablet is-4-desktop is-3-widescreen">
+                        <form className="box ">
+                            <h3 className="title">Log in</h3>
 
-                    <div className="field">
-                        <label className="label">Email or username</label>
-                        <div className="control">
-                            <input type="email" autoFocus name="email" className="input"
-                                   placeholder="Enter email"
-                                   value={this.state.email} onChange={this.handleChange}/>
-                        </div>
+                            <div className="field">
+                                <label className="label">Email or username</label>
+                                <div className="control">
+                                    <input type="email" autoFocus name="email" className="input"
+                                           placeholder="Enter email"
+                                           value={this.state.email} onChange={this.handleChange}/>
+                                </div>
+                            </div>
+
+                            <div className="field">
+                                <label className="label">Password</label>
+                                <div className="control">
+                                    <input type="password" name="password" className="input" placeholder="Enter password"
+                                           value={this.state.password} onChange={this.handleChange}/>
+                                </div>
+                            </div>
+
+                            <NotificationBox message={this.state.errorMessage} type={"is-success"} hasDelete={false}/>
+
+                            <button className="button is-primary" onClick={this.handleSubmit}>Sign in</button>
+                            <br/>
+                        </form>
                     </div>
-
-                    <div className="field">
-                        <label className="label">Password</label>
-                        <div className="control">
-                            <input type="password" name="password" className="input" placeholder="Enter password"
-                                   value={this.state.password} onChange={this.handleChange}/>
-                        </div>
-                    </div>
-
-                    <NotificationBox message={this.state.errorMessage} type={"is-success"} hasDelete={false}/>
-
-                    <button className="button is-primary" onClick={this.handleSubmit}>Sign in</button>
-                    <p className="forgot-password text-right">
-                        Forgot <a href="#">password?</a>
-                    </p>
-                </form>
+                </div>
             </section>
         );
     }
