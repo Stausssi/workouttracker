@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import NotificationBox from "./notificationBox";
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import {BACKEND_URL, FRONTEND_URL} from "../App";
 
 function validateEmail(email: string)
 {
@@ -92,7 +93,7 @@ export default class SignUp extends Component<{},State> {
 
                                     //sends User credentials to API
 
-                                    fetch('http://localhost:9000/backend/signup', {
+                                    fetch(BACKEND_URL + 'signup', {
                                         method: 'POST',
                                         headers: {
                                             Accept: 'application/json',
@@ -114,7 +115,7 @@ export default class SignUp extends Component<{},State> {
                                                 this.setState({errorMessage: "The user was created!"});
 
                                                 //redirect to confirmation page
-                                                window.location.href = "http://localhost:3000/successful-signup";
+                                                window.location.href = FRONTEND_URL + "successful-signup";
                                             } else {
                                                 //update error message: --> no success
                                                 this.setState({errorMessage: "The given username or email already exist!"});

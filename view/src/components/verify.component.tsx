@@ -1,4 +1,5 @@
 import React from "react";
+import {FRONTEND_URL} from "../App";
 
 interface State {
     progress: number
@@ -25,7 +26,7 @@ export default class Verify extends React.Component<any, State>{
         }
 
         //redirect to Login page
-        window.location.href = "http://localhost:3000/login";
+        window.location.href = FRONTEND_URL + "login";
     }
 
     render () {

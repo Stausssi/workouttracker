@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import NotificationBox from "./notificationBox";
+import {BACKEND_URL, FRONTEND_URL} from "../App";
 
 interface State {
     email: string,
@@ -43,7 +44,7 @@ export default class Login extends Component<{}, State> {
 
             //sends User credentials to API
 
-            fetch('http://localhost:9000/backend/login', {
+            fetch( BACKEND_URL + 'login', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -67,8 +68,8 @@ export default class Login extends Component<{}, State> {
                             const decodedJSON = JSON.parse(atob(splitToken[1]));
                             sessionStorage.setItem('username', decodedJSON.username);
 
-                            // PROVISORISCHE LÖSUNG
-                            window.location.href = "http://localhost:3000/";
+                            // Redirect
+                            window.location.href = FRONTEND_URL;
                         } else {
                             this.setState({errorMessage: "Login Error Occured"});
                         }
