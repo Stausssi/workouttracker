@@ -39,8 +39,7 @@ body > #root > div {
   background-color: #4e4e4e;
   overflow-y: scroll;
   color:white;
-  /*overflow-x: scroll;*/
-  /* for Firefox */
+  overflow-x: hide;
   min-height: 0;
 }
 
@@ -50,8 +49,8 @@ body > #root > div {
   height: 100%;
   background-color: #4a4a4a;
   overflow-y: scroll;
+  overflow-x: hide;
   color:white;
-  /* for Firefox */
   min-height: 0;
 }
 
@@ -62,7 +61,6 @@ body > #root > div {
   height:25px; 
   border-radius:20px; 
   float:left;
-  background-color: darkgrey;
 } 
 
 .search button{ 
@@ -73,4 +71,3 @@ body > #root > div {
   margin-right: 16px; 
   cursor: pointer; 
 }  
-
