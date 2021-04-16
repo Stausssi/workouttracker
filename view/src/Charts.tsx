@@ -16,6 +16,7 @@ interface State {
     active:boolean
     type:string
     newtype:string
+    array:any
     secondtype:string //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
     /*
     charts:{
@@ -42,7 +43,8 @@ export default class Graphs extends React.Component<Props,State> {
             type:"line",
             newtype:"line",
             secondtype:"line",
-            active:false
+            active:false,
+            array:''
         };
     }
     
@@ -52,11 +54,10 @@ export default class Graphs extends React.Component<Props,State> {
 
 testapi() {
     this.getdatasets()
-    this.getcharts()
 }
 
 getcombinefetch() {
-    var post:any;
+    //setstate charts then make new fetch to get data for each charts
 // Call the API
 fetch('http://localhost:9000/backend/charts/get').then(function (response) {
 	if (response.ok) {
@@ -66,45 +67,63 @@ fetch('http://localhost:9000/backend/charts/get').then(function (response) {
             console.log("Failed to get charts: ", response);
         })
 	}
-}).then((data) => {
-    post= JSON.parse(data.body)
+}).then((post) => {
     console.log(post)
-	// Store the post data to a variable
-    /* Check if user/sport are defined and */
-    /* query over all charts */
-	// Fetch another API
-    console.log("sport: "+ post[1].param_sport + " user: " + post[1].param_user)
-        var sport=post[1].param_sport
-        var user=post[1].param_user
-    const params = new URLSearchParams({ user: user,sport:sport })
-    //Alternative: encodeURIComponent
-	return fetch('http://localhost:9000/backend/charts/dataset?'+ params); //TODO: update route to filter ID/function  
+	console.log(JSON.parse(post.body));
+    this.setState({array:JSON.parse(post.body)})
+    this.getest()
+}) .catch(error=>console.warn(error))
+}
 
-}).then(function (response) {
-	if (response.ok) {
-		return response.json();
-	} else {
-		return Promise.reject(response);
-	}
-}).then(function (chartsData) {
-	console.log(post, JSON.parse(chartsData.body));
-}).catch(function (error) {
-	console.warn(error);
-});
+getest() {
+    for(let i=0;i<=this.state.array.length;i++){
+        // Store the post data to a variable
+        /* Check if user/sport are defined and query over all charts */ 
+        //query parameter values from DB and set if not NULL. else, let values as undefined
+        var user, sport
+        let queries: any[]=[]
+        const params = new URLSearchParams()
+       if(this.state.array[i].param_sport)     
+        {
+            sport=this.state.array[i].param_sport 
+            queries.push(sport)
+            params.append('sport',sport)
+        }
+        if(this.state.array[i].param_user)
+        {
+            user=this.state.array[i].param_user
+            queries.push(user)
+            params.append('user',user)
+        }
+        const url='http://localhost:9000/backend/charts/dataset?'
+        console.log(url+ params)
+        this.addElement(this.state.array[i].name,this.state.array[i].type)
+        //this.getdataforcharts(url,params)
+    }
+}
+
+getdataforcharts(url:string,params:any) { 
+    fetch(url+ params) 
+    .then((response) => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            return Promise.reject(response);
+        }
+    }).then((chartsData) => {
+        var data=JSON.parse(chartsData.body)
+        console.log(data);
+        //this.addElement() => add dataset
+    
+    }) .catch(error=>console.warn(error))
 }
 
 getdatasets() {
-    fetch("http://localhost:9000/backend/charts/test")
+    fetch("http://localhost:9000/backend/charts/dataset?")
     .then(response => response.json())
+    //.then(data => console.log(data))
     .then(data => console.log(JSON.parse(data.body)))
     .catch(error=>console.warn(error))
-}
-
-getcharts() {
-    /* fetch charts, extract params from chart */
-    fetch("http://localhost:9000/backend/charts/get")
-    .then(response => response.json())
-    .then((data) => console.log(JSON.parse(data.body)));
 }
 
 setcharts(data: any,name: string,type: string) {
@@ -157,6 +176,7 @@ private drawSample() {
         },
     });
 }
+//Get inputs values then create charts
 function() { 
   const title=document.getElementById('titleinput2') as HTMLInputElement
   const type=document.getElementById('typeinput') as HTMLInputElement

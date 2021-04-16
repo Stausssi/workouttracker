@@ -29,10 +29,20 @@ exports.test = (request, response) => {
 */
 
 exports.getdataset = (request,response) => {
-    const user=request.query.user
-    const sport=request.query.sport
-    Data.getspecificsportanduser(user,sport,(error, data) => {
-   //    Data.getall((error,data) =>{
+    let user,sport = null
+    if(request.query.user)
+    {
+    user = request.query.user
+    }
+    sport = request.query.sport
+    //Object.keys(req.query.user)
+   if(request.query.sport)
+    {
+       user=request.query.sport
+    }
+        //users=users.toString()
+        //sports=sports.toString()
+    Data.getall(user,sport,(error, data) => {
         if (error) {
             console.log(error);
             response.status(500).send({message: "Internal server error!" + error});
