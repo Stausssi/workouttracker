@@ -25,6 +25,8 @@ router.post('/activity/add', authenticateJWT, activity.add);
 
 router.all('/sports/fetch', sport.getAll);
 
+router.get('/users/search', users.search);
+
 router.get('/testConnection', function (req, res, next) {
     res.send('Connection to the backend established!');
 })

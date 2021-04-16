@@ -31,7 +31,6 @@ User.create = (newUser, status) => {
 //test, if username/email already exist in database
 //returns True if user exist and False if user doesn´t
 User.exists = (newUser, user_exists) => {
-
     console.log("New User: " + newUser.username + "|" + newUser.email);
     sql.query("SELECT * FROM user WHERE username = ? OR email = ?", [
         newUser.username,

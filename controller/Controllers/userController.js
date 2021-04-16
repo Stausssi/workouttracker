@@ -1,5 +1,5 @@
 const { request } = require('express');
-const User = require('../../model/usermodel');
+const User = require('../../model/userModel');
 const jwt = require("jsonwebtoken");
 const config = require("../mail/emailConfirmation.config");
 const bcrypt = require("bcryptjs");
