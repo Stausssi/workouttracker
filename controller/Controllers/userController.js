@@ -120,5 +120,3 @@ exports.verifyEmail = (req, res) => {
     }
 
 };
-
-//This is a controller file, not a model file --> Move
