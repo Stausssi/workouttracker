@@ -3,7 +3,6 @@ import Login from "./login.component";
 import SignUp from "./signup.component";
 import {Route, Link} from "react-router-dom";
 import React from "react";
-import Verify from "./verify.component";
 
 export default class LoginContainer extends React.Component<any, any> {
     constructor(props: any) {
@@ -29,11 +28,11 @@ export default class LoginContainer extends React.Component<any, any> {
                 </nav>
 
                 <div className="hero is-fullheight-with-navbar">
-                                <Switch>
-                                    <Route exact path='/' component={Login}/>
-                                    <Route path="/login" component={Login}/>
-                                    <Route path="/sign-up" component={SignUp}/>
-                                </Switch>
+                    <Switch>
+                        <Route exact path='/' component={Login}/>
+                        <Route path="/login" component={Login}/>
+                        <Route path="/sign-up" component={SignUp}/>
+                    </Switch>
                 </div>
             </div>
         );

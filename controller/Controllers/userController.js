@@ -64,9 +64,7 @@ exports.signup = (req, res) => {
                                     message: "user could not be created"
                                 });
                             } else {
-                                res.status(201).send({
-                                    message: "user was created"
-                                });
+                                res.status(201).send({message: "user created"});
 
                                 //send confirmation email to user with generated confirmationToken
                                 mail.sendConfirmationEmail(newuser);

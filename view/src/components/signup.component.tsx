@@ -114,7 +114,7 @@ export default class SignUp extends Component<{},State> {
                                                 this.setState({errorMessage: "The user was created!"});
 
                                                 //redirect to confirmation page
-                                                window.location.href = "http://localhost:3000/login";
+                                                window.location.href = "http://localhost:3000/successful-signup";
                                             } else {
                                                 //update error message: --> no success
                                                 this.setState({errorMessage: "The given username or email already exist!"});
