@@ -14,20 +14,21 @@ router.get('/', function (req, res, next) {
     res.render('index')
 });
 
-router.post('/login', users.login );
-  
-router.post('/signup', users.signup );
+router.post('/login', users.login);
+router.post('/signup', users.signup);
 
-router.get('/verify/:hash', function(req, res){
-  users.verifyEmail(req, res);
-  res.redirect('http://localhost:3000/verify');
+router.get('/verify/:hash', function (req, res) {
+    users.verifyEmail(req, res);
+    res.redirect('http://localhost:3000/verify');
 });
 
 router.post('/activity/add', authenticateJWT, activity.add);
 
 router.get('/sports/fetch', authenticateJWT, sport.getAll);
 
-//router.get('/users/search', users.search);
+router.get('/users/search', authenticateJWT, users.search);
+router.post('/users/addFriend', authenticateJWT, users.addFriend);
+router.post('/users/getFriendship', authenticateJWT, users.getFriendship);
 
 /* Calendar routes */
 
