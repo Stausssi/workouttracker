@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 
 import DatePicker from "react-datepicker";
@@ -7,7 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import NotificationBox from "../NotificationBox";
 import SessionHandler from "../../utilities/SessionHandler";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
 import {BACKEND_URL} from "../../App";
 
 interface Props {

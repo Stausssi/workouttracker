@@ -1,3 +1,5 @@
+import {FRONTEND_URL} from "../App";
+
 export default class SessionHandler {
     static getAuthToken() {
         return "Bearer " + sessionStorage.getItem("AccessToken");
@@ -19,5 +21,7 @@ export default class SessionHandler {
 
     static logOut() {
         sessionStorage.clear();
+        // Redirect
+        window.location.href = FRONTEND_URL;
     }
 }

@@ -4,6 +4,7 @@ import './css/App.css';
 import "bulma"
 import 'bulma-extensions/dist/css/bulma-extensions.min.css'
 import {Component} from "react";
+
 import SessionHandler from "./utilities/SessionHandler";
 import LoginContainer from "./pages/LoginContainer";
 import ProtectedRoute from "./utilities/Routing";
