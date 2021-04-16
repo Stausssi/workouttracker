@@ -44,20 +44,10 @@ router.post('/events/remove', event.remove);  //delete?
 /* charts routes */
 router.get('/charts/get', chart.findAll); 
 
-router.get('/charts/test', chart.test); 
-
 router.get('/charts/dataset', chart.getdataset); 
-
-/*router.get('/charts/dataset', function(request, res){
-  console.warn(request)
-  console.warn(response)
-}); */
-
 
 router.post('/charts/add', chart.create); 
 /*
-
-
 
 router.get('/charts/update', chart.findAll); 
 
