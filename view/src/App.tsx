@@ -2,8 +2,6 @@ import {Route, BrowserRouter} from 'react-router-dom'
 import Homepage from './Homepage';
 import Second from './Second';
 import Profil from './Profil'
-import Charts from './Charts'
-import Calendar from './FullCalendar'
 import './css/App.css';
 import "bulma"
 import 'bulma-extensions/dist/css/bulma-extensions.min.css'

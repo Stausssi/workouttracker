@@ -1,39 +1,14 @@
 const sql = require("./createConnection");
 
 class Data {
-    /*TODO: speicify column*/
+    /*TODO: specify column*/  
 
-    buildConditions(sport,user) {
-        var params = [];
-        var values = [];
-        var conditionsStr;
-      
-        if (typeof sport !== 'undefined'  &&  sport !==null) {
-          conditions.push("sport = ?");
-          values.push(sport);
-        }
-      
-        if (typeof user !== 'undefined') {
-          conditions.push("user = ?");
-          values.push(user);
-        }
-//          var sql = 'SELECT * FROM table WHERE ' + conditions.where;
-         
-        connection.query(sql, params, (error, results, fields) => {
-            // handle results here...
-          }
-        );
-      };
-      
-
-    static getspecificsportanduser(users,sports,response) {
-        /* Alle Funktionen unten zusammnefassen */
-        /*Attribute als Variable, durch switch case bestimmen*/
+    static getall(users,sports,response) {
         /* zwischen count und sum unterscheiden */
-        //users=users.toString()
-        //sports=sports.toString()
-               // sql.query("SELECT SUM(duration) AS amount FROM activity WHERE sport = COALESCE(?,sport) AND user = COALESCE(?, user)", [sports, users],
-               sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity WHERE sport = ? GROUP BY year(startedAt), month(startedAt)",[sports],             
+        const nullable=null
+
+        sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity WHERE sport = IFNULL(?,sport) GROUP BY year(startedAt), month(startedAt)",[sports], 
+              // sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity WHERE sport = IFNULL(?,sport) AND user = IFNULL(?,user) GROUP BY year(startedAt), month(startedAt)",[sports,users],  
                 function (error, results) {
                     if (error) {
                         response(error, null);
@@ -65,7 +40,7 @@ class Data {
         });
     }
 
-    static getall(response) {
+    static getold(response) {
         sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity GROUP BY year(startedAt), month(startedAt)",
         function (error, results) {
             if (error) {
