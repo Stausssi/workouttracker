@@ -120,3 +120,18 @@ exports.verifyEmail = (req, res) => {
     }
 
 };
+
+exports.search = (req, res) => {
+    const query = req.query.query;
+    if (!query) {
+        res.status(400).send({message: "Bad Request"});
+    } else {
+        console.log(query);
+        // TODO: Database query --> LIKE Statement
+        res.status(200).send({
+            body: JSON.stringify({
+                message: "users " + query
+            })
+        });
+    }
+}
