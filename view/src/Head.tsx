@@ -4,6 +4,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faHome, faSignInAlt, faUser} from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
 import { Link } from "react-router-dom";
+import SessionHandler from "./SessionHandler";
 
 export const Head = () =>
     <section className="hero is-dark is-small">
@@ -36,11 +37,11 @@ export const Head = () =>
                         <Modal> </Modal>
                     </div>
                     <span className="navbar-item">
-                        <Link className="button is-primary is-inverted" to={'/login'}>
+                        <Link className="button is-primary is-inverted" to={'/login'} onClick={() => SessionHandler.logOut()}>
                             <span className="icon">
                               <FontAwesomeIcon icon={faSignInAlt}/>
                             </span>
-                            <span>Login</span>
+                            <span>Logout</span>
                         </Link>
                     </span>
                 </div>

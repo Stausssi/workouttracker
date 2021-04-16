@@ -1,9 +1,14 @@
 import React, {Component} from "react";
 import {faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+import DatePicker from "react-datepicker";
+import en from "date-fns/locale/en-GB";
+import "react-datepicker/dist/react-datepicker.css";
 
 import NotificationBox from "./notificationBox";
 import SessionHandler from "../SessionHandler";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {BACKEND_URL} from "../App";
 
 interface Props {
     sports: { [key: string]: number }
@@ -12,8 +17,6 @@ interface Props {
 interface State {
     [key: string]: any
 }
-
-// TODO: Duration mit DatePicker ? Start- und Endzeitpunkt
 
 const defaultActivityState = {
     sport: 0,
@@ -27,7 +30,7 @@ const defaultActivityState = {
     distanceClass: "",
     distanceIcon: faTimes,
     distanceIconClass: "",
-    distanceMul: 10,
+    distanceMul: 1,
     averageHeartRate: 0,
     averageHeartRateClass: "",
     averageHeartRateIcon: faTimes,
@@ -35,7 +38,8 @@ const defaultActivityState = {
     altitudeDifference: 0,
     altitudeDifferenceClass: "",
     altitudeDifferenceIcon: faTimes,
-    altitudeDifferenceIconClass: ""
+    altitudeDifferenceIconClass: "",
+    date: new Date()
 }
 
 const defaultNotifyState = {
@@ -46,45 +50,106 @@ const defaultNotifyState = {
 const defaultStates: any[] = [defaultActivityState, defaultNotifyState];
 const defaultState = Object.assign({}, defaultActivityState, defaultNotifyState);
 
-// represents [min, max] values for the corresponding input field
-const validValues: { [key: string]: any[] } = {
-    "sport": [0, null],
-    "duration": [0, null],
-    "distance": [0, null],
-    "pace": [0, null],
-    "averageHeartRate": [25, 250],
-    "altitudeDifference": [0, null]
-}
-
-const hasIcon: string[] = ["duration", "distance", "averageHeartRate", "altitudeDifference"];
-
 enum RESET_TYPES {
     ACTIVITY,
     NOTIFICATION
 }
 
-const tryAgainLater = "Bitte versuche es später erneut, oder kontaktiere einen Administrator.";
+const tryAgainLater = "Please try again later and contact an administrator.";
 const notifyMessages: { [ident: string]: [message: string, type: string] } = {
     "fetchFailed":
-        ["Die Sportarten konnten nicht abgerufen werden!<br />" + tryAgainLater, "is-danger"],
+        ["No sports found!<br />" + tryAgainLater, "is-danger"],
     "success":
-        ["Die Aktivität wurde erfolgreich gespeichert!", "is-success"],
+        ["Your activity was saved successfully ", "is-success"],
     "error":
-        ["Beim Speichern der Aktivität ist etwas schiefgelaufen!<br />" + tryAgainLater, "is-danger"],
+        ["Something went wrong!<br />" + tryAgainLater, "is-danger"],
     "unknownUser":
-        ["Dein Benutzer wurde in der Datenbank nicht gefunden!<br />Bitte vergewissere dich, dass du angemeldet bist und kontaktiere einen Administrator.", "is-danger"]
+        ["Your username wasn't found!<br />Please log-in or contact an administrator if you believe this is an error.", "is-danger"]
 }
 
-const NUM_FIELDS = 5;
-const inputFields: string[] = ["distance", "duration", "pace", "averageHeartRate", "altitudeDifference"];
+interface selectOptions {
+    [key: string]: [value: number, text: string]
+}
+
+interface inputConfig {
+    identifier: string,
+    validValues: [min: any, max: any],
+    hasIcon: boolean,
+    inputLabel?: string,
+    inputType?: string,
+    inputPlaceholder?: string,
+    multiplier?: selectOptions
+}
+
+const inputFields: inputConfig[] = [
+    {
+        identifier: "distance",
+        validValues: [0, null],
+        hasIcon: true,
+        inputLabel: "Distance",
+        inputType: "number",
+        inputPlaceholder: "Please enter the covered distance",
+        multiplier: {
+            "dist_m": [1, "m"],
+            "dist_km": [1000, "km"]
+        }
+    },
+    {
+        identifier: "duration",
+        validValues: [0, null],
+        hasIcon: true,
+        inputLabel: "Duration",
+        inputType: "number",
+        inputPlaceholder: "Please enter the duration of the activity",
+        multiplier: {
+            "dur_s": [1, "s"],
+            "dur_m": [60, "m"],
+            "dur_h": [3600, "h"]
+        }
+    },
+    {
+        identifier: "pace",
+        validValues: [0, null],
+        hasIcon: false
+    },
+    {
+        identifier: "averageHeartRate",
+        validValues: [25, 250],
+        hasIcon: true,
+        inputLabel: "Heart Rate",
+        inputType: "number",
+        inputPlaceholder: "Please insert your average heart rate"
+    },
+    {
+        identifier: "altitudeDifference",
+        validValues: [0, null],
+        hasIcon: true,
+        inputLabel: "Altitude Difference",
+        inputType: "number",
+        inputPlaceholder: "Please enter the altitude difference of the activity",
+        multiplier: {
+            "alt_m": [1, "m"],
+            "alt_km": [1000, "km"]
+        }
+    },
+    /*
+     * !! IT'S IMPORTANT TO LEAVE SPORTS AS THE LAST ENTRY IN THIS LIST !!
+     */
+    {
+        identifier: "sport",
+        validValues: [0, null],
+        hasIcon: false
+    }
+];
+const NUM_FIELDS = inputFields.length - 1;
 
 export default class AddActivity extends Component<Props, State> {
-    HTMLFields: { [field: string]: JSX.Element; } | undefined;
-    mustParams: boolean[] = [];
+    mandatoryParams: boolean[] = [];
     optParams: boolean[] = [];
 
     constructor(props: Props) {
         super(props);
+        // Use Object.assign to copy the defaultState and prevent changes to default values
         this.state = Object.assign({}, defaultState);
 
         // bind this to event handlers
@@ -94,6 +159,7 @@ export default class AddActivity extends Component<Props, State> {
     }
 
     componentDidMount() {
+        // Find submit button of the Modal
         let submit = document.getElementById("submit-activity");
         if (submit) {
             this.setState({submitButton: submit});
@@ -103,6 +169,7 @@ export default class AddActivity extends Component<Props, State> {
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
         // Check for prop changes
         if (prevProps.sports !== this.props.sports) {
+            // Display warning if sports couldn't be fetched
             if (Object.keys(this.props.sports).length === 0) {
                 this.setState({
                     notifyMessage: notifyMessages["fetchFailed"][0],
@@ -113,8 +180,9 @@ export default class AddActivity extends Component<Props, State> {
 
         // Check for state changes
         if (prevState.sport !== this.state.sports) {
+            // Reset params if sport was deselected
             if (!isNaN(this.state.sports)) {
-                this.mustParams = [];
+                this.mandatoryParams = [];
                 this.optParams = [];
             }
         }
@@ -130,34 +198,43 @@ export default class AddActivity extends Component<Props, State> {
             return;
         }
 
+        // Retrieve params
+        let inputParams = null;
+        for (let index in inputFields) {
+            let inputIndex = inputFields[index];
+            if (inputIndex.identifier === name) {
+                inputParams = inputIndex;
+                break;
+            }
+        }
+
+        // Check whether the property has inputParams
+        if (inputParams) {
+            let valid = this.isValid(value, inputParams.validValues);
+            let icon = inputParams.hasIcon;
+
+            this.setState({[name + "Class"]: (valid ? "is-success" : "")});
+
+            if (icon) {
+                this.setState({
+                    [name + "Icon"]: (valid ? faCheck : faTimes),
+                    [name + "IconClass"]: (valid ? "has-text-success" : "")
+                });
+            }
+        } else {
+            // Check if a multiplier was changed
+            if (name.includes("Mul")) {
+                // Calculate property depending on multiplier
+                let multiplyWith = this.state[name] / value;
+                let param = name.replace("Mul", "");
+                this.setState({[param]: this.state[param] * multiplyWith})
+            }
+        }
+
         // Update state
         isNaN(value) ?
             this.setState({[name]: value}) :
             this.setState({[name]: Number(value)});
-
-        // Check whether the property has a range of values
-        if (Object.keys(validValues).includes(name)) {
-            let valid = this.isValid(name, value);
-            let icon = hasIcon.includes(name);
-
-            this.setState({[name + "Class"]: valid ? "is-success" : ""});
-
-            if (valid) {
-                if (icon) {
-                    this.setState({
-                        [name + "Icon"]: faCheck,
-                        [name + "IconClass"]: "has-text-success"
-                    });
-                }
-            } else {
-                if (icon) {
-                    this.setState({
-                        [name + "Icon"]: faTimes,
-                        [name + "IconClass"]: ""
-                    });
-                }
-            }
-        }
     }
 
     handleSubmit(event: any) {
@@ -175,17 +252,35 @@ export default class AddActivity extends Component<Props, State> {
             };
 
             // Append must and valid optional params
-            for (let index in this.mustParams) {
-                let key = inputFields[index];
-                let value = this.state[key];
+            for (let index in this.mandatoryParams) {
+                let inputParams = inputFields[index];
+                let value = this.state[inputParams.identifier];
 
-                if (this.mustParams[index] || (this.optParams[index] && this.isValid(key, value))) {
-                    bodyContent = Object.assign({}, bodyContent, {[key]: value});
+                if (this.mandatoryParams[index] || (this.optParams[index] && this.isValid(value, inputParams.validValues))) {
+                    // Apply multiplier
+                    let mul = this.state[inputParams.identifier + "Mul"];
+                    if (mul > 1) {
+                        value *= mul;
+                    }
+
+                    bodyContent[inputParams.identifier] = value;
                 }
             }
 
+            // Calculate pace
+            if (bodyContent["distance"] > 0 && bodyContent["duration"] > 0) {
+                // Distance is in m, duration in s
+                // Pace will be saved in km/h
+                bodyContent["pace"] = bodyContent["distance"] / bodyContent["duration"] * 3.6;
+            }
+
+            // Check if date is valid
+            if (this.state.date < this.getMaxValidDate()) {
+                bodyContent.startedAt = this.state.date.toISOString().slice(0, 19).replace("T", " ");
+            }
+
             // Send post request
-            fetch("http://localhost:9000/backend/activity/add", {
+            fetch(BACKEND_URL + "activity/add", {
                 method: "POST",
                 headers: {
                     Accept: 'application/json',
@@ -195,7 +290,10 @@ export default class AddActivity extends Component<Props, State> {
                 body: JSON.stringify(bodyContent)
             }).then((response) => {
                 if (response.ok) {
-                    this.setState({notifyMessage: notifyMessages["success"][0], notifyType: notifyMessages["success"][1]});
+                    this.setState({
+                        notifyMessage: notifyMessages["success"][0],
+                        notifyType: notifyMessages["success"][1]
+                    });
 
                     // Disable submit button and reset form
                     this.allowSubmit(false);
@@ -203,8 +301,14 @@ export default class AddActivity extends Component<Props, State> {
                 } else {
                     return response.json().then((response) => {
                         response.errno === 1 ?
-                            this.setState({notifyMessage: notifyMessages["unknownUser"][0], notifyType: notifyMessages["unknownUser"][1]}) :
-                            this.setState({notifyMessage: notifyMessages["error"][0], notifyType: notifyMessages["error"][1]});
+                            this.setState({
+                                notifyMessage: notifyMessages["unknownUser"][0],
+                                notifyType: notifyMessages["unknownUser"][1]
+                            }) :
+                            this.setState({
+                                notifyMessage: notifyMessages["error"][0],
+                                notifyType: notifyMessages["error"][1]
+                            });
                     });
                 }
             });
@@ -225,13 +329,13 @@ export default class AddActivity extends Component<Props, State> {
             <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
                 <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
 
-                <label className="label">Art der Aktivität</label>
+                <label className="label">Sport</label>
                 <div className={`select is-fullwidth mb-5 ${this.state.sportClass}`}>
                     <select name="sport" onChange={this.handleChange} value={this.state.sport}>
                         {
                             this.state.notifyMessage !== notifyMessages["fetchFailed"][0] ?
                                 this.createSportSelect() :
-                                <option key="-1" value="-1">Es ist ein Fehler aufgetreten!</option>
+                                <option key="-1" value="-1">Something went wrong!</option>
                         }
                     </select>
                 </div>
@@ -256,129 +360,92 @@ export default class AddActivity extends Component<Props, State> {
         // Create HTML Fields template
         // Executed on the client -> no performance problem for now
         // TODO: Fix 'Each child in a list should have a unique "key" prop.' warning
-        this.HTMLFields = {
-            "distance": <>
-                <label className="label">Distanz</label>
-                <div className="columns">
-                    <div className="column">
-                        <div className="field">
-                            <div className="control has-icons-right">
-                                <input
-                                    className={`input ${this.state.distanceClass}`}
-                                    type="number"
-                                    name="distance"
-                                    placeholder="Gebe hier die zurückgelegte Distanz ein"
-                                    value={Number(this.state.distance) === 0 ? "" : this.state.distance}
-                                    onChange={this.handleChange}
-                                />
-                                <span className={`icon is-right ${this.state.distanceIconClass}`}>
-                                    <FontAwesomeIcon icon={this.state.distanceIcon}/>
+        let createInputField = (params: inputConfig) => {
+            function createSelectOptions(dict: selectOptions) {
+                let options = [];
+                for (let key in dict) {
+                    if (dict.hasOwnProperty(key)) {
+                        options.push(<option value={dict[key][0]} key={key}>{dict[key][1]}</option>);
+                    }
+                }
+
+                return options;
+            }
+
+            let identifier = params.identifier;
+
+            // Pace doesn't have an input field
+            if (identifier !== "pace") {
+                return (
+                    params.multiplier ?
+                        <>
+                            <label className="label">{params.inputLabel}</label>
+                            <div className="field has-addons">
+                                <div className="control has-icons-right is-expanded">
+                                    <input
+                                        className={`input ${this.state[identifier + "Class"]}`}
+                                        type={params.inputType}
+                                        name={identifier}
+                                        placeholder={params.inputPlaceholder}
+                                        value={Number(this.state[identifier]) === 0 ? "" : this.state[identifier]}
+                                        onChange={this.handleChange}
+                                    />
+                                    <span className={`icon is-right ${this.state[identifier + "IconClass"]}`}>
+                                    <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
                                 </span>
+                                </div>
+                                <div className="control">
+                                    <div className="select is-fullwidth">
+                                        <select
+                                            className="select"
+                                            name={identifier + "Mul"}
+                                            value={this.state[identifier + "Mul"]}
+                                            onChange={this.handleChange}
+                                        >
+                                            {createSelectOptions(params.multiplier)}
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div className="column is-2">
-                        <div className="select is-fullwidth">
-                            <select
-                                className="select"
-                                name="distanceMul"
-                                value={this.state.distanceMul}
-                                onChange={this.handleChange}
-                            >
-                                <option value="1" key="dist_m">m</option>
-                                <option value="1000" key="dist_km">km</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </>,
-            "duration": <>
-                <label className="label">Dauer</label>
-                <div className="columns">
-                    <div className="column">
-                        <div className="field">
-                            <div className="control has-icons-right">
-                                <input
-                                    className={`input ${this.state.durationClass}`}
-                                    type="number"
-                                    name="duration"
-                                    placeholder="Gebe hier die Dauer der Aktivität ein"
-                                    value={Number(this.state.duration) === 0 ? "" : this.state.duration}
-                                    onChange={this.handleChange}
-                                />
-                                <span className={`icon is-right ${this.state.durationIconClass}`}>
-                                    <FontAwesomeIcon icon={this.state.durationIcon}/>
+                        </>
+                        :
+                        <>
+                            <label className="label">{params.inputLabel}</label>
+                            <div className="field">
+                                <div className="control has-icons-right">
+                                    <input
+                                        className={`input ${this.state[identifier + "Class"]}`}
+                                        type={params.inputType}
+                                        name={identifier}
+                                        placeholder={params.inputPlaceholder}
+                                        value={Number(this.state[identifier]) === 0 ? "" : this.state[identifier]}
+                                        onChange={this.handleChange}
+                                    />
+                                    <span className={`icon is-right ${this.state[identifier + "IconClass"]}`}>
+                                    <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
                                 </span>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div className="column is-2">
-                        <div className="select is-fullwidth">
-                            <select
-                                className="select"
-                                name="durationMul"
-                                value={this.state.durationMul}
-                                onChange={this.handleChange}
-                            >
-                                <option value="1" key="dur_s">s</option>
-                                <option value="60" key="dur_m">m</option>
-                                <option value="3600" key="dur_h">h</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </>,
-            "pace": <>
-                <label className="label">Placeholder für Pace -&gt; Wird berechnet?</label>
-            </>,
-            "averageHeartRate": <>
-                <label className="label">Herzrate</label>
-                <div className="field">
-                    <div className="control has-icons-right">
-                        <input
-                            className={`input ${this.state.averageHeartRateClass}`}
-                            type="number"
-                            name="averageHeartRate"
-                            placeholder="Gebe hier deine durchschnittliche Herzrate ein"
-                            value={Number(this.state.averageHeartRate) === 0 ? "" : this.state.averageHeartRate}
-                            onChange={this.handleChange}
-                        />
-                        <span className={`icon is-right ${this.state.averageHeartRateIconClass}`}>
-                            <FontAwesomeIcon icon={this.state.averageHeartRateIcon}/>
-                        </span>
-                    </div>
-                </div>
-            </>,
-            "altitudeDifference": <>
-                <label className="label">Höhenmeter</label>
-                <div className="field">
-                    <div className="control has-icons-right">
-                        <input
-                            className={`input ${this.state.altitudeDifferenceClass}`}
-                            type="number"
-                            name="altitudeDifference"
-                            placeholder="Gebe hier deine Höhenmeter ein"
-                            value={Number(this.state.altitudeDifference) === 0 ? "" : this.state.altitudeDifference}
-                            onChange={this.handleChange}
-                        />
-                        <span className={`icon is-right ${this.state.altitudeDifferenceClass}`}>
-                            <FontAwesomeIcon icon={this.state.altitudeDifferenceIcon}/>
-                        </span>
-                    </div>
-                </div>
-            </>
+                        </>
+                );
+            } else {
+                return (
+                    <></>
+                );
+            }
         };
 
+        // Only create elements if a valid sport is selected
         if (this.state.sportClass === "is-success") {
             // Get bitfields and split them into their bitwise representation
             // reverse to fill zeros in the beginning
             let bitfieldArray: any = this.props.sports[this.state.sport];
-            let must: boolean[] = bitfieldArray[1].toString(2).split("").reverse();
+            let mandatory: boolean[] = bitfieldArray[1].toString(2).split("").reverse();
             let optional: boolean[] = bitfieldArray[0].toString(2).split("").reverse();
 
             // Fill missing zeros
-            for (let i = 0; i < NUM_FIELDS - must.length; i++) {
-                must.push(false);
+            for (let i = 0; i < NUM_FIELDS - mandatory.length; i++) {
+                mandatory.push(false);
             }
 
             for (let i = 0; i < NUM_FIELDS - optional.length; i++) {
@@ -386,16 +453,17 @@ export default class AddActivity extends Component<Props, State> {
             }
 
             // reverse back
-            must = must.reverse();
+            mandatory = mandatory.reverse();
             optional = optional.reverse();
 
-            let fieldsHTML = [<div className="divider">Pflichtangaben</div>];
-            for (let index in must) {
-                must[index] = Boolean(Number(must[index]));
+            let fieldsHTML = [<div className="divider">Mandatory</div>];
+            for (let index in mandatory) {
+                mandatory[index] = Boolean(Number(mandatory[index]));
                 optional[index] = Boolean(Number(optional[index]));
 
-                if (must[index]) {
-                    fieldsHTML.push(this.HTMLFields[inputFields[index]]);
+                let inputParams = inputFields[index];
+                if (mandatory[index]) {
+                    fieldsHTML.push(createInputField(inputParams));
 
                     // Remove param from optional to prevent double input
                     if (optional[index]) {
@@ -405,7 +473,7 @@ export default class AddActivity extends Component<Props, State> {
             }
 
             // Update global params
-            this.mustParams = must;
+            this.mandatoryParams = mandatory;
             this.optParams = optional;
 
             // Only display optional params if there are any
@@ -414,26 +482,49 @@ export default class AddActivity extends Component<Props, State> {
 
                 for (let index in optional) {
                     if (optional[index]) {
-                        fieldsHTML.push(this.HTMLFields[inputFields[index]]);
+                        fieldsHTML.push(createInputField(inputFields[index]));
                     }
                 }
             }
 
+            // Create date picker
+            fieldsHTML.push(<>
+                <label className="label">Date and Time</label>
+                <DatePicker
+                    dateFormat="dd.MM.yyyy HH:mm"
+                    showTimeSelect
+                    timeIntervals={15}
+                    timeFormat="HH:mm"
+                    maxDate={this.getMaxValidDate()}
+                    selected={this.state.date}
+                    locale={en}
+                    onChange={(date: Date) => this.setState({date: date})}
+                    filterTime={(time: Date) => {
+                        let maxTime = this.getMaxValidDate();
+                        let selected = new Date(this.state.date);
+                        selected.setHours(time.getHours());
+                        selected.setMinutes(time.getMinutes());
+
+                        return selected < maxTime;
+                    }}
+                    inline
+                />
+            </>);
+
             return fieldsHTML;
         }
-        return <p>Bitte wähle eine Sportart aus.</p>;
+        return <p className="tag is-info is-light">Please select a sport</p>;
     }
 
     validateInput(returnValue?: boolean) {
         let valid = false;
+        if (this.mandatoryParams.length === NUM_FIELDS) {
+            valid = this.isValid(this.state.sport, inputFields[NUM_FIELDS].validValues);
 
-        if (this.mustParams.length === NUM_FIELDS) {
-            valid = this.isValid("sport", this.state.sport);
-
-            for (let i = 0; i < NUM_FIELDS; ++i) {
-                if (this.mustParams[i]) {
-                    let param = inputFields[i];
-                    valid = valid && this.isValid(param, this.state[param]);
+            for (let index in this.mandatoryParams) {
+                if (this.mandatoryParams[index]) {
+                    let inputParams = inputFields[index];
+                    valid = valid && this.isValid(this.state[inputParams.identifier], inputParams.validValues);
                 }
             }
         }
@@ -447,11 +538,12 @@ export default class AddActivity extends Component<Props, State> {
         }
     }
 
-    isValid(type: string, value: number) {
-        let min = validValues[type][0];
-        let max = validValues[type][1];
+    isValid(value: number, validValues: any[]) {
+        let min = validValues[0];
+        let max = validValues[1];
         value = Number(value);
 
+        // Check whether the value is in range of the params or is NaN (sports)
         return (min < value && (max ? value < max : true)) || isNaN(value);
     }
 
@@ -463,5 +555,9 @@ export default class AddActivity extends Component<Props, State> {
 
     resetState(type: RESET_TYPES) {
         this.setState(defaultStates[type]);
+    }
+
+    getMaxValidDate() {
+        return new Date(Date.now() - this.state.duration * this.state.durationMul * 1000);
     }
 }

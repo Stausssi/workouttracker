@@ -10,12 +10,13 @@ import ProtectedRoute from "./utilities/Routing";
 import Verify from "./components/verify.component";
 import SuccessfulSignup from "./components/successfulSignup.component";
 
+interface Props {}
 
-export default class App extends Component< { }, { } > {
+interface State {}
+
+export default class App extends Component<Props, State> {
     render() {
-
         // Conditional Routing:
-
         // Route      LoggedIn       NotLoggedIn
         // _____________________________________
         // "/"        Homepage       Login
@@ -42,3 +43,5 @@ export default class App extends Component< { }, { } > {
         );
     }
 }
+
+export const BACKEND_URL = "http://localhost:9000/backend/";

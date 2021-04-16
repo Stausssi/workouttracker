@@ -2,14 +2,13 @@ import React from 'react';
 import './css/App.css';
 import ToggleButton from './ToggleButton'
 import 'bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css'
+import {BACKEND_URL} from "./App";
 
-interface Props {
-}
+interface Props {}
 
 interface State {
     showPopup: boolean
     active: boolean
-    apiResponse: any
 }
 
 export default class Body extends React.Component<Props, State> {
@@ -17,19 +16,8 @@ export default class Body extends React.Component<Props, State> {
         super(props);
         this.state = {
             showPopup: false,
-            active: false,
-            apiResponse: ""
+            active: false
         };
-    }
-
-    callAPI() {
-        fetch("http://157.90.160.201:9000/backend/testConnection")
-            .then(res => res.text())
-            .then(res => this.setState({apiResponse: res}));
-    }
-
-    componentDidMount() {
-        this.callAPI();
     }
 
     render() {
@@ -37,7 +25,6 @@ export default class Body extends React.Component<Props, State> {
             <section id="body-content">
                 <div id="col-1">
                     <h1>This is half of a page</h1>
-                    <p>{this.state.apiResponse}</p>
                     <div>
                         <ToggleButton/>
                     </div>

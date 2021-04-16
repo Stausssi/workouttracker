@@ -2,6 +2,7 @@ import {faPlusCircle, faCheck, faTimes} from "@fortawesome/free-solid-svg-icons"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import AddActivity from "./components/add_activity";
+import {BACKEND_URL} from "./App";
 
 interface Props {}
 
@@ -33,8 +34,8 @@ export default class Modal extends React.Component<Props, State> {
         this.setState({active: active});
 
         if (active) {
-            // Fetch activities from database
-            fetch("http://localhost:9000/backend/sports/fetch").then((response) => {
+            // Fetch sports from database
+            fetch(BACKEND_URL + "sports/fetch").then((response) => {
                 if (response.ok) {
                     return response.json().then((response) => {
                         this.setState({sports: JSON.parse(response.body)});
@@ -59,7 +60,7 @@ export default class Modal extends React.Component<Props, State> {
                     <div className="modal-background"/>
                     <div className="modal-card">
                         <header className="modal-card-head">
-                            <p className="modal-card-title">Aktivität hinzufügen</p>
+                            <p className="modal-card-title">Add Activity</p>
                             <button className="delete" aria-label="close" onClick={() => this.toggleActive()}/>
                         </header>
 
@@ -75,13 +76,13 @@ export default class Modal extends React.Component<Props, State> {
                                 <span className="icon is-small">
                                     <FontAwesomeIcon icon={faCheck}/>
                                 </span>
-                                <span>Speichern</span>
+                                <span>Save</span>
                             </button>
                             <button className="button is-danger is-outlined" onClick={() => this.toggleActive()}>
                                 <span className="icon is-small">
                                     <FontAwesomeIcon icon={faTimes}/>
                                 </span>
-                                <span>Abbrechen</span>
+                                <span>Cancel</span>
                             </button>
                         </footer>
                     </div>
