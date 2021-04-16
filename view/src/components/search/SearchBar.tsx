@@ -1,6 +1,8 @@
-import {faSearch} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSearch} from "@fortawesome/free-solid-svg-icons";
+import onClickOutside from "react-onclickoutside";
+
 import SearchResult from "./SearchResult";
 import {BACKEND_URL} from "../../App";
 import SessionHandler from "../../utilities/SessionHandler";
@@ -15,7 +17,7 @@ interface State {
     displayLoading: boolean
 }
 
-export default class SearchBar extends React.Component<Props, State> {
+class SearchBar extends React.Component<Props, State> {
     private searchDelay: any;
 
     constructor(props: Props) {
@@ -37,7 +39,6 @@ export default class SearchBar extends React.Component<Props, State> {
                 searchResults: <></>,
                 displayLoading: true
             }, () => {
-                // TODO: Input filtering
                 clearTimeout(this.searchDelay);
 
                 if (value !== "") {
@@ -59,7 +60,7 @@ export default class SearchBar extends React.Component<Props, State> {
             if (response.ok) {
                 return response.json().then((response) => {
                     let foundUsers: any = <NotificationBox
-                        message={`No user with the name '${query}' was found!`}
+                        message={`User '${query}' could not be found!`}
                         type={"is-danger is-light mx-2"}
                         hasDelete={false}
                     />
@@ -83,15 +84,13 @@ export default class SearchBar extends React.Component<Props, State> {
                 console.log(response);
             }
         });
-
-
     }
 
     render() {
         return (
             <div className={`dropdown ${this.state.searchQuery !== "" ? "is-active" : ""}`}>
                 <div className="dropdown-trigger">
-                    <div className="field" aria-haspopup={"true"} aria-controls={"searchResults"}>
+                    <div className="field">
                         <div className="control is-expanded has-icons-right">
                             <input
                                 className="input is-primary"
@@ -106,7 +105,7 @@ export default class SearchBar extends React.Component<Props, State> {
                         </div>
                     </div>
                 </div>
-                <div className="dropdown-menu is-fullwidth" id={"searchResults"} role={"menu"}>
+                <div className="dropdown-menu">
                     <div className="dropdown-content">
                         {
                             this.state.displayLoading ?
@@ -119,7 +118,7 @@ export default class SearchBar extends React.Component<Props, State> {
                                                    readOnly={true}/>
                                         </div>
                                         <div className="control">
-                                            <button className="button is-loading is-white" disabled={true} />
+                                            <button className="button is-loading is-white" disabled={true}/>
                                         </div>
                                     </div>
                                 </div>
@@ -131,4 +130,16 @@ export default class SearchBar extends React.Component<Props, State> {
             </div>
         );
     }
+
+    handleClickOutside() {
+        if (this.state.searchQuery !== "") {
+            this.setState({
+                searchQuery: "",
+                searchResults: <></>,
+                displayLoading: false
+            });
+        }
+    }
 }
+
+export default onClickOutside(SearchBar);
