@@ -3,6 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import SearchResult from "./SearchResult";
 import {BACKEND_URL} from "../../App";
+import SessionHandler from "../../utilities/SessionHandler";
 
 interface Props {
 }
@@ -48,23 +49,30 @@ export default class SearchBar extends React.Component<Props, State> {
     }
 
     searchFor(query: string) {
-        console.log(`Searching for user ${query} in the database`);
-
-        this.setState({
-            displayLoading: false,
-            searchResults: <>
-                <SearchResult username="@username"/>
-                <SearchResult username="@extremlangerusername"/>
-                <SearchResult username="1"/>
-                <SearchResult username="@12345678901234567890"/>
-            </>
-        });
-
-        // TODO: auth
-        fetch(BACKEND_URL + "users/search?query=" + query).then((response) => {
+        fetch(BACKEND_URL + "users/search?query=" + query, {
+            headers: {
+                Accepts: "application/json",
+                Authorization: SessionHandler.getAuthToken()
+            }
+        }).then((response) => {
             if (response.ok) {
                 return response.json().then((response) => {
-                    console.log("users received:", response);
+                    let foundUsers: any = <><p className="tag is-danger">No user with the name xxxx found!</p></>
+
+                    if (response.userFound) {
+                        foundUsers = JSON.parse(response.users);
+                        for (let index in foundUsers) {
+                            if (foundUsers.hasOwnProperty(index)) {
+                                foundUsers[index] =
+                                    <SearchResult username={foundUsers[index]} key={"result_" + foundUsers[index]}/>
+                            }
+                        }
+                    }
+
+                    this.setState({
+                        displayLoading: false,
+                        searchResults: foundUsers
+                    });
                 });
             } else {
                 console.log(response);
@@ -97,16 +105,15 @@ export default class SearchBar extends React.Component<Props, State> {
                     <div className="dropdown-content">
                         {this.state.searchResults}
                         {this.state.displayLoading ?
-                            <>
-                                <div className="dropdown-item">
-                                    <div className="field">
-                                        <div className="control is-loading">
-                                            <input className="input is-static" type="text" placeholder="Searching..."
-                                                   readOnly={true}/>
-                                        </div>
+                            <div className="dropdown-item">
+                                <div className="field">
+                                    <div className="control is-loading">
+                                        <input className="input is-static" type="text"
+                                               placeholder="Searching for users..."
+                                               readOnly={true}/>
                                     </div>
                                 </div>
-                            </>
+                            </div>
                             :
                             <></>
                         }
