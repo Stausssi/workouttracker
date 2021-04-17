@@ -27,7 +27,7 @@ router.post('/activity/add', authenticateJWT, activity.add);
 
 router.all('/sports/fetch', sport.getAll);
 
-router.get('/users/search', users.search);
+//router.get('/users/search', users.search);
 
 /* Calendar routes */
 
