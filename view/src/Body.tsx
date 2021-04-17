@@ -1,9 +1,9 @@
 import React from 'react';
 import './css/App.css';
-import ToggleButton from './ToggleButton'
+import ToggleButton from './components/ToggleButton'
 import 'bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css'
-import Calendar1 from './FullCalendar';
-import Graphs from './Charts';
+import Calendar1 from './components/FullCalendar';
+import Graphs from './components/Charts';
 
 interface Props {
 }

@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import NotificationBox from "../NotificationBox";
+import NotificationBox from "../notificationBox";
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import {BACKEND_URL, FRONTEND_URL} from "../../App";

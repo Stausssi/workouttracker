@@ -136,17 +136,22 @@ setcharts(data: any,name: string,type: string) {
 
 //Get inputs values then create charts
 configureChart() { 
-  const title=document.getElementById('titleinput2') as HTMLInputElement
-  const type=document.getElementById('typeinput') as HTMLInputElement
-  if(title.value && type.value)
+  const title=document.getElementById('charttitle') as HTMLInputElement
+  const type=document.getElementById('charttype') as HTMLInputElement
+  const dataset=document.getElementById('chartdataset') as HTMLInputElement
+  const fill=document.getElementById('chartfill') as HTMLInputElement
+  const sport=document.getElementById('chartsport') as HTMLInputElement     //Optional  
+  const user=document.getElementById('chartuser') as HTMLInputElement       //optional
+  if(title.value && type.value && dataset.value && fill.value)
   {
       console.log(title.value)
       const chart = {
           name: title.value,
+          //subtitle: Metrik, ifo about what chart is showing
           type: type.value,
-          dataset:"Default",//TODO: add wanted dataset to modal
-          fill:true, //TODO: add option to modal
-          param_sport:'Joggen',
+          dataset:dataset.value,//"Default"
+          fill:fill.value, //TODO: add option to modal
+          param_sport:sport,//:null,
           param_user:null
         } 
         this.action()
@@ -180,7 +185,10 @@ addElement (title:string,type:string) {
 
 
 removeElement (title:string) {
-    /* When this function is call: check if chart on DB wa removed, then remove element on DOM and remove title as identifier from DB */
+    var chartnode = document.getElementById("chartID_"+title) as HTMLCanvasElement;
+    if (chartnode.parentNode) {
+        chartnode.parentNode.removeChild(chartnode);
+    }
 }
 
 addcharts(canvas:HTMLCanvasElement,type:string) {

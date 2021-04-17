@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
 
-import NotificationBox from "../NotificationBox";
+import NotificationBox from "../notificationBox";
 import SessionHandler from "../../utilities/SessionHandler";
 
 import {BACKEND_URL} from "../../App";
