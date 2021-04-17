@@ -123,7 +123,8 @@ exports.verifyEmail = (req, res) => {
 // Search for a given user in the database
 exports.search = (req, res) => {
     const query = req.query.query;
-    if (!query) {
+
+    if (isParamMissing([query])) {
         res.status(400).send({message: "Bad Request"});
     } else {
         User.find(query, (error, foundUsers) => {
@@ -148,28 +149,104 @@ exports.search = (req, res) => {
     }
 }
 
-exports.getFriendship = (req, res) => {
-    // Extract follower and followed out of req and get their relationship
-    User.getFriendship(req.username, req.body.username, (error, befriended, isBlocked) => {
-        if (error) {
-            console.log(error);
-            res.status(500).send({message: "internal server error"});
-        } else {
-            res.status(200).send({
-                befriended: befriended,
-                blocked: isBlocked
-            });
-        }
-    });
+exports.follow = (req, res) => {
+    let username = req.username;
+    let followed = req.body.followed;
+
+    if (isParamMissing([username, followed])) {
+        res.status(400).send({message: "Bad Request"});
+    } else {
+        User.follow(username, followed, (error) => basicSuccessErrorHandling(error, res))
+    }
 }
 
-exports.addFriend = (req, res) => {
-    User.addFriendship(req.body.follower, req.body.followed, (error) => {
-        if (error) {
-            console.log(error);
-            res.status(500).send({message: "internal server error"});
-        } else {
-            res.sendStatus(200);
+exports.unfollow = (req, res) => {
+    let username = req.username;
+    let unfollowed = req.body.unfollowed;
+
+    if (isParamMissing([username, unfollowed])) {
+        res.status(400).send({message: "Bad Request"});
+    } else {
+        User.unfollow(username, unfollowed, (error) => basicSuccessErrorHandling(error, res));
+    }
+}
+
+
+exports.block = (req, res) => {
+    // First unfollow and then block the user
+    let user = req.username;
+    let toBeBlocked = req.body.toBeBlocked;
+
+    if (isParamMissing([user, toBeBlocked])) {
+        res.status(400).send({message: "Bad Request"});
+    } else {
+        User.unfollow(user, toBeBlocked, (error) => {
+            if (error) {
+                console.log(error);
+                res.status(500).send({message: "internal server error"});
+            } else {
+                // Check whether the toBeBlocked user is already following the other user
+                User.getRelationship(toBeBlocked, user, (error, isFollowing, isBlocked) => {
+                    if (error) {
+                        console.log(error);
+                        res.status(500).send({message: "internal server error"});
+                    } else {
+                        User.block(user, toBeBlocked, isFollowing, (error) => basicSuccessErrorHandling(error, res));
+                    }
+                })
+            }
+        });
+    }
+}
+
+exports.unblock = (req, res) => {
+    let user = req.username;
+    let unblocked = req.body.unblocked;
+
+    if (isParamMissing([user, unblocked])) {
+        res.status(400).send({message: "Bad Request"});
+    } else {
+        User.unblock(user, unblocked, (error) => basicSuccessErrorHandling(error, res));
+    }
+}
+
+exports.getRelationship = (req, res) => {
+    let follower = req.username;
+    let followed = req.body.username;
+
+    if (isParamMissing([follower, followed])) {
+        res.status(400).send({message: "Bad Request"});
+    } else {
+        User.getRelationship(follower, followed, (error, isFollowing, isBlocked) => {
+            if (error) {
+                console.log(error);
+                res.status(500).send({message: "internal server error"});
+            } else {
+                res.status(200).send({
+                    following: isFollowing,
+                    blocked: isBlocked
+                });
+            }
+        });
+    }
+}
+
+function basicSuccessErrorHandling(error, res) {
+    if (error) {
+        console.log(error);
+        res.status(500).send({message: "internal server error"});
+    } else {
+        res.sendStatus(200);
+    }
+}
+
+function isParamMissing(listOfParams) {
+    for (let index in listOfParams) {
+        if (listOfParams.hasOwnProperty(index)) {
+            if (!listOfParams[index]) {
+                return true;
+            }
         }
-    })
+    }
+    return false;
 }

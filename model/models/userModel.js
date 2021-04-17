@@ -85,27 +85,57 @@ User.getUserByUsernameOrEmail = (UsernameOrEmail, result) => {
 }
 
 User.find = (user, foundUsers) => {
-    sql.query("SELECT username FROM user WHERE LOCATE(?, username)>0;", [user],
+    sql.query("SELECT username FROM user WHERE LOCATE(?, username)>0;",
+        [user],
         (error, result) => foundUsers(error, result)
     );
 }
 
-User.getFriendship = (user1, user2, relationship) => {
-    sql.query("SELECT blocked FROM friends WHERE follower = ? AND followed = ?", [
-        user1,
-        user2
-    ], function (error, result) {
-        if (result.length > 0) {
-            relationship(error, true, Boolean(result[0].blocked));
-        } else {
-            relationship(error, false, false);
-        }
-    });
+User.follow = (follower, followed, success) => {
+    sql.query("INSERT INTO following VALUES (?, ?, false)",
+        [follower, followed],
+        (error) => success(error)
+    );
 }
 
-User.addFriendship = (follower, followed, success) => {
-    sql.query("INSERT INTO friends VALUES (?, ?, false)", [follower, followed],
+User.unfollow = (follower, followed, success) => {
+    sql.query("DELETE FROM following WHERE follower = ? AND followed = ?",
+        [follower, followed],
         (error) => success(error)
+    );
+}
+
+User.block = (username, toBeBlocked, isFollowing, success) => {
+    if (isFollowing) {
+        sql.query("UPDATE following SET blocked = 1 WHERE follower = ? AND followed = ?",
+            [toBeBlocked, username],
+            (error) => success(error)
+        );
+    } else {
+        sql.query("INSERT INTO following VALUES (?, ?, true)",
+            [toBeBlocked, username],
+            (error) => success(error)
+        );
+    }
+}
+
+User.unblock = (username, unblocked, success) => {
+    sql.query("UPDATE following SET blocked = 0 WHERE follower = ? AND followed = ?",
+        [unblocked, username],
+        (error) => success(error)
+    );
+}
+
+User.getRelationship = (follower, followed, relationship) => {
+    sql.query("SELECT blocked FROM following WHERE follower = ? AND followed = ?",
+        [follower, followed],
+        function (error, result) {
+            if (result.length > 0) {
+                relationship(error, true, Boolean(result[0].blocked));
+            } else {
+                relationship(error, false, false);
+            }
+        }
     );
 }
 
