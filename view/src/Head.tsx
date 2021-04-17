@@ -1,5 +1,7 @@
 import SearchBar from "./components/search/SearchBar";
 import Logo from "./img/WorkoutLogo.png";
+import NewLogo from "./img/TransarentLogo.png";
+import Icon from "./img/LogoIcon.png"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faSignInAlt, faUser } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./components/activity/Modal";
@@ -9,13 +11,12 @@ import { Link } from "react-router-dom";
 
 export const Head = () => (
   <div id="head">
-    <section className="hero is-dark">
+    <section className="hero is-dark is-small">
       <div className="hero-head">
         <nav className="navbar">
-          <div className="navbar-brand">
-            <a className="navbar-item" href="/Second">
-              <img src={Logo} alt="Logo" width={150} />
-            </a>
+              <img src={NewLogo} alt="Logo" width={250} />
+          <div className="container has-text-centered is-justify-content-center is-align-items-center is-flex-grow-1">
+            <p className="title">Workout-Tracker</p>
           </div>
           <div className="navbar-end">
             <div className="navbar-item">
@@ -47,12 +48,7 @@ export const Head = () => (
           </div>
         </nav>
       </div>
-      <div className="hero-body">
-        <div className="container has-text-centered">
-          <p className="title">Workout-Tracker</p>
-          <p className="subtitle">Time for Sport</p>
-        </div>
-      </div>
+      <div className="hero-body"></div>
     </section>
   </div>
 );

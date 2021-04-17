@@ -5,12 +5,10 @@
   height: 100%;
 }
 
-#head{
-  height:20%
-}
+
 
 #body-content {
-    height:80%
+    height:90%
   }
 
 body > #root > div {
@@ -27,7 +25,6 @@ body > #root > div {
 .footer {
   background-color: #0d0d15 !important;
   color:white;
-  height:20%
 
 }
 
@@ -54,20 +51,3 @@ body > #root > div {
   min-height: 0;
 }
 
-
-/* styling search bar */ 
-.search input{ 
-  width:300px; 
-  height:25px; 
-  border-radius:20px; 
-  float:left;
-} 
-
-.search button{ 
-  background-color: #27c499; 
-  color: white; 
-  height:30px;
-  float: right; 
-  margin-right: 16px; 
-  cursor: pointer; 
-}  

@@ -6,45 +6,52 @@ import interactionPlugin from "@fullcalendar/interaction";
 import DatePicker from "react-datepicker";
 import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
+import NotificationBox from "./notificationBox";
+//import {BACKEND_URL} from "../App";   //TODO add Backend URL const to fetch
 //import * as moment from 'moment'
 
 interface Props {}
 interface State {
   showPopup: boolean;
   active: boolean;
-  title:string;
+  title: string;
   startDate: Date;
   endDate: Date;
-  date:Date;
+  date: Date;
   eventsarray: any[];
+  informtext: string;
+  informtype: string;
 }
 
 const initialState = {
   showPopup: false,
   active: false,
-  title:'',
+  title: "",
   startDate: new Date(),
   endDate: new Date(),
   eventsarray: [],
-  date:new Date()
-}
+  date: new Date(),
+  informtext: "",
+  informtype: "",
+};
 
 export default class FullCalendar extends React.Component<Props, State> {
   calendar: Calendar | undefined;
   constructor(props: any) {
     super(props);
-    this.state = initialState
+    this.state = initialState; //init state
   }
 
   action = () => {
     //open and close modal
-    console.log(this.state.active)
+    console.log(this.state.active);
     this.setState((state) => ({ active: !state.active }));
   };
 
-  close() {         //Abort or finish submit
-    this.action()
-    this.setState(initialState) //reset state to inital state
+  close() {
+    //close modal on submit aborted or finished
+    this.action();
+    this.setState(initialState); //reset state to inital state
   }
 
   create(info: any, title: any) {
@@ -57,34 +64,17 @@ export default class FullCalendar extends React.Component<Props, State> {
     //this.createEvent(info.startStr,title,info.endStr)
   }
 
-  createEvent(/*startDate: Date, title: string, endDate: Date*/) {
-    //get title value, create event, add it to array and call update function
-    const title = document.getElementById("titleinput") as HTMLInputElement;
-    //const titleinput=document.getElementById('titleinput') as HTMLInputElement
-    //const startinput=document.getElementById('startinput') as HTMLInputElement
-    //let title = titleinput.value ? "default"
-    if (title.value) {
-      console.log(title.value);
-      const event = {
-        title: title.value ? title.value : "Default",
-        start: this.state.startDate,
-        end: this.state.endDate,
-        allDay: 1,
-        //title: title.value,
-        //start: startinput.value ? startinput.value: this.state.startDate,
-        //allDay: endDate ? endDate : true // If there's no end date, the event will be all day of start date
-      };
-      this.setState({
-        eventsarray: [...this.state.eventsarray, event],
-      });
-      console.log(this.state.eventsarray);
-      this.action();
-      console.log(event);
-      this.setEvents(event);
-      alert("New event " + title.value + " was added!");
-    } else {
-      alert("Please give a name for your event!");
-    }
+  createEvent() {
+    const event = {
+      title: this.state.title,
+      start: this.state.startDate,
+      end: this.state.endDate,
+      allDay: 1, //TODO: allow to define start and end time
+    };
+    this.action();
+    console.log(event);
+    this.setEvents(event);
+    alert("New event " + this.state.title + " was added!"); //TODO: replace wit Notification
   }
 
   setEvents(data: any) {
@@ -96,34 +86,45 @@ export default class FullCalendar extends React.Component<Props, State> {
       },
       body: JSON.stringify(data),
       method: "POST",
-    })
-      .then((test) => {
-        return test.json();
-      }) //convert to json
-      .then((res) => {
-        console.log(res);
-      }) //view response in console
-      .then((data) => {
-        console.log("Request succeeded with JSON response: " + data);
-        this.close()
-        this.getEvents()
-      })
-      .catch((error) => console.log(error)); //catch errors
+    }).then((response) => {
+      if (response.ok) {
+        this.setState({
+          informtext: "Event was successfully added to Database",
+          informtype: "is-success",
+        });
+        this.close();
+        this.getEvents();
+      } else {
+        return response.json().then((response) => {
+          this.setState({
+            informtext:
+              "Event could nott be added to database. Please contact an administrator for more information",
+            informtype: "is-danger",
+          });
+        });
+      }
+    });
   }
 
   getEvents() {
-    fetch("http://localhost:9000/backend/events/get")
-      .then((res) => {
-        return res.json();
-      })
-      .then((response) => {
-        this.setState({ eventsarray: JSON.parse(response.body) });
-        console.log(this.state.eventsarray);
-        this.calendar?.removeAllEventSources(); //remove old events
-        this.calendar?.addEventSource(this.state.eventsarray); //add new events
-      });
+    fetch("http://localhost:9000/backend/events/get").then((response) => {
+      if (response.ok) {
+        return response.json().then((response) => {
+          this.setState({ eventsarray: JSON.parse(response.body) });
+          console.log(this.state.eventsarray);
+          this.calendar?.removeAllEventSources(); //remove old events
+          this.calendar?.addEventSource(this.state.eventsarray); //add new events
+        });
+      } else {
+        return response.json().then((response) => {
+          console.log("Fetch has failed:", response);
+          this.setState({ eventsarray: [] });
+        });
+      }
+    });
   }
 
+  /* TODO: Update + remove events */
   updateevent(properties: any) {
     //Update & deleted already created events --> TODO(optional)
     console.log(properties.event);
@@ -162,7 +163,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       console.log("Calendar already exist. Creating a new Calendar...");
       this.calendar.destroy();
     }
-    const canvas = document.getElementById("calendarFull") as HTMLCanvasElement; //get Canvas Elemnt where Calendar will be displayed
+    const canvas = document.getElementById("calendarFull") as HTMLCanvasElement; //get Canvas Element where Calendar will be displayed
 
     this.calendar = new Calendar(canvas, {
       initialView: "dayGridMonth", //set initial view (Month view)
@@ -172,7 +173,7 @@ export default class FullCalendar extends React.Component<Props, State> {
         //set buttons for navigations/change views
         left: "prev,next",
         center: "title",
-        right: "dayGridMonth,timeGridWeek,today", //today button?
+        right: "dayGridMonth,timeGridWeek,today", //views: month, week, today (display month/week of actual Day)
       },
       eventTimeFormat: {
         //event time format
@@ -203,11 +204,11 @@ export default class FullCalendar extends React.Component<Props, State> {
     const value = target.value;
     const name = target.name;
 
-    this.setState({
-        [name]: value
-    } as unknown as Pick<State, keyof State>);
-    console.log(this.state.title)
-}
+    this.setState(({
+      [name]: value,
+    } as unknown) as Pick<State, keyof State>);
+    console.log(this.state.title);
+  }
 
   render() {
     const active = this.state.active ? "is-active" : ""; //if active is true: show modal. Else hide it
@@ -230,28 +231,27 @@ export default class FullCalendar extends React.Component<Props, State> {
                 <label className="label">Event Name</label>
                 <div className="control">
                   <>
-                  <input
-                    className="input"
-                    id="titleinput"
-                    name="title"
-                    type="text"
-                    placeholder="Event title"
-                    value={this.state.title}
-                    onChange={(title)=>this.handleOnChange(title)}
-                  />
+                    <input
+                      className="input"
+                      id="titleinput"
+                      name="title"
+                      type="text"
+                      placeholder="Event title"
+                      value={this.state.title}
+                      onChange={(title) => this.handleOnChange(title)}
+                    />
                   </>
                   <label className="label">Event Time</label>
                   <>
-                  <DatePicker
-                    dateFormat="dd.MM.yyyy HH:mm"
-                    showTimeSelect
-                    //timeIntervals={15}
-                    timeFormat="HH:mm"
-                    selected={this.state.date}
-                    locale={en}
-                    onChange={(date: Date) => this.setState({date: date})}
-                    inline
-                />
+                    <DatePicker
+                      dateFormat="dd.MM.yyyy HH:mm"
+                      showTimeSelect
+                      timeFormat="HH:mm"
+                      selected={this.state.date}
+                      locale={en}
+                      onChange={(date: Date) => this.setState({ date: date })}
+                      inline
+                    />
                   </>
                 </div>
               </div>
@@ -267,6 +267,11 @@ export default class FullCalendar extends React.Component<Props, State> {
                 Cancel
               </button>
             </footer>
+            <NotificationBox
+              message={this.state.informtext}
+              type={this.state.informtype}
+              hasDelete={false}
+            />
           </div>
         </div>
       </div>
