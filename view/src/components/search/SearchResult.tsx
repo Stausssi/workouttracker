@@ -114,13 +114,15 @@ export default class SearchResult extends React.Component<Props, State> {
     }
 
     updateIcon(event: any) {
-        let following: boolean = this.state.isFollowing;
-        let mouseOver: boolean = event.type === "mouseenter";
+        if (!this.state.disableButton) {
+            let following: boolean = this.state.isFollowing;
+            let mouseOver: boolean = event.type === "mouseenter";
 
-        this.setState({
-            icon: following ? (mouseOver ? faUserMinus : faCheck) : this.state.icon,
-            buttonClass: (following ? (mouseOver ? "is-danger": "is-success") : this.state.buttonClass)
-        });
+            this.setState({
+                icon: following ? (mouseOver ? faUserMinus : faCheck) : this.state.icon,
+                buttonClass: (following ? (mouseOver ? "is-danger" : "is-success") : this.state.buttonClass)
+            });
+        }
     }
 
     render() {
