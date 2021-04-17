@@ -1,7 +1,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import {Link} from "react-router-dom";
-import {faCheck, faUserSlash, faUserPlus, faExclamationTriangle} from "@fortawesome/free-solid-svg-icons";
+import {faCheck, faBan, faUserPlus, faUserMinus, faExclamationTriangle} from "@fortawesome/free-solid-svg-icons";
 import SessionHandler from "../../utilities/SessionHandler";
 import {BACKEND_URL} from "../../App";
 import {IconDefinition} from "@fortawesome/free-brands-svg-icons";
@@ -11,6 +11,7 @@ interface Props {
 }
 
 interface State {
+    isFollowing: boolean
     icon: IconDefinition,
     buttonClass: string
     disableButton: boolean
@@ -21,13 +22,14 @@ export default class SearchResult extends React.Component<Props, State> {
         super(props);
 
         this.state = {
+            isFollowing: false,
             icon: faUserPlus,
             buttonClass: "is-success",
             disableButton: SessionHandler.getUsername() === this.props.username
         }
 
-        // Check whether the users are already friends or blocked
-        fetch(BACKEND_URL + "users/getFriendship", {
+        // Check whether the user is already following or blocked
+        fetch(BACKEND_URL + "users/getRelationship", {
             method: "POST",
             headers: {
                 Accept: "application/json",
@@ -40,19 +42,22 @@ export default class SearchResult extends React.Component<Props, State> {
         }).then((response) => {
             if (response.ok) {
                 return response.json().then((response) => {
-                    let befriended: boolean = response.befriended;
-                    let blocked: boolean = response.blocked;
+                    let isFollowing: boolean = response.following;
+                    let isBlocked: boolean = response.blocked;
 
                     this.setState({
-                        icon: (blocked ? faUserSlash : (befriended ? faCheck : faUserPlus)),
-                        buttonClass: (blocked ? "is-danger" : this.state.buttonClass),
-                        disableButton: this.state.disableButton || befriended || blocked
+                        isFollowing: isFollowing,
+                        icon: (isBlocked ? faBan : (isFollowing ? faCheck : faUserPlus)),
+                        buttonClass: (isBlocked ? "is-danger" : this.state.buttonClass),
+                        disableButton: this.state.disableButton || isBlocked,
                     });
                 });
             }
         });
 
-        this.addFriend = this.addFriend.bind(this);
+        this.followUser = this.followUser.bind(this);
+        this.unfollowUser = this.unfollowUser.bind(this);
+        this.updateIcon = this.updateIcon.bind(this);
     }
 
     scrollInputContent(event: any) {
@@ -64,9 +69,9 @@ export default class SearchResult extends React.Component<Props, State> {
         });
     }
 
-    addFriend(event: any) {
+    followUser(event: any) {
         if (!this.state.disableButton) {
-            fetch(BACKEND_URL + "users/addFriend", {
+            fetch(BACKEND_URL + "users/follow", {
                 method: "POST",
                 headers: {
                     Accept: "application/json",
@@ -74,18 +79,48 @@ export default class SearchResult extends React.Component<Props, State> {
                     Authorization: SessionHandler.getAuthToken()
                 },
                 body: JSON.stringify({
-                    follower: SessionHandler.getUsername(),
                     followed: this.props.username
                 })
             }).then((response) => {
-                // Change icon to checkmark if succeeded or red exclamation triangle if failed
                 this.setState({
-                    icon: response.ok ? faCheck : faExclamationTriangle,
-                    buttonClass: response.ok ? "is-success" : "is-danger",
-                    disableButton: true
+                    isFollowing: response.ok,
+                    icon: response.ok ? faUserMinus : faExclamationTriangle,
+                    buttonClass: "is-danger"
                 });
             });
         }
+    }
+
+    unfollowUser(event: any) {
+        if (!this.state.disableButton) {
+            fetch(BACKEND_URL + "users/unfollow", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: SessionHandler.getAuthToken()
+                },
+                body: JSON.stringify({
+                    unfollowed: this.props.username
+                })
+            }).then((response) => {
+                this.setState({
+                    isFollowing: !response.ok,
+                    icon: response.ok ? faUserPlus : faExclamationTriangle,
+                    buttonClass: response.ok ? "is-success" : "is-danger"
+                });
+            });
+        }
+    }
+
+    updateIcon(event: any) {
+        let following: boolean = this.state.isFollowing;
+        let mouseOver: boolean = event.type === "mouseenter";
+
+        this.setState({
+            icon: following ? (mouseOver ? faUserMinus : faCheck) : this.state.icon,
+            buttonClass: (following ? (mouseOver ? "is-danger": "is-success") : this.state.buttonClass)
+        });
     }
 
     render() {
@@ -107,7 +142,10 @@ export default class SearchResult extends React.Component<Props, State> {
                     <div className="control">
                         <button
                             className={`button ${this.state.buttonClass} is-inverted`}
-                            onClick={this.addFriend}
+                            onClick={this.state.isFollowing ? this.unfollowUser : this.followUser}
+                            onMouseEnter={this.updateIcon}
+                            onMouseLeave={this.updateIcon}
+                            onMouseDown={(e) => e.preventDefault()}
                             disabled={this.state.disableButton}
                         >
                                 <span className="icon is-small">

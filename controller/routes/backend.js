@@ -27,8 +27,10 @@ router.post('/activity/add', authenticateJWT, activity.add);
 router.get('/sports/fetch', authenticateJWT, sport.getAll);
 
 router.get('/users/search', authenticateJWT, users.search);
-router.post('/users/addFriend', authenticateJWT, users.addFriend);
-router.post('/users/getFriendship', authenticateJWT, users.getFriendship);
+router.post('/users/block', authenticateJWT, users.block);
+router.post('/users/follow', authenticateJWT, users.follow);
+router.post('/users/unfollow', authenticateJWT, users.unfollow);
+router.post('/users/getRelationship', authenticateJWT, users.getRelationship);
 
 /* Calendar routes */
 
