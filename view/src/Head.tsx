@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faSignInAlt, faUser } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./components/activity/Modal";
 import { Link } from "react-router-dom";
+import SessionHandler from "./utilities/SessionHandler";
 
 //Head of React app. Used on every page. Integration of Modal to create Activity and Search
 
@@ -38,7 +39,7 @@ export const Head = () => (
               <Modal />
             </div>
             <span className="navbar-item">
-              <Link className="button is-primary is-inverted" to={"/login"}>
+              <Link className="button is-primary is-inverted" to={'/login'} onClick={() => SessionHandler.logOut()}>
                 <span className="icon">
                   <FontAwesomeIcon icon={faSignInAlt} />
                 </span>
