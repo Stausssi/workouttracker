@@ -8,7 +8,7 @@ import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
 import NotificationBox from "./notificationBox";
 //import {BACKEND_URL} from "../App";   //TODO add Backend URL const to fetch
-//import * as moment from 'moment'
+import moment from 'moment'
 
 interface Props {}
 interface State {
@@ -17,6 +17,7 @@ interface State {
   title: string;
   startDate: Date;
   endDate: Date;
+  allDay: boolean;
   date: Date;
   eventsarray: any[];
   informtext: string;
@@ -29,6 +30,7 @@ const initialState = {
   title: "",
   startDate: new Date(),
   endDate: new Date(),
+  allDay: false,
   eventsarray: [],
   date: new Date(),
   informtext: "",
@@ -54,11 +56,21 @@ export default class FullCalendar extends React.Component<Props, State> {
     this.setState(initialState); //reset state to inital state
   }
 
-  create(info: any, title: any) {
+  toggleActive() {
+    let active = !this.state.active;
+    
+    if (!active) {
+      this.setState(initialState);  //reset state on closing modal
+    }
+    else {
+      this.setState(() => ({ active: active })); //if modal is closed, then open it
+    }
+};
+
+  create(info:any) {
     //open modal to set title of new event
-    console.log(info.startStr);
-    console.log(info.endStr);
-    console.log(title);
+    //var startdate=moment(info.start,'YYYY-MM-DD HH:mm').toDate();
+    //var enddate=moment(info.end,'YYYY-MM-DD HH:mm').toDate();
     this.action();
     this.setState({ startDate: info.startStr, endDate: info.endStr });
     //this.createEvent(info.startStr,title,info.endStr)
@@ -69,7 +81,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       title: this.state.title,
       start: this.state.startDate,
       end: this.state.endDate,
-      allDay: 1, //TODO: allow to define start and end time
+      allDay: 1//this.state.allDay, //TODO: allow to define start and end time
     };
     this.action();
     console.log(event);
@@ -98,7 +110,7 @@ export default class FullCalendar extends React.Component<Props, State> {
         return response.json().then((response) => {
           this.setState({
             informtext:
-              "Event could nott be added to database. Please contact an administrator for more information",
+              "Event could nott be added to database. Please contact an administrator for more information. Error is: " + response,
             informtype: "is-danger",
           });
         });
@@ -112,6 +124,8 @@ export default class FullCalendar extends React.Component<Props, State> {
         return response.json().then((response) => {
           this.setState({ eventsarray: JSON.parse(response.body) });
           console.log(this.state.eventsarray);
+          //TODO: Try to update only instaed of delete and reload all
+          //this.calendar?.refetchEvents()
           this.calendar?.removeAllEventSources(); //remove old events
           this.calendar?.addEventSource(this.state.eventsarray); //add new events
         });
@@ -127,6 +141,7 @@ export default class FullCalendar extends React.Component<Props, State> {
   /* TODO: Update + remove events */
   updateevent(properties: any) {
     //Update & deleted already created events --> TODO(optional)
+    //after update, run getevents()
     console.log(properties.event);
     console.log(properties.event.title);
     console.log(properties.event.id);
@@ -141,6 +156,8 @@ export default class FullCalendar extends React.Component<Props, State> {
   }
 
   removeevent() {
+    //TOD:optional
+    //after delete, run getevents()
     /*fetch("http://localhost:9000/backend/events/remove",{
     headers:{
       "accept":"application/json",
@@ -193,7 +210,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       height: "500px", //set height for table --> use auto?
       //selection
       selectable: true, //enable selection of dates
-      select: (info) => this.create(info, "SelectEvent"), //function on select --> run create function
+      select: (info) => this.create(info), //function on select --> run create function
       eventClick: (properties) => this.updateevent(properties),
     });
     this.calendar.render(); //render calendar on document
@@ -207,7 +224,11 @@ export default class FullCalendar extends React.Component<Props, State> {
     this.setState(({
       [name]: value,
     } as unknown) as Pick<State, keyof State>);
-    console.log(this.state.title);
+    console.log(this.state.allDay);
+  }
+
+  handleDateOnChange(date: Date) {
+    this.setState({ date: date });
   }
 
   render() {
@@ -228,12 +249,12 @@ export default class FullCalendar extends React.Component<Props, State> {
             </header>
             <section className="modal-card-body">
               <div className="content">
-                <label className="label">Event Name</label>
                 <div className="control">
+                <label className="label">Event Name</label>
                   <>
                     <input
                       className="input"
-                      id="titleinput"
+                      id="eventtitle"
                       name="title"
                       type="text"
                       placeholder="Event title"
@@ -241,7 +262,7 @@ export default class FullCalendar extends React.Component<Props, State> {
                       onChange={(title) => this.handleOnChange(title)}
                     />
                   </>
-                  <label className="label">Event Time</label>
+                  <label className="label">Event Starttime</label>
                   <>
                     <DatePicker
                       dateFormat="dd.MM.yyyy HH:mm"
@@ -249,9 +270,19 @@ export default class FullCalendar extends React.Component<Props, State> {
                       timeFormat="HH:mm"
                       selected={this.state.date}
                       locale={en}
-                      onChange={(date: Date) => this.setState({ date: date })}
+                      onChange={(date: Date) => this.handleDateOnChange(date)}
                       inline
                     />
+                  </>
+                  <label className="label">AllDay</label>
+                  <>
+                    <label className="checkbox">
+                      <input
+                        type="checkbox"
+                        onChange={(allDay) => this.handleOnChange(allDay)}
+                      />
+                      Set allDay event
+                    </label>
                   </>
                 </div>
               </div>

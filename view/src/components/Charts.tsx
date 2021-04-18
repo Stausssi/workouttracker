@@ -1,5 +1,5 @@
-import React from 'react'
-import Chart from 'chart.js/auto';
+import React from "react";
+import Chart from "chart.js/auto";
 
 interface Props {
   config?: {
@@ -14,36 +14,73 @@ interface Props {
 
 interface State {
   active: boolean;
+  title: string;
   type: string;
+  category: string;
+  sport: string;
+  user: string;
   newtype: string;
   array: any;
   secondtype: string; //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
-  /*
-    charts:{
-        id,
-        label,
-        title,
-        type,
-        data
-    }
-    */
+  chartsarray: {};
+  sports: { [name: string]: number };
 }
 
+const colors = [
+  "red",
+  "blue",
+  "yellow",
+  "gray",
+  "green",
+  "purple",
+  "orange",
+  "black",
+  "pink",
+  "gold",
+  "silver",
+  "bronze",
+];
+
+const labels = [
+  "Jan.",
+  "Feb.",
+  "Mar.",
+  "Apr.",
+  "May.",
+  "Jun.",
+  "Jul.",
+  "Aug.",
+  "Sep.",
+  "Oct.",
+  "Nov.",
+  "Dec.",
+];
+
+const types = [
+  "line",
+  "bar",
+  "horizontalBar",
+  "radar",
+  "polarArea",
+  "doughnut",
+  "pie",
+];
+
+const initialState = {
+  active: false,
+  title: "",
+  type: "",
+  category: "",
+  sport: "",
+  user: "",
+  newtype: "",
+  array: "",
+  secondtype: "", //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
+  chartsarray: {},
+  sports: {},
+};
+
 export default class Graphs extends React.Component<Props, State> {
-  labels = [
-    "Jan.",
-    "Feb.",
-    "Mar.",
-    "Apr.",
-    "May.",
-    "Jun.",
-    "Jul.",
-    "Aug.",
-    "Sep.",
-    "Oct.",
-    "Nov.",
-    "Dec.",
-  ];
   chart1: Chart | undefined;
   chart2: Chart | undefined;
   charts: string[] = [];
@@ -51,19 +88,37 @@ export default class Graphs extends React.Component<Props, State> {
   data: number[] = [];
   constructor(props: Props) {
     super(props);
-    this.state = {
-      type: "line",
-      newtype: "line",
-      secondtype: "line",
-      active: false,
-      array: "",
-    };
+    this.state = initialState;
   }
 
   action = () => {
     //open and close modal
     this.setState((state) => ({ active: !state.active }));
   };
+
+  toggleActive() {
+    let active = !this.state.active;
+    this.setState({ active: active });
+
+    if (active) {
+      // Fetch sports, users and category from database
+      fetch("http://localhost:9000/backend/sports/fetch").then((response) => {
+        if (response.ok) {
+          return response.json().then((response) => {
+            this.setState({ sports: JSON.parse(response.body) });
+          });
+        } else {
+          return response.json().then((response) => {
+            console.log("Sport Fetch failed:", response);
+            this.setState({ sports: {} });
+          });
+        }
+      });
+    } else {
+      // Reset input form on close
+      document.forms[0].reset();
+    }
+  }
 
   getcharts() {
     //setstate charts then make new fetch to get data for each charts
@@ -107,12 +162,28 @@ export default class Graphs extends React.Component<Props, State> {
       }
       const url = "http://localhost:9000/backend/charts/dataset?";
       console.log(url + params);
-      this.addElement(this.state.array[i].name, this.state.array[i].type);
-      //this.getdatasets(url,params)
+      //this.addElement(this.state.array[i].name, this.state.array[i].type);
+      this.getdatasets(url,params,this.state.array[i].name, this.state.array[i].type)
     }
   }
 
-  getdatasets(url: string, params: any) {
+  test() {
+    fetch("http://localhost:9000/backend/charts/dataset?sport=Ballsport")
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        return Promise.reject(response);
+      }
+    })
+    .then((chartsData) => {
+      var data = JSON.parse(chartsData.body);
+      console.log(data);
+    })
+    .catch((error) => console.warn(error));
+  }
+
+  getdatasets(url: string, params: any,name:string,type:string) {
     fetch(url + params)
       .then((response) => {
         if (response.ok) {
@@ -124,7 +195,7 @@ export default class Graphs extends React.Component<Props, State> {
       .then((chartsData) => {
         var data = JSON.parse(chartsData.body);
         console.log(data);
-        //this.addElement() => add dataset
+        this.addElement(name,type,data) //=> add dataset
       })
       .catch((error) => console.warn(error));
   }
@@ -146,7 +217,7 @@ export default class Graphs extends React.Component<Props, State> {
       }) //view response in console
       .then((data: any) => {
         console.log("Request succeeded");
-        this.addElement(name, type);
+        this.addElement(name, type,data);
       })
       .catch((error) => console.log(error)); //catch errors
   }
@@ -169,6 +240,7 @@ export default class Graphs extends React.Component<Props, State> {
         fill: fill.value, //TODO: add option to modal
         param_sport: sport, //:null,
         param_user: null,
+        //year
       };
       this.action();
       this.setcharts(chart, chart.name, chart.type);
@@ -177,7 +249,7 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  addElement(title: string, type: string) {
+  addElement(title: string, type: string,data:any) {
     var chartnode = document.getElementById("chartID_" + title);
     if (!this.charts.includes(title) && !chartnode) {
       this.charts.push();
@@ -189,7 +261,7 @@ export default class Graphs extends React.Component<Props, State> {
       var parent = document.getElementById("charts");
       parent?.appendChild(canvas);
       console.log(document.getElementById(canvas.id));
-      this.addcharts(canvas, type);
+      this.addcharts(canvas, type,data);
       alert("new canvas: " + canvas + " witch id " + canvas.id);
     } else {
       alert(
@@ -207,11 +279,24 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  addcharts(canvas: HTMLCanvasElement, type: string) {
+  addcharts(canvas: HTMLCanvasElement, type: string ,data:any) {
+    let dataarray: any[]=new Array(labels.length);
+    dataarray.fill(0,0,labels.length)
+    for(var i=0;i<data.length;i++)
+    {
+        labels.forEach((item,index)=>{
+        if(data[i].month==index)
+        {
+          console.log("Platz:"+(index-1))
+          dataarray.splice(index-1, 1, data[i].amount);
+        }
+      })
+    }
+    console.log(dataarray)
     new Chart(canvas, {
       type: type, //Define chart type
       data: {
-        labels: this.labels,
+        labels: labels,
         datasets: [
           {
             label: "My First dataset",
@@ -219,7 +304,7 @@ export default class Graphs extends React.Component<Props, State> {
             // type: "line",
             backgroundColor: "rgba(220,220,220,0.2)",
             borderColor: "rgba(220,220,220,1)",
-            data: [65, 59, 4, 81, 56, 55, 40],
+            data: dataarray,
             fill: false,
           },
           {
@@ -228,7 +313,7 @@ export default class Graphs extends React.Component<Props, State> {
             //type: "bar",
             backgroundColor: "rgba(220,20,220,0.2)",
             borderColor: "rgba(220,20,220,1)",
-            data: [32, 25, 33, 88, 12, 92, 33],
+            data: [32, 2500000, 3300000, 88000, 12, 920000, 33],
           },
         ],
       },
@@ -245,7 +330,6 @@ export default class Graphs extends React.Component<Props, State> {
     this.setState({ type: charttype.target.value });
     console.log(this.state.type);
   };
-
 
   /*##############################################################*/
   /*OLD, Delete before merge*/
@@ -308,8 +392,8 @@ export default class Graphs extends React.Component<Props, State> {
 "],
                     
     ];*/
-    const colors = this.getRandomColor(this.data);
-    this.createchart(labels, this.data, colors);
+    //const colors = this.getRandomColor(this.data);
+    this.createchart(this.data /*, colors*/);
   }
 
   getRandomColor(data: string | any[]) {
@@ -319,7 +403,7 @@ export default class Graphs extends React.Component<Props, State> {
     return this.colors;
   }
 
-  createchart(labels: string[], data: number[], colors: string[]) {
+  createchart(/*labels: string[],*/ data: number[] /* color: string[]*/) {
     if (this.chart2) {
       console.log("chart already exist");
       this.chart2.destroy();
@@ -349,6 +433,10 @@ export default class Graphs extends React.Component<Props, State> {
                 beginAtZero: true,
                 stepSize: 5, //gap between scale ticks
                 maxTicksLimit: 5, //max amount of ticks           maxTick * stepSize = max data value
+                scaleLabel: {
+                  display: true,
+                  labelString: "value",
+                },
               },
             },
           ],
@@ -358,6 +446,10 @@ export default class Graphs extends React.Component<Props, State> {
                 beginAtZero: true,
                 stepSize: 5,
                 maxTicksLimit: 5,
+                scaleLabel: {
+                  display: true,
+                  labelString: "Month",
+                },
               },
             },
           ],
@@ -382,6 +474,31 @@ export default class Graphs extends React.Component<Props, State> {
   /* END of TODELETE */
   /*##############################################################*/
 
+  renderOptions() {
+    return (
+      types &&
+      types.length > 0 &&
+      types.map((type) => {
+        return <option key={type}>{type}</option>;
+      })
+    );
+  }
+
+  handleOnChange(
+    event:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLSelectElement>
+  ) {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+
+    this.setState(({
+      [name]: value,
+    } as unknown) as Pick<State, keyof State>);
+    console.log(this.state.type);
+  }
+
   render() {
     const active = this.state.active ? "is-active" : "";
     return (
@@ -402,9 +519,6 @@ export default class Graphs extends React.Component<Props, State> {
             <option value="doughnut">Doughnut</option>
             <option value="pie">Pie</option>
           </select>
-          <button className="button" onClick={() => this.getrandomData()}>
-            Randomize Data!
-          </button>
           <button className="button" onClick={() => this.drawSample()}>
             Draw
           </button>
@@ -415,6 +529,9 @@ export default class Graphs extends React.Component<Props, State> {
             Open Modal
           </button>
           <button className="button" onClick={() => this.getcharts()}>
+            get combine
+          </button>
+          <button className="button" onClick={() => this.test()}>
             get combine
           </button>
         </div>
@@ -438,39 +555,43 @@ export default class Graphs extends React.Component<Props, State> {
             </header>
             <section className="modal-card-body">
               <div className="content">
-                <h1>Chart Name</h1>
-                <label className="label">Chart</label>
                 <div className="control">
-                  <input
-                    className="input"
-                    id="titleinput2"
-                    type="text"
-                    placeholder="e.g Neues Chart"
-                  />
-                  <input
-                    className="input"
-                    id="typeinput"
-                    type="text"
-                    placeholder="e.g line"
-                  />
-                  <input
-                    className="input"
-                    id="function"
-                    type="text"
-                    placeholder="e.g duration"
-                  />
-                  <input
-                    className="input"
-                    id="sport"
-                    type="text"
-                    placeholder="e.g Ballsport"
-                  />
-                  <input
-                    className="input"
-                    id="user"
-                    type="text"
-                    placeholder="e.g defaultuser"
-                  />
+                  <label className="label">Chart Name</label>
+                  <>
+                    <input
+                      className="input"
+                      id="charttitle"
+                      name="title"
+                      type="text"
+                      placeholder="Event title"
+                      value={this.state.title}
+                      onChange={(title) => this.handleOnChange(title)}
+                    />
+                  </>
+                  <label className="label">Chart Type</label>
+                  <>
+                    <span>Select chart type</span> :{"line"}
+                    <select className="select" onChange={(type) => this.handleOnChange(type)}>
+                      {this.renderOptions()}
+                    </select>
+                  </>
+                  <label className="label">Filter for category</label>
+                  <></>
+                  <div className="is-divider" data-content="Optional"></div>
+                  <label className="label">Filter for user</label>
+                  <></>
+                  <label className="label">Filter for sport</label>
+                  <></>
+                  <label className="label">Fill Graph</label>
+                  <>
+                    <label className="checkbox">
+                      <input
+                        type="checkbox"
+                        onChange={(fill) => this.handleOnChange(fill)}
+                      />
+                      Fill graph
+                    </label>
+                  </>
                 </div>
               </div>
             </section>
