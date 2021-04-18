@@ -495,6 +495,31 @@ export default class Graphs extends React.Component<Props, State> {
     } as unknown) as Pick<State, keyof State>);
   }
 
+  renderOptions() {
+    return (
+      types &&
+      types.length > 0 &&
+      types.map((type) => {
+        return <option key={type}>{type}</option>;
+      })
+    );
+  }
+
+  handleOnChange(
+    event:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLSelectElement>
+  ) {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+
+    this.setState(({
+      [name]: value,
+    } as unknown) as Pick<State, keyof State>);
+    console.log(this.state.type);
+  }
+
   render() {
     const active = this.state.active ? "is-active" : "";
     return (

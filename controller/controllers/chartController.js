@@ -19,16 +19,9 @@ exports.findAll = (request, response) => {
 
 exports.getdataset = (request,response) => {
     let user,sport = null
-    if(request.query.user)
-    {
     user = request.query.user
-    }
-    sport = request.query.sport
-    //Object.keys(req.query.user)
-   if(request.query.sport)
-    {
-       user=request.query.sport
-    }
+       sport=request.query.sport
+ 
         //users=users.toString()
         //sports=sports.toString()
     Data.getall(user,sport,(error, data) => {
