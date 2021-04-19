@@ -1,6 +1,6 @@
 import { useState } from 'react'
-//import axios from 'axios'
-//import { response } from 'express'
+import {BACKEND_URL, FRONTEND_URL} from "../../../App";
+
 interface Props {
     onAdd: any,
 }
@@ -31,7 +31,7 @@ const AddComment = ({ onAdd }: Props) => {
 
         onAdd({ text, name, timestamp })
 
-        fetch('http://localhost:3001/backend/commend', {
+        fetch(BACKEND_URL + '/commend', {
             method: 'POST',
             headers:{
                 Accept: 'application/json',

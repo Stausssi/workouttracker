@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-//import {useState} from 'react'
+import {BACKEND_URL, FRONTEND_URL} from "../../App";
 import Header from './components/Header'
 import Comments from './components/Comments'
 import AddComment from './components/AddComment'
@@ -82,7 +82,7 @@ export default class CommmentComponent extends Component<{}, State> {
   }
 
   newThumpsState() {
-    fetch('http://localhost:3001/backend/thumpsup', {
+    fetch(BACKEND_URL + '/thumpsup', {
       method: 'POST',
       headers:{
           Accept: 'application/json',
@@ -103,7 +103,7 @@ export default class CommmentComponent extends Component<{}, State> {
 
   //Count Thumps
   countThumps() {
-    fetch("http://localhost:3001/backend/countThumps/" + +12, {//get as default
+    fetch(BACKEND_URL + "/countThumps/" + +12, {//get as default
         headers:{
             Accept: 'application/json',
             'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ export default class CommmentComponent extends Component<{}, State> {
 
   //Count Thumps
   async isThumpUpSet() {
-    fetch('http://localhost:3001/backend/isthumpsupset', {
+    fetch(BACKEND_URL + '/isthumpsupset', {
       method: 'POST',
       headers:{
           Accept: 'application/json',
