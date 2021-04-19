@@ -1,6 +1,6 @@
 import React from 'react';
 import './css/App.css';
-import ToggleButton from './components/ToggleButton'
+import FeedContainer from './components/Feed/FeedContainer'
 import 'bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css'
 
 interface Props {}
@@ -25,7 +25,7 @@ export default class Body extends React.Component<Props, State> {
                 <div id="col-1">
                     <h1>This is half of a page</h1>
                     <div>
-                        <ToggleButton/>
+                        <FeedContainer/>
                     </div>
                 </div>
                 <div id="col-2">

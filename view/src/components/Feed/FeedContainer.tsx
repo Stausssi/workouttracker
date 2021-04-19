@@ -1,37 +1,20 @@
 import React from 'react';
-import '../css/App.css';
+import '../../css/App.css';
 import 'bulma-extensions'
+import {FriendsFeed, OwnFeed} from "./FriendsAndOwnFeed";
 
-interface Props {
-}
+/*
+* Contains the Friends and Own Feed and has the ability to toggle between them.
+* */
 
 interface State {
     switch: boolean
 }
 
-class OwnFeed extends React.Component<Props> {
-    render() {
-        return (
-            <>
-                <div>Hier kommt die eigene Aktivität hin</div>
-                <div>Weitere eigene Komponenten</div>
-            </>
-        );
-    }
+interface Props {
 }
 
-class FriendsFeed extends React.Component<Props> {
-    render() {
-        return (
-            <>
-                <div>Hier kommt die Aktivitäten der Freunde hin</div>
-                <div>Weitere andere Komponenten</div>
-            </>
-        );
-    }
-}
-
-export default class ToggleButton extends React.Component<Props, State> {
+export default class FeedContainer extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -40,9 +23,7 @@ export default class ToggleButton extends React.Component<Props, State> {
     }
 
     switchFeed() {
-        console.log("test")
         this.setState((state) => ({switch: !state.switch}))
-        console.log(this.state.switch)
     }
 
     render() {
