@@ -12,14 +12,14 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true}));
 app.use(express.json());
 
-app.get("/getURLTing", (req,res) => {
+app.get("/googlefit/getURLTing", (req,res) => {
     const oauth2Client = new google.auth.OAuth2(
         //client id
         "302139597636-dt8i3diuqssqn64sc0to9l79nq0ib748.apps.googleusercontent.com",
         //client secret
         "-go0MpwOnEw3MicUM_S7rOPW",
         //link to redirect to
-        "http://localhost:3001/activity"
+        "http://localhost:3001/googlefit/activity"
     );
         const scopes = [ "https://www.googleapis.com/auth/fitness.location.read https://www.googleapis.com/auth/fitness.activity.read profile email " ];
         const url = oauth2Client.generateAuthUrl({
@@ -38,7 +38,7 @@ app.get("/getURLTing", (req,res) => {
         });
 });
 
-app.get("/activity", async (req, res) => {
+app.get("/googlefit/activity", async (req, res) => {
     const queryURL = new urlParse(req.url);
     const code = queryParser.parse(queryURL.query).code;
     const oauth2Client = new google.auth.OAuth2(
@@ -47,11 +47,12 @@ app.get("/activity", async (req, res) => {
         //client secret
         "-go0MpwOnEw3MicUM_S7rOPW",
         //link to redirect to
-        "http://localhost:3001/activity"
+        "http://localhost:3001/googlefit/activity"
     );
 
     const tokens = await oauth2Client.getToken(code);
-    res.send("HELLO");
+    //res.redirect("http://localhost:3000/");
+    res.send('<script>alert("We import your Activitys from the last Year"); window.location.href = "http://localhost:3000/"; </script>');
 
     let sessionArray = [];
 
