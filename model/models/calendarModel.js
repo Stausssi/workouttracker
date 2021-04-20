@@ -43,7 +43,20 @@ Event.create = (newEvent, result) => {
     });
   };
 
-Event.updateById = function(id, Event, result){
+  Event.remove = (id, result)=>{
+    sql.query("DELETE FROM events WHERE id = ?", id, (error, res) => {
+               if(error) {
+                   console.log("error: ", error);
+                   result(error, null);
+               }
+               else{
+             result(null, true);
+               }
+           }); 
+};
+
+
+/*Event.updateById = function(id, Event, result){
   sql.query("UPDATE Events SET Event = ? WHERE id = ?", [Event.Event, id], function (err, res) {
           if(err) {
               console.log("error: ", err);

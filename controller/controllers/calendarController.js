@@ -1,6 +1,8 @@
 const { request } = require('express');
 const Event = require("../model/models/calendarModel");
 
+//TODO: Add user for event
+
 exports.findAll = (request, response) => {
     Event.getAll((error, data) => {
         if (error) {
@@ -31,7 +33,6 @@ exports.create = (request, response) => {
     // Save event in the database
     Event.create(event, (error, added) => {
       if (error) {
-            console.log(error);
             response.status(500).send({message: "Internal server error!"});
         } else if(!added)
           {
@@ -43,6 +44,26 @@ exports.create = (request, response) => {
 }   
   };
 
+  exports.remove = (request, response) => {
+    const eventid=request.body.id
+    if (!eventid) {
+      response.status(400).send({
+        message: "Bad Request: ID can not be empty!"
+      });
+    }
+  else {
+    Event.remove(eventid,(error,data)=>
+    {
+      if (error) {
+        response.status(500).send({message: "Internal server error!"});
+    } else {
+        response.status(200).send({message: "Event was successfully deleted!"});
+       
+      }
+})
+    
+  }   
+};
 
   exports.update = (request, response) => {
     if (!request.body) {
@@ -79,31 +100,3 @@ exports.create = (request, response) => {
     };*/
     }   
   };
-
-  exports.remove = (request, response) => {
-    if (!request.body) {
-      response.status(400).send({
-        message: "Content can not be empty!"
-      });
-    }
-  else {
-    // update an event
-    //TODO
-   /* sql.query("DELETE FROM customers WHERE id = ?", id, (error, response) => {
-      if (error) {
-        console.log(error);
-        response.status(500).send({message: "Internal server error!"});
-      }
-  
-      if (response.affectedRows == 0) {
-        // not found Customer with the id
-        result({ kind: "not_found" }, null);
-        response.status(404).send({message: "event was not found"});
-      }
-  
-      console.log("deleted customer with id: ", id);
-      result(null, error);
-    });*/
-    
-  }   
-};

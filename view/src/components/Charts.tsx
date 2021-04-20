@@ -495,14 +495,18 @@ export default class Graphs extends React.Component<Props, State> {
     } as unknown) as Pick<State, keyof State>);
   }
 
-  renderOptions() {
+  renderOptions(items: any[]) {
     return (
-      types &&
-      types.length > 0 &&
-      types.map((type) => {
-        return <option key={type}>{type}</option>;
+      items &&
+      items.length > 0 &&
+      items.map((item) => {
+        return <option key={item}>{item}</option>;
       })
     );
+  }
+
+  handleDateOnChange(date: Date) {
+    this.setState({ year: date });
   }
 
   handleOnChange(
@@ -510,18 +514,32 @@ export default class Graphs extends React.Component<Props, State> {
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) {
+    console.log(event.target.value);
+    console.log(event.target.name);
     const target = event.target;
     const value = target.value;
     const name = target.name;
-
     this.setState(({
       [name]: value,
     } as unknown) as Pick<State, keyof State>);
-    console.log(this.state.type);
+  }
+
+  handleOnCheck(event: any) {
+    const target = event.target;
+    const name = target.name;
+    var check = target.checked;
+    console.log(check);
+    console.log(target);
+    console.log(name);
+    console.log(check);
+    this.setState(({
+      [name]: check,
+    } as unknown) as Pick<State, keyof State>);
   }
 
   render() {
     const active = this.state.active ? "is-active" : "";
+    const submit = this.state.submit ? "" : "is-disabled";
     return (
       <div className="container">
         <div className="divider">Chart</div>

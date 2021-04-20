@@ -48,6 +48,11 @@ router.get('/charts/dataset', chart.getdataset);
 
 router.post('/charts/add', chart.create); 
 
+//router.post('/charts/remove', chart.remove);
+
+
+/*
+
 //router.get('/charts/update', chart.findAll); 
 
 //router.post('/charts/remove', chart.create); 

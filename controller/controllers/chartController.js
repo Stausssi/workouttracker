@@ -18,13 +18,17 @@ exports.findAll = (request, response) => {
 */
 
 exports.getdataset = (request,response) => {
-    let user,sport = null
-    user = request.query.user
-       sport=request.query.sport
+    let user,sport,category = null
+    if(request.query.user)
+    {
+        user=request.username
+    }
+    sport = request.query.sport
+    category=request.query.category
  
         //users=users.toString()
         //sports=sports.toString()
-    Data.getall(user,sport,(error, data) => {
+    Data.getall(category,user,sport,(error, data) => {
         if (error) {
             console.log(error);
             response.status(500).send({message: "Internal server error!" + error});
@@ -37,7 +41,7 @@ exports.getdataset = (request,response) => {
 
 exports.create = (request, response) => {
     if (!request.body) {
-        response.status(400).send({
+        return response.status(400).send({
           message: "Content can not be empty!"
         });
       }
@@ -53,7 +57,7 @@ exports.create = (request, response) => {
     Chart.create(chart,(error, added) => {
         if (error) {
             console.log(error);
-            response.status(500).send({message: "Internal server error!" + error});
+            return response.status(500).send({message: "Internal server error!" + error});
         } else{
             if (added) {
                 response.status(200).send({message: "Chart added!"});
