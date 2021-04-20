@@ -1,10 +1,9 @@
 import React from "react";
 
-
 interface Props {
 }
 
-export class OwnFeed extends React.Component<Props> {
+export class OwnFeed extends React.Component<{}> {
     render() {
         return (
             <>
@@ -12,7 +11,7 @@ export class OwnFeed extends React.Component<Props> {
                     <div>Hier kommt die eigene Aktivität hin</div>
                     <div>Weitere eigene Komponenten</div>
 
-                    <Activity />
+                    <ActivityBox />
                 </div>
 
             </>
@@ -31,17 +30,22 @@ export class FriendsFeed extends React.Component<Props> {
     }
 }
 
-class Activity extends React.Component<any, any>{
+//Component for an activity Box, to contain a like button, comment section and an activity table
+class ActivityBox extends React.Component<any, any>{
     render() {
         return(
             <>
                 <div className="card">
                     <div className="card-content">
                         <div className="media">
-                            <div className="media-content has-text-left	">
-                                <p className="title is-4">Niklas Drössler</p>
+                            <figure className="image is-48x48">
+                                <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image"/>
+                            </figure>
+                            <div className="media-content has-text-left	pl-2">
+                                <p className="title is-4">Sportart</p>
                                 <p className="subtitle is-6">
-                                    <time dateTime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                                    <time dateTime="2016-1-1">11:09 PM - 1 Jan 2016 </time>
+                                    - Niklas Drössler
                                 </p>
                             </div>
                             <div className="">
@@ -50,33 +54,7 @@ class Activity extends React.Component<any, any>{
                         </div>
 
                         <div className="content ">
-                            <div className="columns">
-
-                                <div className="column is-one-fifth">
-                                    <b className="title is-5">Sportart</b>
-                                    <figure className="image is-48x48">
-                                        <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image"/>
-                                    </figure>
-                                </div>
-                                <div className="is-divider-vertical"/>
-
-                                <div className="column">
-                                    <table className="table">
-                                        <thead>
-                                            <th>Distanz</th>
-                                            <th>Höhenmeter</th>
-                                            <th>Höhenmeter</th>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>2km</td>
-                                                <td>2000</td>
-                                                <td>2000</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                            <ActivityTable activityData={{ duration: 200, pace: 20, averageHeartRate: 50, altitudeDifference: 10}}/>
                         </div>
                     </div>
                         <div className="card">
@@ -92,6 +70,52 @@ class Activity extends React.Component<any, any>{
                             </header>
                         </div>
                 </div>
+            </>
+        );
+    }
+}
+
+interface activityData {
+    distance?: number,
+    duration?: number,
+    pace?: number,
+    averageHeartRate?: number,
+    altitudeDifference?: number
+}
+
+interface props {
+    activityData: activityData
+}
+
+//displays an activity table
+class ActivityTable extends React.Component<props, { }>{
+    constructor(props: props) {
+        super(props);
+    }
+
+    renderTableHeaders(activityData: activityData){
+        let keys = Object.keys(activityData) //get property keys
+        return keys.map((key) => <th>{key}</th>)
+    }
+
+    renderTableContents(activityData: activityData){
+        let values = Object.values(activityData) //get property values
+        return values.map((value) => <th>{value}</th>)
+    }
+
+    render(){
+        return(
+            <>
+                <table className="table">
+                    <thead>
+                        {this.renderTableHeaders(this.props.activityData)}
+                    </thead>
+                    <tbody>
+                    <tr>
+                        {this.renderTableContents(this.props.activityData)}
+                    </tr>
+                    </tbody>
+                </table>
             </>
         );
     }
