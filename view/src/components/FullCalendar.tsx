@@ -3,16 +3,15 @@ import { Calendar } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import DatePicker from "react-datepicker";
-import en from "date-fns/locale/en-GB";
-import "react-datepicker/dist/react-datepicker.css";
 import NotificationBox from "./notificationBox";
-//import {BACKEND_URL} from "../App";   //TODO add Backend URL const to fetch
+import {BACKEND_URL} from "../App";   //TODO add Backend URL const to fetch
 import moment from 'moment'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {}
+
 interface State {
-  showPopup: boolean;
   active: boolean;
   title: string;
   startDate: Date;
@@ -25,7 +24,6 @@ interface State {
 }
 
 const initialState = {
-  showPopup: false,
   active: false,
   title: "",
   startDate: new Date(),
@@ -54,118 +52,6 @@ export default class FullCalendar extends React.Component<Props, State> {
     //close modal on submit aborted or finished
     this.action();
     this.setState(initialState); //reset state to inital state
-  }
-
-  toggleActive() {
-    let active = !this.state.active;
-    
-    if (!active) {
-      this.setState(initialState);  //reset state on closing modal
-    }
-    else {
-      this.setState(() => ({ active: active })); //if modal is closed, then open it
-    }
-};
-
-  create(info:any) {
-    //open modal to set title of new event
-    //var startdate=moment(info.start,'YYYY-MM-DD HH:mm').toDate();
-    //var enddate=moment(info.end,'YYYY-MM-DD HH:mm').toDate();
-    this.action();
-    this.setState({ startDate: info.startStr, endDate: info.endStr });
-    //this.createEvent(info.startStr,title,info.endStr)
-  }
-
-  createEvent() {
-    const event = {
-      title: this.state.title,
-      start: this.state.startDate,
-      end: this.state.endDate,
-      allDay: 1//this.state.allDay, //TODO: allow to define start and end time
-    };
-    this.action();
-    console.log(event);
-    this.setEvents(event);
-    alert("New event " + this.state.title + " was added!"); //TODO: replace wit Notification
-  }
-
-  setEvents(data: any) {
-    /*Create call to backend route */
-    fetch("http://localhost:9000/backend/events/add", {
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(data),
-      method: "POST",
-    }).then((response) => {
-      if (response.ok) {
-        this.setState({
-          informtext: "Event was successfully added to Database",
-          informtype: "is-success",
-        });
-        this.close();
-        this.getEvents();
-      } else {
-        return response.json().then((response) => {
-          this.setState({
-            informtext:
-              "Event could nott be added to database. Please contact an administrator for more information. Error is: " + response,
-            informtype: "is-danger",
-          });
-        });
-      }
-    });
-  }
-
-  getEvents() {
-    fetch("http://localhost:9000/backend/events/get").then((response) => {
-      if (response.ok) {
-        return response.json().then((response) => {
-          this.setState({ eventsarray: JSON.parse(response.body) });
-          console.log(this.state.eventsarray);
-          //TODO: Try to update only instaed of delete and reload all
-          //this.calendar?.refetchEvents()
-          this.calendar?.removeAllEventSources(); //remove old events
-          this.calendar?.addEventSource(this.state.eventsarray); //add new events
-        });
-      } else {
-        return response.json().then((response) => {
-          console.log("Fetch has failed:", response);
-          this.setState({ eventsarray: [] });
-        });
-      }
-    });
-  }
-
-  /* TODO: Update + remove events */
-  updateevent(properties: any) {
-    //Update & deleted already created events --> TODO(optional)
-    //after update, run getevents()
-    console.log(properties.event);
-    console.log(properties.event.title);
-    console.log(properties.event.id);
-    /*fetch("http://localhost:9000/backend/events/update",{
-    headers:{
-      "accept":"application/json",
-      "content-type":"application/json"
-    },
-    body: JSON.stringify(data),
-    method:"POST"
-  })*/
-  }
-
-  removeevent() {
-    //TOD:optional
-    //after delete, run getevents()
-    /*fetch("http://localhost:9000/backend/events/remove",{
-    headers:{
-      "accept":"application/json",
-      "content-type":"application/json"
-    },
-    body: JSON.stringify(data),
-    method:"POST"
-  })*/
   }
 
   componentDidMount() {
@@ -206,14 +92,101 @@ export default class FullCalendar extends React.Component<Props, State> {
       },
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin], //add plugins to fullcalendar
       events: this.state.eventsarray, //eventsList
-      editable: true, //editing events
       height: "500px", //set height for table --> use auto?
       //selection
       selectable: true, //enable selection of dates
       select: (info) => this.create(info), //function on select --> run create function
-      eventClick: (properties) => this.updateevent(properties),
+      //eventClick: (properties) => this.updateevent(properties),
+      eventDidMount:(element)=>{
+        console.log(element.event.id)
+        console.log(element.event.title)
+        var deleteButton=document.createElement("button")
+        deleteButton.onclick=()=>this.removeevent(element)
+        deleteButton.className="delete"
+        element.el.append(deleteButton)
+      }
     });
     this.calendar.render(); //render calendar on document
+  }
+
+  create(info:any) {
+    //open modal to set title of new event
+    //var startdate=moment(info.start,'YYYY-MM-DD HH:mm').toDate();
+    //var enddate=moment(info.end,'YYYY-MM-DD HH:mm').toDate();
+    this.action();
+    this.setState({ startDate: info.startStr, endDate: info.endStr });
+  }
+
+  createEvent() {
+    const event = {
+      title: this.state.title,
+      start: this.state.startDate,
+      end: this.state.endDate,
+      allDay: 1//this.state.allDay, //TODO: allow to define start and end time
+    };
+    this.action();
+    console.log(event);
+    this.setEvents(event);
+  }
+
+  getEvents() {
+    fetch("http://localhost:9000/backend/events/get").then((response) => {    //BACKEND_URL + "/events/get"
+      if (response.ok) {
+        return response.json().then((response) => {
+          this.setState({ eventsarray: JSON.parse(response.body) });
+          console.log(this.state.eventsarray);
+          this.calendar?.removeAllEventSources(); //remove old events
+          this.calendar?.addEventSource(this.state.eventsarray); //add new events
+        });
+      } else {
+        return response.json().then((response) => {
+          console.error("Fetch has failed:", response);
+          this.setState({ eventsarray: []
+          });
+        });
+      }
+    });
+  }
+
+  setEvents(data: any) {
+    /*Create call to backend route */
+    fetch("http://localhost:9000/backend/events/add", { //BACKEND_URL + "/events/add"
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(data),
+      method: "POST",
+    }).then((response) => {
+      if (response.ok) {
+        this.setState({
+          informtext: "Event was successfully added to Database",
+          informtype: "is-success",
+        });
+      } else {
+        return response.json().then((response) => {
+          this.setState({
+            informtext:
+            "Event could not be added to database. Please contact an administrator for more information. Error is: " + response,
+            informtype: "is-danger",
+          });
+        });
+      }
+      this.close();     //reset state when setEvents has end
+      this.getEvents(); //check if needed
+    });
+  }
+
+  removeevent(element:any) { 
+    element.event.remove()
+    fetch("http://localhost:9000/backend/events/remove",{     //BACKEND_URL + "/events/remove"
+    headers:{
+      "accept":"application/json",
+      "content-type":"application/json"
+    },
+    body: JSON.stringify({id: element.event.id}),
+    method:"POST"
+  })
   }
 
   handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -225,10 +198,6 @@ export default class FullCalendar extends React.Component<Props, State> {
       [name]: value,
     } as unknown) as Pick<State, keyof State>);
     console.log(this.state.allDay);
-  }
-
-  handleDateOnChange(date: Date) {
-    this.setState({ date: date });
   }
 
   render() {
@@ -262,28 +231,6 @@ export default class FullCalendar extends React.Component<Props, State> {
                       onChange={(title) => this.handleOnChange(title)}
                     />
                   </>
-                  <label className="label">Event Starttime</label>
-                  <>
-                    <DatePicker
-                      dateFormat="dd.MM.yyyy HH:mm"
-                      showTimeSelect
-                      timeFormat="HH:mm"
-                      selected={this.state.date}
-                      locale={en}
-                      onChange={(date: Date) => this.handleDateOnChange(date)}
-                      inline
-                    />
-                  </>
-                  <label className="label">AllDay</label>
-                  <>
-                    <label className="checkbox">
-                      <input
-                        type="checkbox"
-                        onChange={(allDay) => this.handleOnChange(allDay)}
-                      />
-                      Set allDay event
-                    </label>
-                  </>
                 </div>
               </div>
             </section>
@@ -292,10 +239,12 @@ export default class FullCalendar extends React.Component<Props, State> {
                 className="button is-success"
                 onClick={() => this.createEvent()}
               >
-                Save changes
+                <FontAwesomeIcon icon={faCheck}/>
+                <span className="m-2">Save</span>
               </button>
-              <button className="button" onClick={() => this.action()}>
-                Cancel
+              <button className="button is-danger" onClick={() => this.action()}>
+                <FontAwesomeIcon icon={faTimes}/>
+                <span className="m-2">Cancel</span>
               </button>
             </footer>
             <NotificationBox

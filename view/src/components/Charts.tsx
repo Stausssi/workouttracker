@@ -1,5 +1,11 @@
 import React from "react";
 import Chart from "chart.js/auto";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
+import NotificationBox from "./notificationBox";
+import DatePicker from "react-datepicker";
+import en from "date-fns/locale/en-GB";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface Props {
   config?: {
@@ -18,12 +24,16 @@ interface State {
   type: string;
   category: string;
   sport: string;
-  user: string;
+  fill: boolean;
+  submit: boolean;
   newtype: string;
   array: any;
   secondtype: string; //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
   chartsarray: {};
-  sports: { [name: string]: number };
+  sports: string[];
+  informtext: string;
+  informtype: string;
+  year: Date;
 }
 
 const colors = [
@@ -66,18 +76,31 @@ const types = [
   "pie",
 ];
 
+const categories = [
+  "effort",
+  "distance",
+  "duration",
+  "pace",
+  "averageHeartRate",
+  "altitudeDifference",
+];
+
 const initialState = {
   active: false,
   title: "",
   type: "",
   category: "",
   sport: "",
-  user: "",
+  fill: false,
+  submit: false,
   newtype: "",
   array: "",
   secondtype: "", //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
   chartsarray: {},
-  sports: {},
+  sports: [],
+  informtext: "",
+  informtype: "",
+  year: new Date(),
 };
 
 export default class Graphs extends React.Component<Props, State> {
@@ -94,30 +117,54 @@ export default class Graphs extends React.Component<Props, State> {
   action = () => {
     //open and close modal
     this.setState((state) => ({ active: !state.active }));
+    //let active = !this.state.active;
+    //this.setState({ active: active });
   };
 
-  toggleActive() {
-    let active = !this.state.active;
-    this.setState({ active: active });
+  allow() {
+    let submit = !this.state.submit;
+    this.setState({ submit: submit });
+  }
 
-    if (active) {
-      // Fetch sports, users and category from database
-      fetch("http://localhost:9000/backend/sports/fetch").then((response) => {
-        if (response.ok) {
-          return response.json().then((response) => {
-            this.setState({ sports: JSON.parse(response.body) });
-          });
-        } else {
-          return response.json().then((response) => {
-            console.log("Sport Fetch failed:", response);
-            this.setState({ sports: {} });
-          });
-        }
-      });
-    } else {
-      // Reset input form on close
-      document.forms[0].reset();
+  componentDidMount() {
+    this.fetchsports();
+  }
+
+  fetchsports() {
+    // Fetch sports, users and category from database
+    fetch("http://localhost:9000/backend/sports/fetch").then((response) => {
+      if (response.ok) {
+        return response.json().then((response) => {
+          let data = JSON.parse(response.body);
+          let sports = [];
+          sports.push("");
+          for (let key in data) {
+            sports.push(key);
+          }
+          this.setState({ sports: sports });
+        });
+      } else {
+        return response.json().then((response) => {
+          console.log("Sport Fetch failed:", response);
+          this.setState({ sports: [] });
+        });
+      }
+    });
+  }
+
+  createSportSelect() {
+    let sports = [];
+    sports.push(<option value="0" key="0" />);
+
+    for (let key in this.state.sports) {
+      sports.push(
+        <option value={key} key={key}>
+          {key}
+        </option>
+      );
     }
+
+    return sports;
   }
 
   getcharts() {
@@ -147,9 +194,14 @@ export default class Graphs extends React.Component<Props, State> {
       // Store the post data to a variable
       /* Check if user/sport are defined and query over all charts */
       //query parameter values from DB and set if not NULL. else, let values as undefined
-      var user, sport;
+      var user, sport, category;
       let queries: any[] = [];
       const params = new URLSearchParams();
+      if (this.state.array[i].category) {
+        category = this.state.array[i].category;
+        queries.push(category);
+        params.append("category", category);
+      }
       if (this.state.array[i].param_sport) {
         sport = this.state.array[i].param_sport;
         queries.push(sport);
@@ -163,27 +215,42 @@ export default class Graphs extends React.Component<Props, State> {
       const url = "http://localhost:9000/backend/charts/dataset?";
       console.log(url + params);
       //this.addElement(this.state.array[i].name, this.state.array[i].type);
-      this.getdatasets(url,params,this.state.array[i].name, this.state.array[i].type)
+      this.getdatasets(
+        url,
+        params,
+        this.state.array[i].name,
+        this.state.array[i].type,
+        this.state.array[i].fill
+      );
     }
   }
 
   test() {
-    fetch("http://localhost:9000/backend/charts/dataset?sport=Ballsport")
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        return Promise.reject(response);
-      }
-    })
-    .then((chartsData) => {
-      var data = JSON.parse(chartsData.body);
-      console.log(data);
-    })
-    .catch((error) => console.warn(error));
+    console.log(this.state.fill);
+    fetch(
+      "http://localhost:9000/backend/charts/dataset?category=duration&sport=Ballsport&user=true"
+    )
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          return Promise.reject(response);
+        }
+      })
+      .then((chartsData) => {
+        var data = JSON.parse(chartsData.body);
+        console.log(data);
+      })
+      .catch((error) => console.warn(error));
   }
 
-  getdatasets(url: string, params: any,name:string,type:string) {
+  getdatasets(
+    url: string,
+    params: any,
+    name: string,
+    type: string,
+    fill: boolean
+  ) {
     fetch(url + params)
       .then((response) => {
         if (response.ok) {
@@ -195,12 +262,12 @@ export default class Graphs extends React.Component<Props, State> {
       .then((chartsData) => {
         var data = JSON.parse(chartsData.body);
         console.log(data);
-        this.addElement(name,type,data) //=> add dataset
+        this.addElement(name, type, data, fill); //=> add dataset
       })
       .catch((error) => console.warn(error));
   }
 
-  setcharts(data: any, name: string, type: string) {
+  setcharts(data: any, name: string, type: string, fill: boolean) {
     fetch("http://localhost:9000/backend/charts/add", {
       headers: {
         accept: "application/json",
@@ -217,39 +284,27 @@ export default class Graphs extends React.Component<Props, State> {
       }) //view response in console
       .then((data: any) => {
         console.log("Request succeeded");
-        this.addElement(name, type,data);
+        this.addElement(name, type, data, fill);
       })
       .catch((error) => console.log(error)); //catch errors
   }
 
   //Get inputs values then create charts
   configureChart() {
-    const title = document.getElementById("charttitle") as HTMLInputElement;
-    const type = document.getElementById("charttype") as HTMLInputElement;
-    const dataset = document.getElementById("chartdataset") as HTMLInputElement;
-    const fill = document.getElementById("chartfill") as HTMLInputElement;
-    const sport = document.getElementById("chartsport") as HTMLInputElement; //Optional
-    //const user = document.getElementById("chartuser") as HTMLInputElement; //optional
-    if (title.value && type.value && dataset.value && fill.value) {
-      console.log(title.value);
-      const chart = {
-        name: title.value,
-        //subtitle: Metrik, ifo about what chart is showing
-        type: type.value,
-        dataset: dataset.value, //"Default"
-        fill: fill.value, //TODO: add option to modal
-        param_sport: sport, //:null,
-        param_user: null,
-        //year
-      };
-      this.action();
-      this.setcharts(chart, chart.name, chart.type);
-    } else {
-      alert("Please give a name and a type for your chart!");
-    }
+    const chart = {
+      name: this.state.title,
+      //subtitle: Metrik, ifo about what chart is showing
+      type: this.state.type,
+      category: this.state.category, //"Default"
+      fill: this.state.fill, //TODO: add option to modal
+      param_sport: this.state.sport, //:null,
+      //year
+    };
+    this.action();
+    this.setcharts(chart, chart.name, chart.type, chart.fill);
   }
 
-  addElement(title: string, type: string,data:any) {
+  addElement(title: string, type: string, data: any, fill: boolean) {
     var chartnode = document.getElementById("chartID_" + title);
     if (!this.charts.includes(title) && !chartnode) {
       this.charts.push();
@@ -261,12 +316,8 @@ export default class Graphs extends React.Component<Props, State> {
       var parent = document.getElementById("charts");
       parent?.appendChild(canvas);
       console.log(document.getElementById(canvas.id));
-      this.addcharts(canvas, type,data);
-      alert("new canvas: " + canvas + " witch id " + canvas.id);
+      this.addcharts(canvas, type, data, fill);
     } else {
-      alert(
-        "Der ausgewählte Name existiert bereits. bitte wählen Sie in ein anderer Name aus!"
-      );
     }
   }
 
@@ -279,20 +330,18 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  addcharts(canvas: HTMLCanvasElement, type: string ,data:any) {
-    let dataarray: any[]=new Array(labels.length);
-    dataarray.fill(0,0,labels.length)
-    for(var i=0;i<data.length;i++)
-    {
-        labels.forEach((item,index)=>{
-        if(data[i].month==index)
-        {
-          console.log("Platz:"+(index-1))
-          dataarray.splice(index-1, 1, data[i].amount);
+  addcharts(canvas: HTMLCanvasElement, type: string, data: any, fill: boolean) {
+    let dataarray: any[] = new Array(labels.length);
+    dataarray.fill(0, 0, labels.length);
+    for (let i = 0; i < data.length; i++) {
+      labels.forEach((item, index) => {
+        if (data[i].month === index) {
+          console.log("Platz:" + (index - 1));
+          dataarray.splice(index - 1, 1, data[i].amount);
         }
-      })
+      });
     }
-    console.log(dataarray)
+    console.log(dataarray);
     new Chart(canvas, {
       type: type, //Define chart type
       data: {
@@ -302,10 +351,9 @@ export default class Graphs extends React.Component<Props, State> {
             label: "My First dataset",
             //new option, type will default to bar as that what is used to create the scale
             // type: "line",
-            backgroundColor: "rgba(220,220,220,0.2)",
-            borderColor: "rgba(220,220,220,1)",
+            backgroundColor: colors,
             data: dataarray,
-            fill: false,
+            fill: fill,
           },
           {
             label: "My second dataset",
@@ -319,17 +367,6 @@ export default class Graphs extends React.Component<Props, State> {
       },
     });
   }
-
-  /*Utils*/
-  empty(list: any[]) {
-    //empty array
-    list.length = 0;
-  }
-
-  updateChartType = (charttype: any) => {
-    this.setState({ type: charttype.target.value });
-    console.log(this.state.type);
-  };
 
   /*##############################################################*/
   /*OLD, Delete before merge*/
@@ -373,34 +410,6 @@ export default class Graphs extends React.Component<Props, State> {
         ],
       },
     });
-  }
-
-  drawSample2() {
-    const labels = ["Januar", "Februar", "März", "April", "Mai", "Juni"];
-    this.empty(this.data);
-    this.data.push(30, 90, 60, 80, 20, 70, 50);
-    // this.data.push(""+30,""+ 90,""+ 60,""+ 80,""+ 20,""+ 70,""+ 50)
-    /*  const colors =  [
-        'rgb(255, 99, 132)',
-        'rgb(255, 159, 64)',
-        'rgb(255, 205, 86)',
-        'rgb(75, 192, 192)',
-        'rgb(54, 162, 235)',
-        'rgb(153, 102, 255)',
-        'rgb(231,233,237)',
-        'rgb(128,128,128)',
-"],
-                    
-    ];*/
-    //const colors = this.getRandomColor(this.data);
-    this.createchart(this.data /*, colors*/);
-  }
-
-  getRandomColor(data: string | any[]) {
-    for (let i = 0; i < data.length; i++) {
-      this.colors.push("#" + Math.floor(Math.random() * 16777215).toString(16));
-    }
-    return this.colors;
   }
 
   createchart(/*labels: string[],*/ data: number[] /* color: string[]*/) {
@@ -458,30 +467,21 @@ export default class Graphs extends React.Component<Props, State> {
     });
   }
 
-  getrandomData() {
-    const datasatz = Array.from({ length: 20 }, () =>
-      Math.floor(Math.random() * 100)
-    );
-    console.log(datasatz);
-    const string = [];
-    for (var x = 0; x < datasatz.length; x++) {
-      var stringval = "" + datasatz[x];
-      string.push(stringval);
-    }
-    console.log(string);
-  }
-
   /* END of TODELETE */
   /*##############################################################*/
 
-  renderOptions() {
+  renderOptions(items: any[]) {
     return (
-      types &&
-      types.length > 0 &&
-      types.map((type) => {
-        return <option key={type}>{type}</option>;
+      items &&
+      items.length > 0 &&
+      items.map((item) => {
+        return <option key={item}>{item}</option>;
       })
     );
+  }
+
+  handleDateOnChange(date: Date) {
+    this.setState({ year: date });
   }
 
   handleOnChange(
@@ -489,41 +489,38 @@ export default class Graphs extends React.Component<Props, State> {
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) {
+    console.log(event.target.value);
+    console.log(event.target.name);
     const target = event.target;
     const value = target.value;
     const name = target.name;
-
     this.setState(({
       [name]: value,
     } as unknown) as Pick<State, keyof State>);
-    console.log(this.state.type);
+  }
+
+  handleOnCheck(event: any) {
+    const target = event.target;
+    const name = target.name;
+    var check = target.checked;
+    console.log(check);
+    console.log(target);
+    console.log(name);
+    console.log(check);
+    this.setState(({
+      [name]: check,
+    } as unknown) as Pick<State, keyof State>);
   }
 
   render() {
     const active = this.state.active ? "is-active" : "";
+    const submit = this.state.submit ? "" : "is-disabled";
     return (
       <div className="container">
         <div className="divider">Chart</div>
         <div className="controls">
-          <select
-            name="chartType"
-            id="chartType"
-            defaultValue={this.state.type}
-            onChange={this.updateChartType}
-          >
-            <option value="line">Line</option>
-            <option value="bar">Bar</option>
-            <option value="horizontalBar">Horizontal Bar</option>
-            <option value="radar">Radar</option>
-            <option value="polarArea">Polar Area</option>
-            <option value="doughnut">Doughnut</option>
-            <option value="pie">Pie</option>
-          </select>
           <button className="button" onClick={() => this.drawSample()}>
             Draw
-          </button>
-          <button className="button" onClick={() => this.drawSample2()}>
-            Draw with Config
           </button>
           <button className="button" onClick={() => this.action()}>
             Open Modal
@@ -532,7 +529,7 @@ export default class Graphs extends React.Component<Props, State> {
             get combine
           </button>
           <button className="button" onClick={() => this.test()}>
-            get combine
+            Test Api
           </button>
         </div>
         <div id="charts" />
@@ -557,55 +554,95 @@ export default class Graphs extends React.Component<Props, State> {
               <div className="content">
                 <div className="control">
                   <label className="label">Chart Name</label>
-                  <>
-                    <input
-                      className="input"
-                      id="charttitle"
-                      name="title"
-                      type="text"
-                      placeholder="Event title"
-                      value={this.state.title}
-                      onChange={(title) => this.handleOnChange(title)}
-                    />
-                  </>
+                  <input
+                    className="input"
+                    id="charttitle"
+                    name="title"
+                    type="text"
+                    placeholder="Chart title"
+                    value={this.state.title}
+                    onChange={(title) => this.handleOnChange(title)}
+                  />
                   <label className="label">Chart Type</label>
-                  <>
-                    <span>Select chart type</span> :{"line"}
-                    <select className="select" onChange={(type) => this.handleOnChange(type)}>
-                      {this.renderOptions()}
+                  <div className="select is-fullwidth mb-5">
+                    <select
+                      className="type"
+                      name="type"
+                      id="type"
+                      onChange={(type) => this.handleOnChange(type)}
+                    >
+                      {this.renderOptions(types)}
                     </select>
-                  </>
+                  </div>
                   <label className="label">Filter for category</label>
-                  <></>
+                  <div className="select is-fullwidth">
+                    <select
+                      className="select is-fullwidth mb-5"
+                      name="category"
+                      id="category"
+                      onChange={(category) => this.handleOnChange(category)}
+                    >
+                      {this.renderOptions(categories)}
+                    </select>
+                  </div>
                   <div className="is-divider" data-content="Optional"></div>
-                  <label className="label">Filter for user</label>
-                  <></>
                   <label className="label">Filter for sport</label>
-                  <></>
-                  <label className="label">Fill Graph</label>
-                  <>
-                    <label className="checkbox">
+                  <div className="select is-fullwidth mb-5">
+                    <select
+                      className="sport"
+                      name="sport"
+                      id="sport"
+                      onChange={(sport) => this.handleOnChange(sport)}
+                    >
+                      {this.renderOptions(this.state.sports)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="label">Select year</label>
+                    <DatePicker
+                      dateFormat="yyyy"
+                      showYearPicker
+                      locale={en}
+                      onChange={(date: Date) => this.handleDateOnChange(date)
+                      }
+                      inline
+                    />
+                  </div>
+                  <div>
+                    <label className="label">
                       <input
                         type="checkbox"
-                        onChange={(fill) => this.handleOnChange(fill)}
+                        name="fill"
+                        checked={this.state.fill}
+                        onChange={(fill) => this.handleOnCheck(fill)}
                       />
-                      Fill graph
+                      Fill Graph
                     </label>
-                  </>
+                  </div>
                 </div>
               </div>
             </section>
             <footer className="modal-card-foot">
               <button
-                className="button is-success"
+                className={`button is-success  ${submit}`}
                 onClick={() => this.configureChart()}
               >
-                Save changes
+                <FontAwesomeIcon icon={faCheck} />
+                <span className="m-2">Save</span>
               </button>
-              <button className="button" onClick={() => this.action()}>
-                Cancel
+              <button
+                className="button is-danger"
+                onClick={() => this.action()}
+              >
+                <FontAwesomeIcon icon={faTimes} />
+                <span className="m-2">Cancel</span>
               </button>
             </footer>
+            <NotificationBox
+              message={this.state.informtext}
+              type={this.state.informtype}
+              hasDelete={false}
+            />
           </div>
         </div>
       </div>

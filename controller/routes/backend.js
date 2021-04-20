@@ -42,14 +42,17 @@ router.post('/events/remove', event.remove);  //delete?
 /* charts routes */
 router.get('/charts/get', chart.findAll); 
 
-
 router.get('/charts/dataset', chart.getdataset); 
+
 router.post('/charts/add', chart.create); 
+
+//router.post('/charts/remove', chart.remove);
+
+
 /*
 
 router.get('/charts/update', chart.findAll); 
 
-router.post('/charts/remove', chart.create); 
 */
 router.get('/testConnection', function (req, res, next) {
     res.send('Connection to the backend established!');
