@@ -27,6 +27,8 @@ router.all('/sports/fetch', sport.getAll);
 
 router.get('/users/search', users.search);
 
+router.get('/feed/:type', authenticateJWT, feed.getFeed);
+
 router.get('/testConnection', function (req, res, next) {
     res.send('Connection to the backend established!');
 })
