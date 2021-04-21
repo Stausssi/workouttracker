@@ -29,16 +29,12 @@ export default class SearchResult extends React.Component<Props, State> {
         }
 
         // Check whether the user is already following or blocked
-        fetch(BACKEND_URL + "users/getRelationship", {
-            method: "POST",
+        fetch(BACKEND_URL + "users/getRelationship?user=" + this.props.username, {
+            method: "GET",
             headers: {
                 Accept: "application/json",
-                "Content-Type": "application/json",
                 Authorization: SessionHandler.getAuthToken()
-            },
-            body: JSON.stringify({
-                username: this.props.username
-            })
+            }
         }).then((response) => {
             if (response.ok) {
                 return response.json().then((response) => {
@@ -72,7 +68,7 @@ export default class SearchResult extends React.Component<Props, State> {
     followUser(event: any) {
         if (!this.state.disableButton) {
             fetch(BACKEND_URL + "users/follow", {
-                method: "POST",
+                method: "PUT",
                 headers: {
                     Accept: "application/json",
                     "Content-Type": "application/json",
@@ -94,7 +90,7 @@ export default class SearchResult extends React.Component<Props, State> {
     unfollowUser(event: any) {
         if (!this.state.disableButton) {
             fetch(BACKEND_URL + "users/unfollow", {
-                method: "POST",
+                method: "PUT",
                 headers: {
                     Accept: "application/json",
                     "Content-Type": "application/json",

@@ -52,6 +52,7 @@ class SearchBar extends React.Component<Props, State> {
 
     searchFor(query: string) {
         fetch(BACKEND_URL + "users/search?query=" + query, {
+            method: "GET",
             headers: {
                 Accepts: "application/json",
                 Authorization: SessionHandler.getAuthToken()
@@ -107,24 +108,22 @@ class SearchBar extends React.Component<Props, State> {
                 </div>
                 <div className="dropdown-menu">
                     <div className="dropdown-content">
-                        {
-                            this.state.displayLoading ?
-                                <div className="dropdown-item">
-                                    <div className="field has-addons">
-                                        <div className="control">
-                                            <input className="input is-static"
-                                                   type="text"
-                                                   placeholder={`Searching...`}
-                                                   readOnly={true}/>
-                                        </div>
-                                        <div className="control">
-                                            <button className="button is-loading is-white" disabled={true}/>
-                                        </div>
+                        {this.state.displayLoading ?
+                            <div className="dropdown-item">
+                                <div className="field has-addons">
+                                    <div className="control">
+                                        <input className="input is-static"
+                                               type="text"
+                                               placeholder={`Searching...`}
+                                               readOnly={true}/>
+                                    </div>
+                                    <div className="control">
+                                        <button className="button is-loading is-white" disabled={true}/>
                                     </div>
                                 </div>
-                                :
-                                this.state.searchResults
-                        }
+                            </div>
+                            :
+                            this.state.searchResults}
                     </div>
                 </div>
             </div>
