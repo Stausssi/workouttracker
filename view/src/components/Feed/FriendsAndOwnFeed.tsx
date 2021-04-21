@@ -1,9 +1,43 @@
 import React from "react";
 
-interface Props {
+type postData = {
+    likes: number
+    activityData: activityData
+    username: string
+    sport: string
+    addedAt: Date
 }
 
-export class OwnFeed extends React.Component<{}> {
+interface FeedState {
+    //postData: postData,
+    //comments: string,
+    loaded: boolean
+}
+
+interface EmptyProps {
+
+}
+
+export class OwnFeed extends React.Component<EmptyProps, FeedState> {
+    constructor(props: EmptyProps) {
+        super(props);
+        this.state = {
+            loaded: false
+        }
+    }
+
+    componentDidMount() {
+        // fetch X activities from Backend
+        // render x ActivityBoxes based on them --> insert information
+
+        //set loaded to true
+        this.setState({loaded: true});
+    }
+
+    renderFeed (){
+        return <ActivityBox />;
+    }
+
     render() {
         return (
             <>
@@ -11,15 +45,14 @@ export class OwnFeed extends React.Component<{}> {
                     <div>Hier kommt die eigene Aktivität hin</div>
                     <div>Weitere eigene Komponenten</div>
 
-                    <ActivityBox />
+                    {this.state.loaded ? this.renderFeed(): <p>not Working</p>}
                 </div>
-
             </>
         );
     }
 }
 
-export class FriendsFeed extends React.Component<Props> {
+export class FriendsFeed extends React.Component<{ }, { }> {
     render() {
         return (
             <>
@@ -106,7 +139,7 @@ class ActivityTable extends React.Component<props, { }>{
     render(){
         return(
             <>
-                <table className="table">
+                <table className="table is-narrow">
                     <thead>
                         {this.renderTableHeaders(this.props.activityData)}
                     </thead>
