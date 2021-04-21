@@ -1,6 +1,7 @@
 import React, {Component} from "react";
+import SessionHandler from "../utilities/SessionHandler";
 
-
+//google fit import button
 export default class GoogleFit  extends Component<{}> {
     constructor(props: any) {
         super(props);
@@ -14,6 +15,7 @@ export default class GoogleFit  extends Component<{}> {
             headers:{
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
+                Authorization: SessionHandler.getAuthToken() 
             },
         }).then((response) => {
             if (response.status !== 200) {
@@ -23,7 +25,7 @@ export default class GoogleFit  extends Component<{}> {
             }
             // Examine the text in the response
             response.json().then((data) => {
-                window.location =data.url;
+                window.location =data.url;//redirect to generated google url
             });
           });
     }

@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import {BACKEND_URL, FRONTEND_URL} from "../App";
+import SessionHandler from "../utilities/SessionHandler";
 
 interface State {
     firstname: string,
@@ -41,11 +42,12 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
     }
 
     getDefaultValues() {
-      fetch(BACKEND_URL + "/profilesite/" + +12, {//get as default
-          headers:{
+      fetch(BACKEND_URL + "/profilesite/" + SessionHandler.getUser(), {//get as default
+            headers:{
               Accept: 'application/json',
               'Content-Type': 'application/json',
-          },
+              Authorization: SessionHandler.getAuthToken() 
+            },
       }).then((response) => {
         if (response.status !== 200) {
           console.log('Looks like there was a problem. Status Code: ' +
@@ -82,9 +84,9 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
             headers:{
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
+                Authorization: SessionHandler.getAuthToken() 
             },
             body: JSON.stringify({
-                user: 12,
                 firstname: this.state.firstname,
                 lastname: this.state.lastname,
                 age: this.state.age,
@@ -123,7 +125,7 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
             <div className="section">
                 <div className="container">
                     <form className='box'>
-                        <p className="is-size-4">Hello {12},<br/> here you can change your account values</p>
+                        <p className="is-size-4">Hello {SessionHandler.getUser()},<br/> here you can change your account values</p>
                         <div className='field'>
                             <label className="label">Firstname</label>
                             <input className="input" name='firstname' type='text' maxLength={20} placeholder={this.state.firstnamePlaceholder} value={this.state.firstname} onChange={this.handleChange} />

@@ -3,6 +3,7 @@ import {BACKEND_URL, FRONTEND_URL} from "../../App";
 import Header from './components/Header'
 import Comments from './components/Comments'
 import AddComment from './components/AddComment'
+import SessionHandler from "../../utilities/SessionHandler";
 
 interface State {
   showAddComent: boolean;
@@ -62,10 +63,11 @@ export default class CommmentComponent extends Component<{}, State> {
 
   //refresh comment
   refreshComment() {
-    fetch("http://localhost:3001/backend/commendisnew/" + +12, {//get as default
+    fetch("http://localhost:3001/backend/commendisnew/" + 12, {//get as default
         headers:{
             Accept: 'application/json',
             'Content-Type': 'application/json',
+            Authorization: SessionHandler.getAuthToken() 
         },
     }).then((response) => {
         if (response.status !== 200) {
@@ -87,10 +89,10 @@ export default class CommmentComponent extends Component<{}, State> {
       headers:{
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          Authorization: SessionHandler.getAuthToken() 
       },
       body: JSON.stringify({
           activity: 12,
-          user: 12,
       }),
     });
     var tmpthumpsUpCounter;
@@ -103,10 +105,11 @@ export default class CommmentComponent extends Component<{}, State> {
 
   //Count Thumps
   countThumps() {
-    fetch(BACKEND_URL + "/countThumps/" + +12, {//get as default
+    fetch(BACKEND_URL + "/countThumps/" + 12, {//get as default
         headers:{
             Accept: 'application/json',
             'Content-Type': 'application/json',
+            Authorization: SessionHandler.getAuthToken() 
         },
     }).then((response) => {
       if (response.status !== 200) {
@@ -123,17 +126,13 @@ export default class CommmentComponent extends Component<{}, State> {
 
 
   //Count Thumps
-  async isThumpUpSet() {
-    fetch(BACKEND_URL + '/isthumpsupset', {
-      method: 'POST',
+  async isThumpUpSet() {      //ggf als get
+    fetch(BACKEND_URL + '/isthumpsupset/' + 12, {
       headers:{
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          Authorization: SessionHandler.getAuthToken() 
       },
-      body: JSON.stringify({
-          activity: 12,
-          user: 12,
-      }),
     }).then((response) => {
       if (response.status !== 200) {
         console.log('Looks like there was a problem. Status Code: ' +

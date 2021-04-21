@@ -3,6 +3,8 @@ import Comment from './Comment'
 interface Props {
     comments: any,
 }
+
+//map comment and id
 const Comments = ({comments}: Props) => {
     return (
         <>

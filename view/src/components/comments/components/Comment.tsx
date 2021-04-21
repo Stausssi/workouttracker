@@ -1,6 +1,7 @@
 interface Props {
     comment: any,
 }
+//comment component formate timestamp and comment
 const Comment = ({ comment }: Props) => {
     return (
         <div className='message'>

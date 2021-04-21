@@ -11,7 +11,7 @@ const Header = ({ onAdd, thumpsUp, showthumpsUp, thumpsUpCounter}: Props) => {
     return (
         <header>
             <Button onClick={onAdd}/>
-            <Emoji onClick={thumpsUp} symbol="👍"  className={showthumpsUp ? 'button is-success' : 'button is-black'}/>
+            <Emoji onClick={thumpsUp} symbol="👍" className={showthumpsUp ? 'button is-success' : 'button is-black'}/>
             <p className="is-size-4">{thumpsUpCounter}</p>
         </header>
     )
