@@ -125,7 +125,7 @@ exports.search = (req, res) => {
     const query = req.query.query;
 
     if (isParamMissing([query])) {
-        res.status(400).send({message: "Bad Request"});
+        res.sendStatus(400);
     } else {
         User.find(query, (error, foundUsers) => {
             if (error) {
@@ -154,9 +154,9 @@ exports.follow = (req, res) => {
     let followed = req.body.followed;
 
     if (isParamMissing([username, followed])) {
-        res.status(400).send({message: "Bad Request"});
+        res.sendStatus(400);
     } else {
-        User.follow(username, followed, (error) => basicSuccessErrorHandling(error, res))
+        User.follow(username, followed, (error) => basicSuccessErrorHandling(error, res, 204))
     }
 }
 
@@ -165,12 +165,11 @@ exports.unfollow = (req, res) => {
     let unfollowed = req.body.unfollowed;
 
     if (isParamMissing([username, unfollowed])) {
-        res.status(400).send({message: "Bad Request"});
+        res.sendStatus(400);
     } else {
-        User.unfollow(username, unfollowed, (error) => basicSuccessErrorHandling(error, res));
+        User.unfollow(username, unfollowed, (error) => basicSuccessErrorHandling(error, res, 204));
     }
 }
-
 
 exports.block = (req, res) => {
     // First unfollow and then block the user
@@ -178,7 +177,7 @@ exports.block = (req, res) => {
     let toBeBlocked = req.body.toBeBlocked;
 
     if (isParamMissing([user, toBeBlocked])) {
-        res.status(400).send({message: "Bad Request"});
+        res.sendStatus(400);
     } else {
         User.unfollow(user, toBeBlocked, (error) => {
             if (error) {
@@ -191,7 +190,7 @@ exports.block = (req, res) => {
                         console.log(error);
                         res.status(500).send({message: "internal server error"});
                     } else {
-                        User.block(user, toBeBlocked, isFollowing, (error) => basicSuccessErrorHandling(error, res));
+                        User.block(user, toBeBlocked, isFollowing, (error) => basicSuccessErrorHandling(error, res, 204));
                     }
                 })
             }
@@ -204,18 +203,18 @@ exports.unblock = (req, res) => {
     let unblocked = req.body.unblocked;
 
     if (isParamMissing([user, unblocked])) {
-        res.status(400).send({message: "Bad Request"});
+        res.sendStatus(400);
     } else {
-        User.unblock(user, unblocked, (error) => basicSuccessErrorHandling(error, res));
+        User.unblock(user, unblocked, (error) => basicSuccessErrorHandling(error, res, 204));
     }
 }
 
 exports.getRelationship = (req, res) => {
     let follower = req.username;
-    let followed = req.body.username;
+    let followed = req.query.user;
 
     if (isParamMissing([follower, followed])) {
-        res.status(400).send({message: "Bad Request"});
+        res.sendStatus(400);
     } else {
         User.getRelationship(follower, followed, (error, isFollowing, isBlocked) => {
             if (error) {
@@ -231,12 +230,12 @@ exports.getRelationship = (req, res) => {
     }
 }
 
-function basicSuccessErrorHandling(error, res) {
+function basicSuccessErrorHandling(error, res, successCode=201) {
     if (error) {
         console.log(error);
-        res.status(500).send({message: "internal server error"});
+        res.sendStatus(500);
     } else {
-        res.sendStatus(200);
+        res.sendStatus(successCode);
     }
 }
 

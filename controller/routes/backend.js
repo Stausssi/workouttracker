@@ -25,10 +25,11 @@ router.post('/activity/add', authenticateJWT, activity.add);
 router.all('/sports/fetch', sport.getAll);
 
 router.get('/users/search', authenticateJWT, users.search);
-router.post('/users/block', authenticateJWT, users.block);
-router.post('/users/follow', authenticateJWT, users.follow);
-router.post('/users/unfollow', authenticateJWT, users.unfollow);
-router.post('/users/getRelationship', authenticateJWT, users.getRelationship);
+router.put('/users/block', authenticateJWT, users.block);
+router.put('/users/unblock', authenticateJWT, users.unblock);
+router.put('/users/follow', authenticateJWT, users.follow);
+router.put('/users/unfollow', authenticateJWT, users.unfollow);
+router.get('/users/getRelationship', authenticateJWT, users.getRelationship);
 
 router.get('/testConnection', function (req, res, next) {
     res.send('Connection to the backend established!');
