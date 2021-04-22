@@ -68,16 +68,14 @@ exports.create = (request, response) => {
 exports.remove = (request, response) => {
     const chartid = request.body.id
     if (!chartid) {
-      response.status(400).send({
-        message: "Bad Request: ID can not be empty!"
-      });
+      response.sendStatus(400)
     }
     else {
       Chart.remove(chartid, (error, data) => {
         if (error) {
-          response.status(500).send({ message: "Internal server error!" });
+          response.sendStatus(500)
         } else {
-          response.status(200).send({ message: "Event was successfully deleted!" });
+          response.status(200)
   
         }
       })
