@@ -7,6 +7,8 @@ import DatePicker from "react-datepicker";
 import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
+import SessionHandler from "../SessionHandler";
+import { BACKEND_URL } from "../App";
 
 interface Props {
   config?: {
@@ -139,7 +141,13 @@ export default class Graphs extends React.Component<Props, State> {
 
   fetchsports() {
     // Fetch sports, users and category from database
-    fetch("http://localhost:9000/backend/sports/fetch").then((response) => {
+    fetch(BACKEND_URL+"sports/fetch", {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      //Authorization: SessionHandler.getAuthToken()
+    },
+  }).then((response) => {
       if (response.ok) {
         return response.json().then((response) => {
           let data = JSON.parse(response.body);
@@ -162,8 +170,13 @@ export default class Graphs extends React.Component<Props, State> {
   getcharts() {
     //setstate charts then make new fetch to get data for each charts
     // Call the API
-    fetch("http://localhost:9000/backend/charts/get")
-      .then(function (response) {
+    fetch(BACKEND_URL+"charts/get", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        //Authorization: SessionHandler.getAuthToken()
+      },
+    }).then((response) => {
         if (response.ok) {
           return response.json();
         } else {
@@ -200,7 +213,7 @@ export default class Graphs extends React.Component<Props, State> {
         params.append("year", year);
         console.log(year);
       }
-      const url = "http://localhost:9000/backend/charts/dataset?";
+      const url = BACKEND_URL+"charts/dataset?"
       console.log(url + params);
       this.getdatasets(
         url,
@@ -214,7 +227,7 @@ export default class Graphs extends React.Component<Props, State> {
 
   test() {
     fetch(
-      "http://localhost:9000/backend/charts/dataset?category=duration&sport=Ballsport&year=2021"
+      BACKEND_URL+"charts/dataset?category=duration&sport=Ballsport&year=2021"
     )
       .then((response) => {
         if (response.ok) {
@@ -237,8 +250,13 @@ export default class Graphs extends React.Component<Props, State> {
     type: string,
     fill: boolean
   ) {
-    fetch(url + params)
-      .then((response) => {
+    fetch(url + params, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        //Authorization: SessionHandler.getAuthToken()
+      },
+    }).then((response) => {
         if (response.ok) {
           return response.json();
         } else {
@@ -254,13 +272,15 @@ export default class Graphs extends React.Component<Props, State> {
   }
 
   setcharts(chart: any) {
-    fetch("http://localhost:9000/backend/charts/add", {
+    
+    fetch(BACKEND_URL+"charts/add", {
+      method: "POST",
       headers: {
         accept: "application/json",
         "content-type": "application/json",
+         //Authorization: SessionHandler.getAuthToken()
       },
       body: JSON.stringify(chart),
-      method: "POST",
     }).then((response) => {
       if (response.ok) {
       } else {
@@ -429,47 +449,6 @@ export default class Graphs extends React.Component<Props, State> {
 
   /*##############################################################*/
   /*OLD, Delete before merge*/
-  private drawSample() {
-    //Destroy previous chart if exists before create a new chart
-    if (typeof this.chart1 !== "undefined") {
-      console.log("chart already exist");
-      this.chart1.destroy();
-    }
-    console.log(this.state.type);
-    //Create new Chart
-    const canvas = document.getElementById("myChart") as HTMLCanvasElement;
-    this.chart1 = new Chart(canvas, {
-      type: this.state.type, //Define chart type
-      data: {
-        labels: [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-        ],
-        datasets: [
-          {
-            label: "My First dataset",
-            // type: "line",
-            backgroundColor: "rgba(220,220,220,0.2)",
-            borderColor: "rgba(220,220,220,1)",
-            data: [65, 59, 4, 81, 56, 55, 40],
-            fill: false,
-          },
-          {
-            label: "My First dataset",
-            //type: "bar",
-            backgroundColor: "rgba(220,20,220,0.2)",
-            borderColor: "rgba(220,20,220,1)",
-            data: [32, 25, 33, 88, 12, 92, 33],
-          },
-        ],
-      },
-    });
-  }
 
   createchart(/*labels: string[],*/ data: number[] /* color: string[]*/) {
     if (this.chart2) {
@@ -583,9 +562,6 @@ export default class Graphs extends React.Component<Props, State> {
       <div className="container">
         <div className="divider">Chart</div>
         <div className="controls">
-          <button className="button" onClick={() => this.drawSample()}>
-            Draw
-          </button>
           <button className="button" onClick={() => this.action()}>
             Open Modal
           </button>

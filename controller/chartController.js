@@ -3,10 +3,11 @@ const Chart = require("../model/chartModel");
 const Data = require("../model/dataModel");
 
 exports.findAll = (request, response) => {
+  let username = request.username;
     Chart.getAll((error, charts) => {
         if (error) {
             console.log(error);
-            response.status(500).send({message: "Internal server error!"});
+            response.sendStatus(500)
         } else{
             response.status(200).send({body: JSON.stringify(charts)});
         } 
@@ -18,6 +19,7 @@ exports.findAll = (request, response) => {
 */
 
 exports.getdataset = (request,response) => {
+    let username = request.username;
     let year,sport,category = null
     sport = request.query.sport
     category=request.query.category
@@ -26,7 +28,7 @@ exports.getdataset = (request,response) => {
     Data.getall(category,sport,year,(error, data) => {
         if (error) {
             console.log(error);
-            response.status(500).send({message: "Internal server error!" + error});
+            response.sendStatus(500)
         } else{
             response.status(200).send({body: JSON.stringify(data)});
         } 
@@ -36,9 +38,7 @@ exports.getdataset = (request,response) => {
 
 exports.create = (request, response) => {
     if (!request.body) {
-        return response.status(400).send({
-          message: "Content can not be empty!"
-        });
+        response.sendStatus(400)
       }
     else {
         const chart = new Chart({
@@ -48,17 +48,18 @@ exports.create = (request, response) => {
             fill: request.body.fill,
             param_sport: request.body.param_sport,
             year:request.body.year
+            //user:request.username
           });
     Chart.create(chart,(error, added) => {
         if (error) {
             console.log(error);
-            return response.status(500).send({message: "Internal server error!" + error});
+            return response.sendStatus(500)
         } else{
             if (added) {
-                response.status(200).send({message: "Chart added!"});
+                response.sendStatus(200)
             }
             else {
-                response.status(500).send({message: "An error occured while addind new chart"});
+                response.sendStatus(500)
             }
         } 
     });
@@ -71,6 +72,7 @@ exports.remove = (request, response) => {
       response.sendStatus(400)
     }
     else {
+      let username = request.username;
       Chart.remove(chartid, (error, data) => {
         if (error) {
           response.sendStatus(500)

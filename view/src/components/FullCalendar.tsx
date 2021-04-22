@@ -156,7 +156,6 @@ export default class FullCalendar extends React.Component<Props, State> {
   setEvents(data: any) {
     /*Create call to backend route */
     fetch(BACKEND_URL + "events/add", {
-      //BACKEND_URL + "/events/add"
       method: "POST",
       headers: {
         accept: "application/json",
