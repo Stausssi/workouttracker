@@ -505,7 +505,7 @@ export default class Graphs extends React.Component<Props, State> {
     );
   }
 
-  handleDateOnChange(date: Date) {
+  handleDateOnChange(date: any) {
     this.setState({ year: date });
   }
 
@@ -536,6 +536,11 @@ export default class Graphs extends React.Component<Props, State> {
       [name]: check,
     } as unknown) as Pick<State, keyof State>);
   }
+
+  disableFutureDt = (current: { isBefore: (arg0: any) => any }) => {
+    const today = moment();
+    return current.isBefore(today);
+  };
 
   render() {
     const active = this.state.active ? "is-active" : "";

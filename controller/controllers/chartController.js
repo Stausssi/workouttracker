@@ -18,17 +18,12 @@ exports.findAll = (request, response) => {
 */
 
 exports.getdataset = (request,response) => {
-    let user,sport,category = null
-    if(request.query.user)
-    {
-        user=request.username
-    }
+    let year,sport,category = null
     sport = request.query.sport
     category=request.query.category
- 
-        //users=users.toString()
-        //sports=sports.toString()
-    Data.getall(category,user,sport,(error, data) => {
+    year=request.query.year
+
+    Data.getall(category,sport,year,(error, data) => {
         if (error) {
             console.log(error);
             response.status(500).send({message: "Internal server error!" + error});
@@ -49,10 +44,10 @@ exports.create = (request, response) => {
         const chart = new Chart({
             name: request.body.name,
             type: request.body.type,
-            dataset: request.body.dataset,
+            category: request.body.category,
             fill: request.body.fill,
             param_sport: request.body.param_sport,
-            param_user: request.body.param_user
+            year:request.body.year
           });
     Chart.create(chart,(error, added) => {
         if (error) {
@@ -69,3 +64,23 @@ exports.create = (request, response) => {
     });
 }
 };
+
+exports.remove = (request, response) => {
+    const chartid = request.body.id
+    if (!chartid) {
+      response.status(400).send({
+        message: "Bad Request: ID can not be empty!"
+      });
+    }
+    else {
+      Chart.remove(chartid, (error, data) => {
+        if (error) {
+          response.status(500).send({ message: "Internal server error!" });
+        } else {
+          response.status(200).send({ message: "Event was successfully deleted!" });
+  
+        }
+      })
+  
+    }
+  };
