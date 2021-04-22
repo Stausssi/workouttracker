@@ -5,7 +5,7 @@ const config = require("../utilities/mail/emailConfirmation.config");
 const bcrypt = require("bcryptjs");
 const mail = require("../utilities/mail/confirmationEmail");
 const tokenGeneration = require("../utilities/authentication/AccessTokenSecret.config");
-const misc = require("../utilities/misc");
+const {isParamMissing, basicSuccessErrorHandling} = require("../utilities/misc");
 
 //creates a new user if the email/username doesn´t already exist
 exports.signup = (req, res) => {
@@ -124,7 +124,7 @@ exports.verifyEmail = (req, res) => {
 exports.search = (req, res) => {
     const query = req.query.query;
 
-    if (misc.isParamMissing([query])) {
+    if (isParamMissing([query])) {
         res.sendStatus(400);
     } else {
         User.find(query, (error, foundUsers) => {
@@ -153,10 +153,10 @@ exports.follow = (req, res) => {
     let username = req.username;
     let followed = req.body.followed;
 
-    if (misc.isParamMissing([username, followed])) {
+    if (isParamMissing([username, followed])) {
         res.sendStatus(400);
     } else {
-        User.follow(username, followed, (error) => misc.basicSuccessErrorHandling(error, res, 204))
+        User.follow(username, followed, (error) => basicSuccessErrorHandling(error, res, 204))
     }
 }
 
@@ -164,10 +164,10 @@ exports.unfollow = (req, res) => {
     let username = req.username;
     let unfollowed = req.body.unfollowed;
 
-    if (misc.isParamMissing([username, unfollowed])) {
+    if (isParamMissing([username, unfollowed])) {
         res.sendStatus(400);
     } else {
-        User.unfollow(username, unfollowed, (error) => misc.basicSuccessErrorHandling(error, res, 204));
+        User.unfollow(username, unfollowed, (error) => basicSuccessErrorHandling(error, res, 204));
     }
 }
 
@@ -176,7 +176,7 @@ exports.block = (req, res) => {
     let user = req.username;
     let toBeBlocked = req.body.toBeBlocked;
 
-    if (misc.isParamMissing([user, toBeBlocked])) {
+    if (isParamMissing([user, toBeBlocked])) {
         res.sendStatus(400);
     } else {
         User.unfollow(user, toBeBlocked, (error) => {
@@ -190,7 +190,7 @@ exports.block = (req, res) => {
                         console.log(error);
                         res.status(500).send({message: "internal server error"});
                     } else {
-                        User.block(user, toBeBlocked, isFollowing, (error) => misc.basicSuccessErrorHandling(error, res, 204));
+                        User.block(user, toBeBlocked, isFollowing, (error) => basicSuccessErrorHandling(error, res, 204));
                     }
                 })
             }
@@ -202,10 +202,10 @@ exports.unblock = (req, res) => {
     let user = req.username;
     let unblocked = req.body.unblocked;
 
-    if (misc.isParamMissing([user, unblocked])) {
+    if (isParamMissing([user, unblocked])) {
         res.sendStatus(400);
     } else {
-        User.unblock(user, unblocked, (error) => misc.basicSuccessErrorHandling(error, res, 204));
+        User.unblock(user, unblocked, (error) => basicSuccessErrorHandling(error, res, 204));
     }
 }
 
@@ -213,7 +213,7 @@ exports.getRelationship = (req, res) => {
     let follower = req.username;
     let followed = req.query.user;
 
-    if (misc.isParamMissing([follower, followed])) {
+    if (isParamMissing([follower, followed])) {
         res.sendStatus(400);
     } else {
         User.getRelationship(follower, followed, (error, isFollowing, isBlocked) => {
