@@ -4,9 +4,9 @@ const Data = () => {
 }
 /*TODO: specify column*/
 
-Data.getall = (category, users, sports, response) => {
+Data.getall = (category,sports,year, response) => {
     /* zwischen count und sum unterscheiden */
-    sql.query("SELECT  sum(duration) as amount, month(startedAt) as month, year(startedAt) FROM activity WHERE sport = IFNULL(?,sport) AND user = IFNULL(?,user) GROUP BY year(startedAt), month(startedAt)", [/*category,*/ sports, users],
+    sql.query("SELECT  sum(??) as amount, month(startedAt) as month FROM activity WHERE sport = IFNULL(?,sport) AND YEAR(startedAt)=2021 GROUP BY month(startedAt)", [category,sports, year],
         function (error, results) {
             if (error) {
                 response(error, null);
@@ -15,33 +15,6 @@ Data.getall = (category, users, sports, response) => {
             }
         });
 }
-
-
-
-/*
-    getdurationpermonth() {
-    }
-    getdistancepermonth() {
-    }
-    getamountforsportpermonth() {
-    }
-    getaveragespeedpermonth() {
-    }
-    getaverageheartratepermonth() {
-    }
-    getaltitudedifferencepermonth() {
-    }
-    geteffortpermonth() {
-    }*/
-
-
-
-
-
-
-
-
-
 
 
 module.exports = Data;

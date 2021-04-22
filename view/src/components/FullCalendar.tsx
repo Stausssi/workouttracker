@@ -5,7 +5,6 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import NotificationBox from "./notificationBox";
 import {BACKEND_URL} from "../App";   //TODO add Backend URL const to fetch
-import moment from 'moment'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 
@@ -92,7 +91,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       },
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin], //add plugins to fullcalendar
       events: this.state.eventsarray, //eventsList
-      height: "500px", //set height for table --> use auto?
+      height: "600px", //set height for table --> use auto?
       //selection
       selectable: true, //enable selection of dates
       select: (info) => this.create(info), //function on select --> run create function
@@ -173,7 +172,7 @@ export default class FullCalendar extends React.Component<Props, State> {
         });
       }
       this.close();     //reset state when setEvents has end
-      this.getEvents(); //check if needed
+      this.getEvents(); 
     });
   }
 

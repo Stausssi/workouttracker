@@ -6,6 +6,7 @@ import NotificationBox from "./notificationBox";
 import DatePicker from "react-datepicker";
 import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
+import moment from "moment";
 
 interface Props {
   config?: {
@@ -29,7 +30,7 @@ interface State {
   newtype: string;
   array: any;
   secondtype: string; //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
-  chartsarray: {};
+  charts: {};
   sports: string[];
   informtext: string;
   informtype: string;
@@ -88,15 +89,15 @@ const categories = [
 const initialState = {
   active: false,
   title: "",
-  type: "",
-  category: "",
+  type: "line",
+  category: "effort",
   sport: "",
   fill: false,
   submit: false,
   newtype: "",
   array: "",
   secondtype: "", //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
-  chartsarray: {},
+  charts: {},
   sports: [],
   informtext: "",
   informtype: "",
@@ -120,6 +121,12 @@ export default class Graphs extends React.Component<Props, State> {
     //let active = !this.state.active;
     //this.setState({ active: active });
   };
+
+  close() {
+    //close modal on submit aborted or finished
+    this.action();
+    this.setState(initialState); //reset state to inital state
+  }
 
   allow() {
     let submit = !this.state.submit;
@@ -152,21 +159,6 @@ export default class Graphs extends React.Component<Props, State> {
     });
   }
 
-  createSportSelect() {
-    let sports = [];
-    sports.push(<option value="0" key="0" />);
-
-    for (let key in this.state.sports) {
-      sports.push(
-        <option value={key} key={key}>
-          {key}
-        </option>
-      );
-    }
-
-    return sports;
-  }
-
   getcharts() {
     //setstate charts then make new fetch to get data for each charts
     // Call the API
@@ -181,7 +173,6 @@ export default class Graphs extends React.Component<Props, State> {
         }
       })
       .then((post) => {
-        console.log(post);
         console.log(JSON.parse(post.body));
         this.setState({ array: JSON.parse(post.body) });
         this.loopOverData();
@@ -194,27 +185,23 @@ export default class Graphs extends React.Component<Props, State> {
       // Store the post data to a variable
       /* Check if user/sport are defined and query over all charts */
       //query parameter values from DB and set if not NULL. else, let values as undefined
-      var user, sport, category;
-      let queries: any[] = [];
+      var year, sport, category;
       const params = new URLSearchParams();
       if (this.state.array[i].category) {
         category = this.state.array[i].category;
-        queries.push(category);
         params.append("category", category);
       }
       if (this.state.array[i].param_sport) {
         sport = this.state.array[i].param_sport;
-        queries.push(sport);
         params.append("sport", sport);
       }
-      if (this.state.array[i].param_user) {
-        user = this.state.array[i].param_user;
-        queries.push(user);
-        params.append("user", user);
+      if (this.state.array[i].year) {
+        year = this.state.array[i].year;
+        params.append("year", year);
+        console.log(year);
       }
       const url = "http://localhost:9000/backend/charts/dataset?";
       console.log(url + params);
-      //this.addElement(this.state.array[i].name, this.state.array[i].type);
       this.getdatasets(
         url,
         params,
@@ -226,9 +213,8 @@ export default class Graphs extends React.Component<Props, State> {
   }
 
   test() {
-    console.log(this.state.fill);
     fetch(
-      "http://localhost:9000/backend/charts/dataset?category=duration&sport=Ballsport&user=true"
+      "http://localhost:9000/backend/charts/dataset?category=duration&sport=Ballsport&year=2021"
     )
       .then((response) => {
         if (response.ok) {
@@ -267,71 +253,138 @@ export default class Graphs extends React.Component<Props, State> {
       .catch((error) => console.warn(error));
   }
 
-  setcharts(data: any, name: string, type: string, fill: boolean) {
+  setcharts(chart: any) {
     fetch("http://localhost:9000/backend/charts/add", {
       headers: {
         accept: "application/json",
         "content-type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(chart),
       method: "POST",
-    })
-      .then((test) => {
-        return test.json();
-      }) //convert to json
-      .then((res) => {
-        console.log(res);
-      }) //view response in console
-      .then((data: any) => {
-        console.log("Request succeeded");
-        this.addElement(name, type, data, fill);
-      })
-      .catch((error) => console.log(error)); //catch errors
+    }).then((response) => {
+      if (response.ok) {
+      } else {
+        console.log(response); //view response in console
+      }
+    });
   }
 
   //Get inputs values then create charts
   configureChart() {
-    const chart = {
-      name: this.state.title,
-      //subtitle: Metrik, ifo about what chart is showing
-      type: this.state.type,
-      category: this.state.category, //"Default"
-      fill: this.state.fill, //TODO: add option to modal
-      param_sport: this.state.sport, //:null,
-      //year
-    };
-    this.action();
-    this.setcharts(chart, chart.name, chart.type, chart.fill);
+    if (
+      this.state.title &&
+      this.state.type &&
+      this.state.year &&
+      this.state.category
+    ) {
+      var year = this.state.year.getFullYear();
+      const chart = {
+        name: this.state.title,
+        type: this.state.type,
+        category: this.state.category,
+        fill: this.state.fill,
+        param_sport: this.state.sport, //can be null
+        year: year,
+      };
+      console.log(chart);
+      const params = new URLSearchParams();
+      params.append("category", chart.category);
+      params.append("sport", chart.param_sport);
+      params.append("year", chart.year.toString());
+      const url = "http://localhost:9000/backend/charts/dataset?";
+      console.log(url + params);
+      this.getdatasets(url, params, chart.name, chart.type, chart.fill);
+      this.close();
+      this.setcharts(chart);
+    } else {
+      console.error("Configurtion values are missing");
+    }
   }
 
   addElement(title: string, type: string, data: any, fill: boolean) {
-    var chartnode = document.getElementById("chartID_" + title);
-    if (!this.charts.includes(title) && !chartnode) {
-      this.charts.push();
+    var buttonnode = document.getElementById(title);
+    var chartnode = document.getElementById("chart_ID" + title);
+    if (!this.charts.includes(title) && !chartnode && !buttonnode) {
+      this.charts.push(title);
       // erstelle ein neues div Element für jedes neues Chart
       //if(!document.getElementById("canvas"+title) --> check if element exists
       var canvas = document.createElement("canvas");
       canvas.id = "chartID_" + title;
+      canvas.className = title;
+      var button = document.createElement("button");
+      button.id = title;
+      button.className = "button is-danger";
+      button.innerHTML = "Delete " + canvas.id;
+      button.onclick = (event: any) =>
+        this.removeChart(event.target.id);
       // füge das neu erstellte Element und seinen Inhalt ins DOM ein
       var parent = document.getElementById("charts");
       parent?.appendChild(canvas);
+      parent?.appendChild(button);
       console.log(document.getElementById(canvas.id));
-      this.addcharts(canvas, type, data, fill);
+      console.log(document.getElementById(button.id));
+      this.addcharts(canvas, title, type, data, fill);
     } else {
+      this.setState({
+        informtext: "Element could not be added",
+        informtype: "is-danger",
+      });
+    }
+    console.log(this.charts);
+  }
+
+  removeChart(id: string) {
+    var chart = null;
+    const chartID = "chartID_"+id
+    chart = Chart.getChart(chartID);
+    console.log(chart);
+    console.log(chartID);
+    if (chart) {
+      chart.destroy();
+      this.removeElement(id);
+      /*   fetch("http://localhost:9000/backend/charts/remove",{     //BACKEND_URL + "/events/remove"
+    headers:{
+      "accept":"application/json",
+      "content-type":"application/json"
+    },
+    body: JSON.stringify({id: id}),
+    method:"POST"
+  })*/
     }
   }
 
   removeElement(title: string) {
-    var chartnode = document.getElementById(
-      "chartID_" + title
-    ) as HTMLCanvasElement;
-    if (chartnode.parentNode) {
-      chartnode.parentNode.removeChild(chartnode);
+    console.log(title);
+    console.log(document.getElementById("chartID_chart"));
+    var canvas = document.getElementById("chartID_"+title) as HTMLCanvasElement;
+    var button = document.getElementById(title) as HTMLButtonElement;
+    if (canvas.parentNode && button.parentNode) {                       // parent ist div id=charts
+      canvas.parentNode.removeChild(canvas);
+      button.parentNode.removeChild(button);
+      const id = this.charts.indexOf(title);
+      this.charts.splice(id, 1);
+      console.log(this.charts)
     }
   }
 
-  addcharts(canvas: HTMLCanvasElement, type: string, data: any, fill: boolean) {
+  subtitle(category: string, ylab: string) {
+    var subtitle = "";
+    //bei getdatasets definieren
+    if (categories.includes(category)) {
+      subtitle = `${category} in ${ylab} per month`;
+    }
+    return subtitle;
+  }
+
+  addcharts(
+    canvas: HTMLCanvasElement,
+    title: string,
+    type: string,
+    data: any,
+    fill: boolean
+  ) {
     let dataarray: any[] = new Array(labels.length);
+    let subtitle = "Hier etwas einfügen!";
     dataarray.fill(0, 0, labels.length);
     for (let i = 0; i < data.length; i++) {
       labels.forEach((item, index) => {
@@ -343,6 +396,12 @@ export default class Graphs extends React.Component<Props, State> {
     }
     console.log(dataarray);
     new Chart(canvas, {
+      options: {
+        title: {
+          display: true,
+          text: "title",
+        },
+      },
       type: type, //Define chart type
       data: {
         labels: labels,
@@ -480,7 +539,7 @@ export default class Graphs extends React.Component<Props, State> {
     );
   }
 
-  handleDateOnChange(date: Date) {
+  handleDateOnChange(date: any) {
     this.setState({ year: date });
   }
 
@@ -511,6 +570,11 @@ export default class Graphs extends React.Component<Props, State> {
       [name]: check,
     } as unknown) as Pick<State, keyof State>);
   }
+
+  disableFutureDt = (current: { isBefore: (arg0: any) => any }) => {
+    const today = moment();
+    return current.isBefore(today);
+  };
 
   render() {
     const active = this.state.active ? "is-active" : "";
@@ -602,9 +666,11 @@ export default class Graphs extends React.Component<Props, State> {
                     <DatePicker
                       dateFormat="yyyy"
                       showYearPicker
+                      selected={this.state.year}
                       locale={en}
-                      onChange={(date: Date) => this.handleDateOnChange(date)
-                      }
+                      onChange={(date: Date) => this.handleDateOnChange(date)}
+                      minDate={new Date("01-01-1900")}
+                      maxDate={new Date()}
                       inline
                     />
                   </div>
