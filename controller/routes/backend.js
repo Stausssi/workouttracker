@@ -37,9 +37,7 @@ router.get('/events/get', event.findAll);
 
 router.post('/events/add', event.create); 
 
-router.post('/events/update', event.update); //put?
-
-router.post('/events/remove', event.remove);  //delete?
+router.delete('/events/remove', event.remove);  //delete?
 
 /* charts routes */
 router.get('/charts/get', chart.findAll); 
@@ -48,7 +46,7 @@ router.get('/charts/dataset', chart.getdataset);
 
 router.post('/charts/add', chart.create); 
 
-router.post('/charts/remove', chart.remove);
+router.delete('/charts/remove', chart.remove);
 
 
 /*

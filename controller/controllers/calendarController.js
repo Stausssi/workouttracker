@@ -42,13 +42,13 @@ exports.create = (request, response) => {
 
 exports.remove = (request, response) => {
   const eventid = request.body.id
-  if (!eventid) {
+  let username = request.username;
+  if (!eventid/* || !username */) {
     response.sendStatus(400)
   }
   else {
-    let username = request.username;
     Event.remove(eventid, (error, data) => {
-      if (error) {
+      if (error || !data) {
         response.sendStatus(500)
       } else {
         response.sendStatus(200)

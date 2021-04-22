@@ -31,7 +31,7 @@ Event.getAll = (response) => {
 
 
 Event.create = (newEvent, result) => {
-    sql.query("INSERT INTO events SET ?", newEvent, (error, res) => {
+    sql.query("INSERT INTO events SET ?", [newEvent], (error, res) => {
       if (error) {
         console.log("error: ", error);
         result(error, false);
@@ -44,7 +44,7 @@ Event.create = (newEvent, result) => {
   };
 
   Event.remove = (id, result)=>{
-    sql.query("DELETE FROM events WHERE id = ?", id, (error, res) => {
+    sql.query("DELETE FROM events WHERE id = ?", [id], (error, res) => {
                if(error) {
                    console.log("error: ", error);
                    result(error, null);
