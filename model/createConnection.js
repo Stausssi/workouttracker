@@ -8,16 +8,16 @@ const connection = mysql.createConnection({
     user: dbConfig.USER,
     password: dbConfig.PASSWORD,
     database: dbConfig.DB
-  });
-  
-  // open the MySQL connection
-  connection.connect(error => {
+});
+
+// open the MySQL connection
+connection.connect(error => {
     if (error) {
         console.log(error);
         throw error;
     }
-    
+
     console.log("Successfully connected to the database.");
-  });
-  
-  module.exports = connection;
+});
+
+module.exports = connection;
