@@ -4,10 +4,11 @@ const Event = require("../model/calendarModel");
 //TODO: Add user for event
 
 exports.findAll = (request, response) => {
+  let username = request.username;
   Event.getAll((error, data) => {
     if (error) {
       console.log(error);
-      response.status(500).send({ message: "Internal server error!" });
+      response.sendStatus(500)
     } else {
       response.status(200).send({ body: JSON.stringify(data) });
     }
@@ -17,11 +18,10 @@ exports.findAll = (request, response) => {
 //Create new event and add it to DB
 exports.create = (request, response) => {
   if (!request.body) {
-    response.status(400).send({
-      message: "Content can not be empty!"
-    });
+    response.sendStatus(400)
   }
   else {
+    let username = request.username;
     // constructor for event
     const event = new Event({
       title: request.body.title,
@@ -29,15 +29,12 @@ exports.create = (request, response) => {
       end: request.body.end,
       allDay: request.body.allDay
     });
-    //response.status(200).send("test")
     // Save event in the database
     Event.create(event, (error, added) => {
-      if (error) {
-        response.status(500).send({ message: "Internal server error!" });
-      } else if (!added) {
-        response.status(500).send({ message: "Event could not be added" });
+      if (error || !added) {
+        response.sendStatus(500)
       } else {
-        response.status(200).send({ message: "New event was successfully be added!" });
+        response.sendStatus(200)
       }
     });
   }
@@ -46,55 +43,18 @@ exports.create = (request, response) => {
 exports.remove = (request, response) => {
   const eventid = request.body.id
   if (!eventid) {
-    response.status(400).send({
-      message: "Bad Request: ID can not be empty!"
-    });
+    response.sendStatus(400)
   }
   else {
+    let username = request.username;
     Event.remove(eventid, (error, data) => {
       if (error) {
-        response.status(500).send({ message: "Internal server error!" });
+        response.sendStatus(500)
       } else {
-        response.status(200).send({ message: "Event was successfully deleted!" });
-
+        response.sendStatus(200)
       }
     })
 
   }
 };
 
-exports.update = (request, response) => {
-  if (!request.body) {
-    response.status(400).send({
-      message: "Content can not be empty!"
-    });
-  }
-  else {
-    // update an event
-    //TODO
-    /* Event.updateById = (id, customer, result) => {
-       sql.query(
-         "UPDATE events SET title = ?, start = ?, end = ? allDay = ? WHERE id = ?",
-         [event.title, event.start, event.end, event.allDay, id],
-         (error, res) => {
-           if (error) {
-             console.log(error);
-             response.status(500).send({message: "Internal server error!"});
-           }
-           else
-           {
-     
-           if (res.affectedRows == 0) {
-             // not found Customer with the id
-             result({ kind: "not_found" }, null);
-             response.status(404).send({message: "event was not found"});
-           }
-     
-           console.log("updated event: ", { id: id, ...event });
-           result(null, { id: id, ...event });
-         }
-       }
-       );
-     };*/
-  }
-};

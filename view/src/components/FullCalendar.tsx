@@ -4,9 +4,10 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import NotificationBox from "./notificationBox";
-import {BACKEND_URL} from "../App";   //TODO add Backend URL const to fetch
+import { BACKEND_URL } from "../App"; //TODO add Backend URL const to fetch
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
+import SessionHandler from "../SessionHandler";
 
 interface Props {}
 
@@ -96,19 +97,19 @@ export default class FullCalendar extends React.Component<Props, State> {
       selectable: true, //enable selection of dates
       select: (info) => this.create(info), //function on select --> run create function
       //eventClick: (properties) => this.updateevent(properties),
-      eventDidMount:(element)=>{
-        console.log(element.event.id)
-        console.log(element.event.title)
-        var deleteButton=document.createElement("button")
-        deleteButton.onclick=()=>this.removeevent(element)
-        deleteButton.className="delete"
-        element.el.append(deleteButton)
-      }
+      eventDidMount: (element) => {
+        console.log(element.event.id);
+        console.log(element.event.title);
+        var deleteButton = document.createElement("button");
+        deleteButton.onclick = () => this.removeevent(element);
+        deleteButton.className = "delete";
+        element.el.append(deleteButton);
+      },
     });
     this.calendar.render(); //render calendar on document
   }
 
-  create(info:any) {
+  create(info: any) {
     //open modal to set title of new event
     //var startdate=moment(info.start,'YYYY-MM-DD HH:mm').toDate();
     //var enddate=moment(info.end,'YYYY-MM-DD HH:mm').toDate();
@@ -121,7 +122,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       title: this.state.title,
       start: this.state.startDate,
       end: this.state.endDate,
-      allDay: 1//this.state.allDay, //TODO: allow to define start and end time
+      allDay: 1, //this.state.allDay, //TODO: allow to define start and end time
     };
     this.action();
     console.log(event);
@@ -129,7 +130,13 @@ export default class FullCalendar extends React.Component<Props, State> {
   }
 
   getEvents() {
-    fetch("http://localhost:9000/backend/events/get").then((response) => {    //BACKEND_URL + "/events/get"
+    fetch(BACKEND_URL + "/events/get", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        //Authorization: SessionHandler.getAuthToken()
+      },
+    }).then((response) => {
       if (response.ok) {
         return response.json().then((response) => {
           this.setState({ eventsarray: JSON.parse(response.body) });
@@ -140,8 +147,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       } else {
         return response.json().then((response) => {
           console.error("Fetch has failed:", response);
-          this.setState({ eventsarray: []
-          });
+          this.setState({ eventsarray: [] });
         });
       }
     });
@@ -149,13 +155,15 @@ export default class FullCalendar extends React.Component<Props, State> {
 
   setEvents(data: any) {
     /*Create call to backend route */
-    fetch("http://localhost:9000/backend/events/add", { //BACKEND_URL + "/events/add"
+    fetch(BACKEND_URL + "events/add", {
+      //BACKEND_URL + "/events/add"
+      method: "POST",
       headers: {
         accept: "application/json",
-        "content-type": "application/json",
+        "Content-Type": "application/json",
+         //Authorization: SessionHandler.getAuthToken()
       },
       body: JSON.stringify(data),
-      method: "POST",
     }).then((response) => {
       if (response.ok) {
         this.setState({
@@ -166,26 +174,34 @@ export default class FullCalendar extends React.Component<Props, State> {
         return response.json().then((response) => {
           this.setState({
             informtext:
-            "Event could not be added to database. Please contact an administrator for more information. Error is: " + response,
+              "Event could not be added to database. Please contact an administrator for more information. Error is: " +
+              response,
             informtype: "is-danger",
           });
         });
       }
-      this.close();     //reset state when setEvents has end
-      this.getEvents(); 
+      this.close(); //reset state when setEvents has end
+      this.getEvents();
     });
   }
 
-  removeevent(element:any) { 
-    element.event.remove()
-    fetch("http://localhost:9000/backend/events/remove",{     //BACKEND_URL + "/events/remove"
-    headers:{
-      "accept":"application/json",
-      "content-type":"application/json"
-    },
-    body: JSON.stringify({id: element.event.id}),
-    method:"POST"
-  })
+  removeevent(element: any) {
+    element.event.remove();
+    fetch(BACKEND_URL + "events/remove", {
+      method: "DELETE",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+         //Authorization: SessionHandler.getAuthToken()
+      },
+      body: JSON.stringify({ id: element.event.id }),
+    }).then((response) => {
+      if (response.ok) {
+        console.log("Delete request has been submitted successfully");
+      } else {
+        console.log("Delete request has failed: " + response);
+      }
+    });
   }
 
   handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -218,7 +234,7 @@ export default class FullCalendar extends React.Component<Props, State> {
             <section className="modal-card-body">
               <div className="content">
                 <div className="control">
-                <label className="label">Event Name</label>
+                  <label className="label">Event Name</label>
                   <>
                     <input
                       className="input"
@@ -238,11 +254,14 @@ export default class FullCalendar extends React.Component<Props, State> {
                 className="button is-success"
                 onClick={() => this.createEvent()}
               >
-                <FontAwesomeIcon icon={faCheck}/>
+                <FontAwesomeIcon icon={faCheck} />
                 <span className="m-2">Save</span>
               </button>
-              <button className="button is-danger" onClick={() => this.action()}>
-                <FontAwesomeIcon icon={faTimes}/>
+              <button
+                className="button is-danger"
+                onClick={() => this.action()}
+              >
+                <FontAwesomeIcon icon={faTimes} />
                 <span className="m-2">Cancel</span>
               </button>
             </footer>
