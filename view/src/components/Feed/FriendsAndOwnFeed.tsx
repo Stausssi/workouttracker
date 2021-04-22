@@ -146,6 +146,13 @@ interface props {
 class ActivityTable extends React.Component<props, {}> {
     constructor(props: props) {
         super(props);
+
+        //get props keys
+        const activityObject = this.props["activityData"];
+
+        //iterate over props and check if value exists --> delete if not
+        // @ts-ignore
+        Object.keys(activityObject).forEach((k:any) => activityObject[k] == null && delete activityObject[k])
     }
 
     renderTableHeaders(activityData: activityData) {
