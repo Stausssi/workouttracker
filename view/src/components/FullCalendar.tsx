@@ -44,15 +44,13 @@ export default class FullCalendar extends React.Component<Props, State> {
 
   action = () => {
     //open and close modal
-    console.log(this.state.active);
-    this.setState((state) => ({ active: !state.active }));
+    let active = !this.state.active;
+    if (active == true) {
+      this.setState(() => ({ active: active }));
+    } else {
+      this.setState(initialState);
+    }
   };
-
-  close() {
-    //close modal on submit aborted or finished
-    this.action();
-    this.setState(initialState); //reset state to inital state
-  }
 
   componentDidMount() {
     this.initCalendar();
@@ -101,7 +99,7 @@ export default class FullCalendar extends React.Component<Props, State> {
         console.log(element.event.id);
         console.log(element.event.title);
         var deleteButton = document.createElement("button");
-        deleteButton.onclick = () => this.removeevent(element);
+        deleteButton.onclick = () => this.removeEvent(element);
         deleteButton.className = "delete";
         element.el.append(deleteButton);
       },
@@ -111,10 +109,8 @@ export default class FullCalendar extends React.Component<Props, State> {
 
   create(info: any) {
     //open modal to set title of new event
-    //var startdate=moment(info.start,'YYYY-MM-DD HH:mm').toDate();
-    //var enddate=moment(info.end,'YYYY-MM-DD HH:mm').toDate();
-    this.action();
     this.setState({ startDate: info.startStr, endDate: info.endStr });
+    this.action();
   }
 
   createEvent() {
@@ -122,9 +118,8 @@ export default class FullCalendar extends React.Component<Props, State> {
       title: this.state.title,
       start: this.state.startDate,
       end: this.state.endDate,
-      allDay: 1, //this.state.allDay, //TODO: allow to define start and end time
+      allDay: 1, //this.state.allDay
     };
-    this.action();
     console.log(event);
     this.setEvents(event);
   }
@@ -160,7 +155,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
-         //Authorization: SessionHandler.getAuthToken()
+        //Authorization: SessionHandler.getAuthToken()
       },
       body: JSON.stringify(data),
     }).then((response) => {
@@ -179,26 +174,27 @@ export default class FullCalendar extends React.Component<Props, State> {
           });
         });
       }
-      this.close(); //reset state when setEvents has end
+      this.action(); //reset state when setEvents has end
       this.getEvents();
     });
   }
 
-  removeevent(element: any) {
+  removeEvent(element: any) {
     element.event.remove();
+    console.log(element.event.id)
     fetch(BACKEND_URL + "events/remove", {
       method: "DELETE",
       headers: {
         accept: "application/json",
         "content-type": "application/json",
-         //Authorization: SessionHandler.getAuthToken()
+        //Authorization: SessionHandler.getAuthToken()
       },
       body: JSON.stringify({ id: element.event.id }),
     }).then((response) => {
       if (response.ok) {
         console.log("Delete request has been submitted successfully");
       } else {
-        console.log("Delete request has failed: " + response);
+        console.log("Delete request has failed");
       }
     });
   }
@@ -211,7 +207,6 @@ export default class FullCalendar extends React.Component<Props, State> {
     this.setState(({
       [name]: value,
     } as unknown) as Pick<State, keyof State>);
-    console.log(this.state.allDay);
   }
 
   render() {
@@ -227,7 +222,7 @@ export default class FullCalendar extends React.Component<Props, State> {
               <button
                 className="delete"
                 aria-label="close"
-                onClick={() => this.close()}
+                onClick={() => this.action()}
               ></button>
             </header>
             <section className="modal-card-body">
