@@ -32,8 +32,8 @@ Chart.create = (newChart, response) => {
     });
 }
 
-Chart.remove = (id, result) => {
-    sql.query("DELETE FROM charts WHERE id = ?", id, (error, res) => {
+Chart.remove = (name, result) => {
+    sql.query("DELETE FROM charts WHERE name = ?", name, (error, res) => {
         if (error) {
             console.log("error: ", error);
             result(error, null);

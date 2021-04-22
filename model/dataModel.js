@@ -6,7 +6,7 @@ const Data = () => {
 
 Data.getall = (category,sports,year, response) => {
     /* zwischen count und sum unterscheiden */
-    sql.query("SELECT  sum(??) as amount, month(startedAt) as month FROM activity WHERE sport = IFNULL(?,sport) AND YEAR(startedAt)=2021 GROUP BY month(startedAt)", [category,sports, year],
+    sql.query("SELECT  sum(??) as amount, month(startedAt) as month FROM activity WHERE sport = IFNULL(?,sport) AND YEAR(startedAt)=2021 GROUP BY month(startedAt) ORDER BY month(startedAt)", [category,sports, year],
         function (error, results) {
             if (error) {
                 response(error, null);

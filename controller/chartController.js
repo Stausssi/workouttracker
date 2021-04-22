@@ -41,6 +41,7 @@ exports.create = (request, response) => {
         response.sendStatus(400)
       }
     else {
+      let username = request.username;
         const chart = new Chart({
             name: request.body.name,
             type: request.body.type,
@@ -67,7 +68,7 @@ exports.create = (request, response) => {
 };
 
 exports.remove = (request, response) => {
-    const chartid = request.body.id
+    const chartid = request.body.chartid
     if (!chartid) {
       response.sendStatus(400)
     }
