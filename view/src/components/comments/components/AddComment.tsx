@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import SessionHandler from "../../../utilities/SessionHandler";
 import {BACKEND_URL, FRONTEND_URL} from "../../../App";
+import SessionHandler from "../../../utilities/SessionHandler";
 
 interface Props {
     onAdd: any,
@@ -9,7 +9,6 @@ interface Props {
 //add new comment in the front and backend
 const AddComment = ({ onAdd }: Props) => {
     const [text, setText] = useState('')
-    const [name, setName] = useState('')
     const [countLengt, setCountLengt] = useState(500)
 
     const onSubmit = (e:any) => {
@@ -31,27 +30,29 @@ const AddComment = ({ onAdd }: Props) => {
     
         const timestamp = Tag + "." + Monat + "." + Year + " " + Stunden + ":" + Minuten;
         //const timestamp = new Date().getTime();
+        if(SessionHandler.getUser()){
+            // @ts-ignore
+            const name = SessionHandler.getUser().username.toString();
+            //insert in frontend
+            onAdd({ text, name, timestamp })
 
-        //insert in frontend
-        onAdd({ text, name, timestamp })
-
-        //insert in backend
-        fetch(BACKEND_URL + '/commend', {
-            method: 'POST',
-            headers:{
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: SessionHandler.getAuthToken() 
-            },
-            body: JSON.stringify({
-                text: text,
-                activity: 12,
-            }),
-        });
+            //insert in backend
+            fetch(BACKEND_URL + 'commend', {
+                method: 'POST',
+                headers:{
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: SessionHandler.getAuthToken()
+                },
+                body: JSON.stringify({
+                    text: text,
+                    activity: 48,
+                }),
+            });
+        }
 
         //set to default values
         setText('')
-        setName('')
         setCountLengt(500);
     }
 
@@ -69,10 +70,6 @@ const AddComment = ({ onAdd }: Props) => {
                 <label className="label">Comment</label>
                 <input className="input" type='text' maxLength={500} placeholder='Add your comment' value={text} onChange={(e) => onKeyUp(e)} />
                 <p>{countLengt}</p>
-            </div>
-            <div className='field'>
-                <label className="label">Name</label>
-                <input className="input" type='text' placeholder='Add your Name' value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <input  className='button is-black is-outlined'  type='submit' placeholder='Insert Comment'/>
         </form>

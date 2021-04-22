@@ -7,9 +7,10 @@ import SessionHandler from "../../utilities/SessionHandler";
 
 interface State {
   showAddComent: boolean;
-  showthumpsUp: boolean; 
-  thumpsUpCounter: number; 
+  showthumpsUp: boolean;
+  thumpsUpCounter: number;
   comments: any[];
+  activity: number;
 }
 
 export default class CommmentComponent extends Component<{}, State> {
@@ -17,10 +18,11 @@ export default class CommmentComponent extends Component<{}, State> {
       super(props);
 
       this.state = {
-        showAddComent: false,
-        showthumpsUp: false,
-        thumpsUpCounter: 0,
-        comments: [],
+            showAddComent: false,
+            showthumpsUp: false,
+            thumpsUpCounter: 0,
+            comments: [],
+            activity: 48    //an onAdd ändern
       };
 
       this.refreshComment();
@@ -63,7 +65,7 @@ export default class CommmentComponent extends Component<{}, State> {
 
   //refresh comment
   refreshComment() {
-    fetch("http://localhost:3001/backend/commendisnew/" + 12, {//get as default
+    fetch(BACKEND_URL + "commendisnew/" + this.state.activity, {//get as default
         headers:{
             Accept: 'application/json',
             'Content-Type': 'application/json',
@@ -84,7 +86,7 @@ export default class CommmentComponent extends Component<{}, State> {
   }
 
   newThumpsState() {
-    fetch(BACKEND_URL + '/thumpsup', {
+    fetch(BACKEND_URL + 'thumpsup', {
       method: 'POST',
       headers:{
           Accept: 'application/json',
@@ -92,7 +94,7 @@ export default class CommmentComponent extends Component<{}, State> {
           Authorization: SessionHandler.getAuthToken() 
       },
       body: JSON.stringify({
-          activity: 12,
+          activity: this.state.activity,
       }),
     });
     var tmpthumpsUpCounter;
@@ -105,7 +107,7 @@ export default class CommmentComponent extends Component<{}, State> {
 
   //Count Thumps
   countThumps() {
-    fetch(BACKEND_URL + "/countThumps/" + 12, {//get as default
+    fetch(BACKEND_URL + "countThumps/" + this.state.activity, {//get as default
         headers:{
             Accept: 'application/json',
             'Content-Type': 'application/json',
@@ -127,7 +129,7 @@ export default class CommmentComponent extends Component<{}, State> {
 
   //Count Thumps
   async isThumpUpSet() {      //ggf als get
-    fetch(BACKEND_URL + '/isthumpsupset/' + 12, {
+    fetch(BACKEND_URL + 'isthumpsupset/' + this.state.activity, {
       headers:{
           Accept: 'application/json',
           'Content-Type': 'application/json',

@@ -3,6 +3,7 @@ import {BACKEND_URL, FRONTEND_URL} from "../App";
 import SessionHandler from "../utilities/SessionHandler";
 
 interface State {
+    username: string,
     firstname: string,
     lastname: string,
     email: string,
@@ -17,22 +18,27 @@ interface State {
 }
 
 export default class ProfileSiteProfileSite  extends Component<{}, State> {
-    //firstnamePlaceholder: string;
     constructor(props: any) {
         super(props);
+        var username = "undefined Username";
+        if(SessionHandler.getUser()) {
+            // @ts-ignore
+            username = SessionHandler.getUser().username.toString();
+        }
 
         this.state = {
-          firstname: '',
-          lastname: '',
-          age: '',
-          weight: '',
-          email: '',
-      
-          firstnamePlaceholder: 'Add your firstname',
-          lastnamePlaceholder: 'Add your lastname',
-          agePlaceholder: 'Add your age',
-          weightPlaceholder: 'Add your weight',
-          emailPlaceholder: 'Add your email',
+              username: username,
+              firstname: '',
+              lastname: '',
+              age: '',      //it is now date
+              weight: '',
+              email: '',
+
+              firstnamePlaceholder: 'Add your firstname',
+              lastnamePlaceholder: 'Add your lastname',
+              agePlaceholder: 'Add your age',
+              weightPlaceholder: 'Add your weight',
+              emailPlaceholder: 'Add your email',
         };
 
         this.getDefaultValues();
@@ -42,7 +48,7 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
     }
 
     getDefaultValues() {
-      fetch(BACKEND_URL + "/profilesite/" + SessionHandler.getUser(), {//get as default
+      fetch(BACKEND_URL + "profilesite/" + this.state.username, {//get as default
             headers:{
               Accept: 'application/json',
               'Content-Type': 'application/json',
@@ -79,7 +85,7 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
     handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
         //coolen PUT REQUEST machen der die Daten auf das Backend schiebt und sie dort dann überprüfen
-        fetch(BACKEND_URL + '/profilesiteupdate', {
+        fetch(BACKEND_URL + 'profilesiteupdate', {
             method: 'PUT',
             headers:{
                 Accept: 'application/json',
@@ -125,14 +131,14 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
             <div className="section">
                 <div className="container">
                     <form className='box'>
-                        <p className="is-size-4">Hello {SessionHandler.getUser()},<br/> here you can change your account values</p>
+                        <p className="is-size-4">Hello {this.state.username},<br/> here you can change your account values</p>
                         <div className='field'>
                             <label className="label">Firstname</label>
-                            <input className="input" name='firstname' type='text' maxLength={20} placeholder={this.state.firstnamePlaceholder} value={this.state.firstname} onChange={this.handleChange} />
+                            <input className="input" name='firstname' type='text' maxLength={30} placeholder={this.state.firstnamePlaceholder} value={this.state.firstname} onChange={this.handleChange} />
                         </div>
                         <div className='field'>
                             <label className="label">Lastname</label>
-                            <input className="input" name='lastname' type='text' maxLength={20} placeholder={this.state.lastnamePlaceholder} value={this.state.lastname} onChange={this.handleChange} />
+                            <input className="input" name='lastname' type='text' maxLength={30} placeholder={this.state.lastnamePlaceholder} value={this.state.lastname} onChange={this.handleChange} />
                         </div>
                         <div className='field'>
                             <label className="label">age</label>
@@ -144,7 +150,7 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
                         </div>
                         <div className='field'>
                             <label className="label">e-mail</label>
-                            <input className="input" name='email' type='email' maxLength={20} placeholder={this.state.emailPlaceholder} value={this.state.email} onChange={this.handleChange} />
+                            <input className="input" name='email' type='email' maxLength={50} placeholder={this.state.emailPlaceholder} value={this.state.email} onChange={this.handleChange} />
                         </div>
                         <button type='submit' className='input is-black is-outlined' onClick={this.handleSubmit}>Change Data</button>
                     </form>

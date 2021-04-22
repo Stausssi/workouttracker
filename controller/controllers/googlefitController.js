@@ -3,8 +3,8 @@ const request = require('request');
 const urlParse = require('url-parse');
 const queryParser = require('query-string');
 const axios = require('axios');
+const GoogleFit = require("../../model/models/GoogleFitModel");
 
-const connection = require("../../model/createConnection");
 
 exports.getFitURL = (req,res) => {
     const oauth2Client = new google.auth.OAuth2(
@@ -13,7 +13,7 @@ exports.getFitURL = (req,res) => {
         //client secret
         "-go0MpwOnEw3MicUM_S7rOPW",
         //link to redirect to
-        "http://localhost:3001/googlefit/activity"
+        "http://localhost:9000/backend/googlefit/activity"
     );
         //generates URL
         const scopes = [ "https://www.googleapis.com/auth/fitness.location.read https://www.googleapis.com/auth/fitness.activity.read profile email " ];
@@ -23,7 +23,7 @@ exports.getFitURL = (req,res) => {
             state: JSON.stringify({
                 callbackURL: req.body.callbackURL,
                 userID: req.body.userid,
-                username: req.username
+                username: "MeinUsername" //req.username
             })
         })
 
@@ -46,12 +46,10 @@ exports.insertActivitysFromGoogle = async (req, res) => {
         //client secret
         "-go0MpwOnEw3MicUM_S7rOPW",
         //link to redirect to
-        "http://localhost:3001/googlefit/activity"
+        "http://localhost:9000/backend/googlefit/activity"
     );
 
     const tokens = await oauth2Client.getToken(code);
-    //res.redirect("http://localhost:3000/");
-    res.send('<script>alert("We import your Activitys from the last Year"); window.location.href = "http://localhost:3000/"; </script>');
 
     let sessionArray = [];
 
@@ -76,9 +74,12 @@ exports.insertActivitysFromGoogle = async (req, res) => {
         }
     }
 
+    var dberror = false;
+
     axios.get(`https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=${starttimestamp}&endTime=${endtimestamp}`, authstuff)//get activitys
         .then(res => {
             sessionArray = res.data.session;
+
             try {
                 for(const session of sessionArray){
                     const body = {
@@ -103,22 +104,22 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                             else if(session.activityType == 82 || session.activityType == 84 || session.activityType == 83) sport = "Schwimmen";//swimming
                             else if(session.activityType == 11 || session.activityType == 12 || session.activityType == 27 || session.activityType == 28 || session.activityType == 29 || session.activityType == 34 || session.activityType == 51 || session.activityType == 120 || session.activityType == 89 || session.activityType == 90 || session.activityType == 91) sport = "Ballsport";//ball
                             else if(session.activityType == 24) sport = "Tanzen";//dancing
+
+                            const avarageSpeed = (res.data.bucket[0].dataset[0].point[0].value[0].fpVal / 1000) / (duration / 3600000);
+
                             //darabase insert
-                            connection.query("SELECT `PrimaryKey` FROM `activity` WHERE `PKUser`='" + username + "' AND `duration`='" + duration + "' AND `sport`='" + sport + "';" , function(error, rows, fields){//AND `distance`='" + res.data.bucket[0].dataset[0].point[0].value[0].fpVal + "' 
-                                if(error) {
-                                    console.log(error);
-                                }
-                                else {
-                                    //hier ist das ergebnis in rows
-                                    if(rows.length == 0) {
-                                        const avarageSpeed = (res.data.bucket[0].dataset[0].point[0].value[0].fpVal / 1000) / (duration / 3600000);
-                                        connection.query("INSERT INTO `activity` (`PrimaryKey`, `PKUser`, `timestamp`, `sport`, `duration`, `avageSpeed`, `distance`) VALUES (NULL, '" + 12 + "', current_timestamp(), '" + sport + "', '" + duration + "', '" + avarageSpeed + "', '" + res.data.bucket[0].dataset[0].point[0].value[0].fpVal + "')" , function(error, rows, fields){
-                                            if(error) {
-                                                console.log(error);
-                                            }
-                                        });
-                                    }
-                                }
+                            var insertObj = {
+                                username: username,
+                                duration: duration,
+                                sport: sport,
+                                avarageSpeed: avarageSpeed,
+                                distance: res.data.bucket[0].dataset[0].point[0].value[0].fpVal
+                            };
+
+                            console.log(insertObj);
+
+                            GoogleFit.insertGoogleFItActivityInDB(insertObj, function (error) {
+                                if (error) dberror = true;
                             });
                         } catch (e) {
                             console.log(e);
@@ -138,4 +139,6 @@ exports.insertActivitysFromGoogle = async (req, res) => {
             console.log("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!");
             console.log(err);
         });
+    if (dberror) res.send('<script>alert("Internal server error!"); window.location.href = "http://localhost:3000/"; </script>');
+    else res.send('<script>alert("We import your Activitys from the last Year"); window.location.href = "http://localhost:3000/"; </script>');
 }

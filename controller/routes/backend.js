@@ -29,8 +29,8 @@ router.get('/countThumps/:activity', authenticateJWT, comment.countThumps);
 router.get('/profilesite/:user', authenticateJWT, profile.profilesite);
 router.put('/profilesiteupdate', authenticateJWT, profile.profileUpdate);
 
-router.put('/googlefit/getURLTing', googlefit.getFitURL);
-router.put('/googlefit/activity', googlefit.insertActivitysFromGoogle);
+router.get('/googlefit/getURLTing', googlefit.getFitURL);
+router.get('/googlefit/activity', googlefit.insertActivitysFromGoogle);
 
 
 router.get('/verify/:hash', function(req, res){

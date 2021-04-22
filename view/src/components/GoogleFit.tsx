@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import SessionHandler from "../utilities/SessionHandler";
+import {BACKEND_URL} from "../App";
 
 //google fit import button
 export default class GoogleFit  extends Component<{}> {
@@ -11,7 +12,7 @@ export default class GoogleFit  extends Component<{}> {
 
     handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
-        fetch('http://localhost:3001/googlefit/getURLTing', {
+        fetch(BACKEND_URL + 'googlefit/getURLTing', {
             headers:{
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
