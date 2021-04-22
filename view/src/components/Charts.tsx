@@ -141,13 +141,13 @@ export default class Graphs extends React.Component<Props, State> {
 
   fetchsports() {
     // Fetch sports, users and category from database
-    fetch(BACKEND_URL+"sports/fetch", {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      //Authorization: SessionHandler.getAuthToken()
-    },
-  }).then((response) => {
+    fetch(BACKEND_URL + "sports/fetch", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        //Authorization: SessionHandler.getAuthToken()
+      },
+    }).then((response) => {
       if (response.ok) {
         return response.json().then((response) => {
           let data = JSON.parse(response.body);
@@ -170,13 +170,14 @@ export default class Graphs extends React.Component<Props, State> {
   getcharts() {
     //setstate charts then make new fetch to get data for each charts
     // Call the API
-    fetch(BACKEND_URL+"charts/get", {
+    fetch(BACKEND_URL + "charts/get", {
       method: "GET",
       headers: {
         Accept: "application/json",
         //Authorization: SessionHandler.getAuthToken()
       },
-    }).then((response) => {
+    })
+      .then((response) => {
         if (response.ok) {
           return response.json();
         } else {
@@ -213,7 +214,7 @@ export default class Graphs extends React.Component<Props, State> {
         params.append("year", year);
         console.log(year);
       }
-      const url = BACKEND_URL+"charts/dataset?"
+      const url = BACKEND_URL + "charts/dataset?";
       console.log(url + params);
       this.getdatasets(
         url,
@@ -227,7 +228,7 @@ export default class Graphs extends React.Component<Props, State> {
 
   test() {
     fetch(
-      BACKEND_URL+"charts/dataset?category=duration&sport=Ballsport&year=2021"
+      BACKEND_URL + "charts/dataset?category=duration&sport=Ballsport&year=2021"
     )
       .then((response) => {
         if (response.ok) {
@@ -256,7 +257,8 @@ export default class Graphs extends React.Component<Props, State> {
         Accept: "application/json",
         //Authorization: SessionHandler.getAuthToken()
       },
-    }).then((response) => {
+    })
+      .then((response) => {
         if (response.ok) {
           return response.json();
         } else {
@@ -272,13 +274,12 @@ export default class Graphs extends React.Component<Props, State> {
   }
 
   setcharts(chart: any) {
-    
-    fetch(BACKEND_URL+"charts/add", {
+    fetch(BACKEND_URL + "charts/add", {
       method: "POST",
       headers: {
         accept: "application/json",
         "content-type": "application/json",
-         //Authorization: SessionHandler.getAuthToken()
+        //Authorization: SessionHandler.getAuthToken()
       },
       body: JSON.stringify(chart),
     }).then((response) => {
@@ -311,7 +312,7 @@ export default class Graphs extends React.Component<Props, State> {
       params.append("category", chart.category);
       params.append("sport", chart.param_sport);
       params.append("year", chart.year.toString());
-      const url = "http://localhost:9000/backend/charts/dataset?";
+      const url = BACKEND_URL + "charts/dataset?";
       console.log(url + params);
       this.getdatasets(url, params, chart.name, chart.type, chart.fill);
       this.close();
@@ -335,8 +336,7 @@ export default class Graphs extends React.Component<Props, State> {
       button.id = title;
       button.className = "button is-danger";
       button.innerHTML = "Delete " + canvas.id;
-      button.onclick = (event: any) =>
-        this.removeChart(event.target.id);
+      button.onclick = (event: any) => this.removeChart(event.target.id);
       // füge das neu erstellte Element und seinen Inhalt ins DOM ein
       var parent = document.getElementById("charts");
       parent?.appendChild(canvas);
@@ -355,35 +355,38 @@ export default class Graphs extends React.Component<Props, State> {
 
   removeChart(id: string) {
     var chart = null;
-    const chartID = "chartID_"+id
+    const chartID = "chartID_" + id;
     chart = Chart.getChart(chartID);
     console.log(chart);
     console.log(chartID);
     if (chart) {
       chart.destroy();
       this.removeElement(id);
-      /*   fetch("http://localhost:9000/backend/charts/remove",{     //BACKEND_URL + "/events/remove"
-    headers:{
-      "accept":"application/json",
-      "content-type":"application/json"
-    },
-    body: JSON.stringify({id: id}),
-    method:"POST"
-  })*/
+      fetch(BACKEND_URL + "charts/remove", {
+        method: "DELETE",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          //Authorization: SessionHandler.getAuthToken()
+        },
+      });
     }
   }
 
   removeElement(title: string) {
     console.log(title);
     console.log(document.getElementById("chartID_chart"));
-    var canvas = document.getElementById("chartID_"+title) as HTMLCanvasElement;
+    var canvas = document.getElementById(
+      "chartID_" + title
+    ) as HTMLCanvasElement;
     var button = document.getElementById(title) as HTMLButtonElement;
-    if (canvas.parentNode && button.parentNode) {                       // parent ist div id=charts
+    if (canvas.parentNode && button.parentNode) {
+      // parent ist div id=charts
       canvas.parentNode.removeChild(canvas);
       button.parentNode.removeChild(button);
       const id = this.charts.indexOf(title);
       this.charts.splice(id, 1);
-      console.log(this.charts)
+      console.log(this.charts);
     }
   }
 
