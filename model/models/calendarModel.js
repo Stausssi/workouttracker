@@ -5,10 +5,11 @@ const Event = function(event) {
     this.start= event.start;
     this.end = event.end;
     this.allDay = event.allDay;
+    this.user = event.user;
 }
 
 Event.getAll = (response) => {
-    sql.query("SELECT * FROM events;",
+    sql.query("SELECT * FROM events;",  //Where user = ?
         function (error, result) {
             if(error) {
                 response(error, null)
