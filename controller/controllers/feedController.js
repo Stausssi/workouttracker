@@ -12,19 +12,28 @@ exports.getFeed = (req, res) => {
 
     // handle INPUT !!!!!!!!!!!!!!!!!!!!!!!
 
-    if(type === "own"){
+    if (type === "own") {
         // query database
-        Feed.getOwnFeed(user, start_offset , elementPerRequest, (error, result) => {
-            if(error){
-                res.status(500).send({message:"server Error"});
-            }else{
-                
+        Feed.getOwnFeed(user, start_offset, elementPerRequest, (error, result) => {
+            if (error) {
+                res.sendStatus(500);
+            } else {
+                //Send back JSON Feed Data
+                res.status(200).send(JSON.stringify(result));
             }
         });
-    } else if (type === "friends") {
+    } else if (type === "following") {
         // query database
+        Feed.getFollowingFeed(user, start_offset, elementPerRequest, (error, result) => {
+            if (error) {
+                res.sendStatus(500);
+            } else {
+                //Send back JSON Feed Data
+                res.status(200).send(JSON.stringify(result));
+            }
+        });
     } else {
         // Resource not found --> HTTP Status Code: 404
-        res.status(404).send({message: "resource not found"})
+        res.sendStatus(404);
     }
 }
