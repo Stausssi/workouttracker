@@ -8,7 +8,7 @@ const Feed = function (activity_array) {
     this.activities = [];
 
     activity_array.forEach((row) => {
-        this.activities.append({
+        this.activities.push({
             likes: row.likes,
             activityData: {
                 distance: row.distance,
@@ -32,7 +32,6 @@ const Feed = function (activity_array) {
 // result: return possible errors or the results result(error: Boolean, return: Object)
 
 Feed.getOwnFeed = (user, start, amount, result) => {
-    // get last
     sql.query('SELECT * FROM ' +
         '(SELECT * FROM activity WHERE user=? ORDER BY addedAt DESC LIMIT ?, ?) activities ' +
         'LEFT OUTER JOIN ' +
@@ -54,5 +53,31 @@ Feed.getOwnFeed = (user, start, amount, result) => {
         });
 }
 
+
+//Docstring
+Feed.getFollowingFeed = (user, start, amount, result) => {
+    //get Feed for users that "user" is following, just like in getOwnFeed() and append the number of likes for each post
+    sql.query('SELECT * FROM ' +
+        '(SELECT * FROM activity WHERE user in ' +
+        '(SELECT followed FROM following WHERE follower=?) ' +
+        'ORDER BY addedAt DESC LIMIT ?, ?) activities ' +
+        'LEFT OUTER JOIN ' +
+        '(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsup GROUP BY activity_id) likecount ' +
+        'USING(activity_id)',
+        [
+            user,
+            start,
+            amount
+        ], (error, db_results, fields) => {
+            if (error) {
+                //if an error occurs, return
+                console.log(error)
+                result(true, null); // Error == True
+            } else {
+                // return db_results as Feed Object
+                result(false, new Feed(db_results));
+            }
+        });
+}
 
 module.exports = Feed;
