@@ -23,7 +23,7 @@ router.get('/verify/:hash', function(req, res){
 
 router.post('/activity/add', authenticateJWT, activity.add);
 
-router.all('/sports/fetch', sport.getAll);
+router.get('/sports/fetch', authenticateJWT, sport.getAll);
 
 router.get('/users/search', users.search);
 
