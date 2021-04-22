@@ -2,9 +2,26 @@
 const sql = require('../createConnection');
 
 // formats an array of database activities into an object
-const Feed = function(activity_array){
+const Feed = function (activity_array) {
     // null values ? --> leave key out ?
     //same format that view expects
+    this.activities = [];
+
+    activity_array.forEach((row) => {
+        this.activities.append({
+            likes: row.likes,
+            activityData: {
+                distance: row.distance,
+                duration: row.duration,
+                pace: row.pace,
+                averageHeartRate: row.averageHeartRate,
+                altitudeDifference: row.altitudeDifference
+            },
+            username: row.user,
+            sport: row.sport,
+            addedAt: row.addedAt
+        });
+    });
 }
 
 // returns the first 5 elements of a "user"s feed sorted by the most recent one,
@@ -12,27 +29,30 @@ const Feed = function(activity_array){
 // start=5 : the function leaves out the five most recent records and returns the ones after that
 // --> User can load new activities without having to load all recent activities
 // Amount: how many records should be returned
-// result: return possible errors or the results
+// result: return possible errors or the results result(error: Boolean, return: Object)
 
 Feed.getOwnFeed = (user, start, amount, result) => {
     // get last
-    sql.query('SELECT * FROM activity WHERE user= ? ORDER BY addedAt DESC LIMIT ?, ?',
+    sql.query('SELECT * FROM ' +
+        '(SELECT * FROM activity WHERE user=? ORDER BY addedAt DESC LIMIT ?, ?) activities ' +
+        'LEFT OUTER JOIN ' +
+        '(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsup GROUP BY activity_id) likecount ' +
+        'USING(activity_id)',
         [
             user,
             start,
             amount
-        ], (error, db_results) => {
-            if(error){
+        ], (error, db_results, fields) => {
+            if (error) {
                 //if an error occurs, return
-                result(error, null);
+                console.log(error)
+                result(true, null); // Error == True
             } else {
                 // return db_results as Feed Object
-                return new Feed(db_results)
+                result(false, new Feed(db_results));
             }
         });
 }
-
-
 
 
 module.exports = Feed;

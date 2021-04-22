@@ -5,6 +5,7 @@ const router = express.Router();
 const users = require("../controllers/userController");
 const activity = require("../controllers/activityController");
 const sport = require("../controllers/sportController");
+const feed = require("../controllers/feedController");
 
 const {authenticateJWT} = require("../utilities/authentication/MiddlewareAuthentication");
 
@@ -27,7 +28,7 @@ router.all('/sports/fetch', sport.getAll);
 
 router.get('/users/search', users.search);
 
-router.get('/feed/:type', authenticateJWT, feed.getFeed);
+router.get('/feed/:type/', authenticateJWT, feed.getFeed);
 
 router.get('/testConnection', function (req, res, next) {
     res.send('Connection to the backend established!');
