@@ -114,7 +114,7 @@ class SearchBar extends React.Component<Props, State> {
                                     <div className="control">
                                         <input className="input is-static"
                                                type="text"
-                                               placeholder={`Searching...`}
+                                               placeholder={"Searching..."}
                                                readOnly={true}/>
                                     </div>
                                     <div className="control">

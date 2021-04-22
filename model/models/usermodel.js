@@ -86,7 +86,7 @@ User.getUserByUsernameOrEmail = (UsernameOrEmail, result) => {
 }
 
 User.find = (user, foundUsers) => {
-    sql.query("SELECT username FROM user WHERE LOCATE(?, username)>0;",
+    sql.query("SELECT username FROM user WHERE LOCATE(?, username)>0 LIMIT 5;",
         [user],
         (error, result) => foundUsers(error, result)
     );
