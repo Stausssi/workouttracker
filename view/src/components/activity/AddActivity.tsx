@@ -85,7 +85,7 @@ interface inputConfig {
 const inputFields: inputConfig[] = [
     {
         identifier: "distance",
-        validValues: [0, null],
+        validValues: [0, 40075000], // -> earth circumference
         hasIcon: true,
         inputLabel: "Distance",
         inputType: "number",
@@ -97,7 +97,7 @@ const inputFields: inputConfig[] = [
     },
     {
         identifier: "duration",
-        validValues: [0, null],
+        validValues: [0, 604800], // Max 1 week -> 604800 seconds
         hasIcon: true,
         inputLabel: "Duration",
         inputType: "number",
@@ -123,7 +123,7 @@ const inputFields: inputConfig[] = [
     },
     {
         identifier: "altitudeDifference",
-        validValues: [0, null],
+        validValues: [0, 40075000], // -> earth circumference
         hasIcon: true,
         inputLabel: "Altitude Difference",
         inputType: "number",
@@ -211,7 +211,7 @@ export default class AddActivity extends Component<Props, State> {
 
         // Check whether the property has inputParams
         if (inputParams) {
-            let valid = this.isValid(value, inputParams.validValues);
+            let valid = this.isValid(value, inputParams.validValues, name === "sport", this.state[name + "Mul"]);
             let icon = inputParams.hasIcon;
 
             this.setState({[name + "Class"]: (valid ? "is-success" : "")});
@@ -228,7 +228,10 @@ export default class AddActivity extends Component<Props, State> {
                 // Calculate property depending on multiplier
                 let multiplyWith = this.state[name] / value;
                 let param = name.replace("Mul", "");
-                this.setState({[param]: this.state[param] * multiplyWith})
+
+                // Round to the last 2 decimal places
+                let rounded = Math.round((this.state[param] * multiplyWith) * 100) / 100;
+                this.setState({[param]: rounded})
             }
         }
 
@@ -256,10 +259,10 @@ export default class AddActivity extends Component<Props, State> {
             for (let index in this.mandatoryParams) {
                 let inputParams = inputFields[index];
                 let value = this.state[inputParams.identifier];
+                let mul = this.state[inputParams.identifier + "Mul"];
 
-                if (this.mandatoryParams[index] || (this.optParams[index] && this.isValid(value, inputParams.validValues))) {
+                if (this.mandatoryParams[index] || (this.optParams[index] && this.isValid(value, inputParams.validValues, false, mul))) {
                     // Apply multiplier
-                    let mul = this.state[inputParams.identifier + "Mul"];
                     if (mul > 1) {
                         value *= mul;
                     }
@@ -389,16 +392,17 @@ export default class AddActivity extends Component<Props, State> {
                                         name={identifier}
                                         placeholder={params.inputPlaceholder}
                                         value={Number(this.state[identifier]) === 0 ? "" : this.state[identifier]}
+                                        min={params.validValues[0]}
+                                        max={params.validValues[1]}
                                         onChange={this.handleChange}
                                     />
                                     <span className={`icon is-right ${this.state[identifier + "IconClass"]}`}>
-                                    <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
-                                </span>
+                                        <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
+                                    </span>
                                 </div>
                                 <div className="control">
-                                    <div className="select is-fullwidth">
+                                    <div className={`select ${this.state[identifier + "Class"]} is-fullwidth`}>
                                         <select
-                                            className="select"
                                             name={identifier + "Mul"}
                                             value={this.state[identifier + "Mul"]}
                                             onChange={this.handleChange}
@@ -420,11 +424,13 @@ export default class AddActivity extends Component<Props, State> {
                                         name={identifier}
                                         placeholder={params.inputPlaceholder}
                                         value={Number(this.state[identifier]) === 0 ? "" : this.state[identifier]}
+                                        min={params.validValues[0]}
+                                        max={params.validValues[1]}
                                         onChange={this.handleChange}
                                     />
                                     <span className={`icon is-right ${this.state[identifier + "IconClass"]}`}>
-                                    <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
-                                </span>
+                                        <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -518,16 +524,17 @@ export default class AddActivity extends Component<Props, State> {
 
             return fieldsHTML;
         }
-        return <p className="tag is-info is-light" key={"inputField_sportInfo"}>Please select a sport</p>;
+        return <p className="tag is-info mt-4" key={"inputField_sportInfo"}>Please select a sport</p>;
     }
 
     validateInput(returnValue?: boolean) {
-        let valid = this.isValid(this.state.sport, inputFields[NUM_FIELDS].validValues);
+        let valid = this.isValid(this.state.sport, inputFields[NUM_FIELDS].validValues, true);
 
         for (let index in this.mandatoryParams) {
             if (this.mandatoryParams[index]) {
                 let inputParams = inputFields[index];
-                valid = valid && this.isValid(this.state[inputParams.identifier], inputParams.validValues);
+                let identifier = inputParams.identifier;
+                valid = valid && this.isValid(this.state[identifier], inputParams.validValues, identifier === "pace", this.state[identifier + "Mul"]);
             }
         }
 
@@ -540,13 +547,20 @@ export default class AddActivity extends Component<Props, State> {
         }
     }
 
-    isValid(value: number, validValues: any[]) {
+    isValid(value: number, validValues: any[], possibleNaN: boolean = false, multiplier: number | undefined | null = 1) {
         let min = validValues[0];
         let max = validValues[1];
         value = Number(value);
 
         // Check whether the value is in range of the params or is NaN (sports)
-        return (min < value && (max ? value < max : true)) || isNaN(value);
+        if (isNaN(value)) {
+            return possibleNaN;
+        } else {
+            if (multiplier && multiplier > 0) {
+                value *= multiplier;
+            }
+            return (min < value && (max ? value < max : true));
+        }
     }
 
     allowSubmit(state: boolean) {
