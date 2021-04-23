@@ -69,6 +69,7 @@ export default class FullCalendar extends React.Component<Props, State> {
     this.calendar = new Calendar(canvas, {
       initialView: "dayGridMonth", //set initial view (Month view)
       firstDay: 1,
+      dayMaxEvents: 2, 
       timeZone: "local",
       headerToolbar: {
         //set buttons for navigations/change views

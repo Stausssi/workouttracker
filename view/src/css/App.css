@@ -51,3 +51,7 @@ body > #root > div {
   min-height: 0;
 }
 
+.fc-popover{
+  background: gray !important;
+}
+
