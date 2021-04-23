@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import NotificationBox from "./notificationBox";
+import NotificationBox from "./NotificationBox";
 
 export default class Login extends Component {
     constructor(props) {

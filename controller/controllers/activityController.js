@@ -1,4 +1,4 @@
-const Activity = require("../../model/activityModel");
+const Activity = require("../../model/models/activityModel");
 
 exports.add = (req, res) => {
     if (!req.body) {

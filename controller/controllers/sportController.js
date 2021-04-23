@@ -1,5 +1,5 @@
 const { request } = require('express');
-const Sport = require("../../model/sportModel");
+const Sport = require("../../model/models/sportModel");
 
 exports.getAll = (req, res) => {
     Sport.getAll(function (error, sports) {

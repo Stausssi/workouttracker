@@ -3,7 +3,7 @@ import { Calendar } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import NotificationBox from "./notificationBox";
+import NotificationBox from "./NotificationBox";
 import { BACKEND_URL } from "../App"; //TODO add Backend URL const to fetch
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
