@@ -1,6 +1,8 @@
 import React from "react";
 import {BACKEND_URL} from "../../App";
 import SessionHandler from "../../utilities/SessionHandler";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faAngleDown} from "@fortawesome/free-solid-svg-icons";
 
 type postData = {
     likes: number
@@ -87,13 +89,14 @@ export class FriendsFeed extends React.Component<{}, {}> {
 class ActivityBox extends React.Component<{ postData: postData }, any> {
     render() {
         const props = this.props.postData;
+        const image_path = props.sport + '.png';
         return (
             <>
                 <div className="card">
                     <div className="card-content">
                         <div className="media">
-                            <figure className="image is-48x48">
-                                <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image"/>
+                            <figure className="image is-32x32">
+                                <img src={image_path} alt="product" />
                             </figure>
                             <div className="media-content has-text-left	pl-2">
                                 <p className="title is-4">{props.sport}</p>
@@ -117,9 +120,9 @@ class ActivityBox extends React.Component<{ postData: postData }, any> {
                             <p className="card-header-title">
                                 Comments
                             </p>
-                            <button className="card-header-icon" aria-label="more options">
+                            <button className="card-header-icon button is-white is-large" aria-label="more options">
                                 <span className="icon">
-                                    <i className="fas fa-angle-down" aria-hidden="true"/>
+                                    <FontAwesomeIcon icon={faAngleDown}/>
                                 </span>
                             </button>
                         </header>
