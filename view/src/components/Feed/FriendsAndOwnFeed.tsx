@@ -98,7 +98,7 @@ class ActivityBox extends React.Component<{ postData: postData }, any> {
                             <div className="media-content has-text-left	pl-2">
                                 <p className="title is-4">{props.sport}</p>
                                 <p className="subtitle is-6">
-                                    <time dateTime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                                    <time dateTime="2016-1-1">{new Date(props.addedAt).toLocaleString().slice(0,16)}</time>
                                     - {props.username}
                                 </p>
                             </div>
