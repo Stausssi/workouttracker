@@ -8,6 +8,7 @@ import { BACKEND_URL } from "../App"; //TODO add Backend URL const to fetch
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import SessionHandler from "../SessionHandler";
+import moment from "moment";
 
 interface Props {}
 
@@ -19,6 +20,7 @@ interface State {
   allDay: boolean;
   date: Date;
   eventsarray: any[];
+  activityEvents: any[];
   informtext: string;
   informtype: string;
 }
@@ -30,6 +32,7 @@ const initialState = {
   endDate: new Date(),
   allDay: false,
   eventsarray: [],
+  activityEvents:[],
   date: new Date(),
   informtext: "",
   informtype: "",
@@ -90,15 +93,30 @@ export default class FullCalendar extends React.Component<Props, State> {
         hour12: false,
       },
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin], //add plugins to fullcalendar
-      events: this.state.eventsarray, //eventsList
+      events: [ // put the array in the `events` property
+      {
+        title  : 'event1',
+        start  : '2010-01-01'
+      },
+      {
+        title  : 'event2',
+        start  : '2010-01-05',
+        end    : '2010-01-07'
+      },
+      {
+        title  : 'event3',
+        start  : '2010-01-09T12:30:00',
+      }
+    ],
+//this.state.eventsarray, //eventsList
       height: "600px", //set height for table --> use auto?
       //selection
       selectable: true, //enable selection of dates
       select: (info) => this.create(info), //function on select --> run create function
       //eventClick: (properties) => this.updateevent(properties),
       eventDidMount: (element) => {
-        console.log(element.event.id);
-        console.log(element.event.title);
+        //console.log(element.event.id);
+        //console.log(element.event.title);
         var deleteButton = document.createElement("button");
         deleteButton.onclick = () => this.removeEvent(element);
         deleteButton.className = "delete";
@@ -125,8 +143,50 @@ export default class FullCalendar extends React.Component<Props, State> {
     this.setEvents(event);
   }
 
+  test() {
+    console.log(this.state.activityEvents)
+    fetch(BACKEND_URL + "/events/getactivity", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        //Authorization: SessionHandler.getAuthToken()
+      },
+    }).then((response) => {
+      if (response.ok) {
+        let activityEvents: any[]=[]
+        return response.json().then((response) => {
+          //this.setState({ eventsarray: JSON.parse(response.body) });
+          console.log(JSON.parse(response.body));
+          let posts=JSON.parse(response.body)
+          posts.map((item:any)=>{
+            var end
+            //console.log(item.duration)
+            end=moment(item.startedAt).add('seconds', item.duration).format('YYYY-MM-DD HH:mm:ss')
+            const event = {
+              id:item.activity_id,
+              title:item.title,
+              start:item.startedAt,
+              end:end,
+              allDay:1
+            } 
+            console.log(event)
+            activityEvents.push(event)
+          })
+          this.setState({activityEvents:activityEvents})
+          this.calendar?.addEventSource(this.state.activityEvents); //add new events
+        });
+      } else {
+        return response.json().then((response) => {
+          console.error("Fetch has failed:", response);
+          this.setState({ activityEvents: [] });
+        });
+      }
+    });
+  }
+
+
   getEvents() {
-    fetch(BACKEND_URL + "/events/get", {
+    fetch(BACKEND_URL + "events/get", {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -148,6 +208,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       }
     });
   }
+  
 
   setEvents(data: any) {
     /*Create call to backend route */
@@ -267,6 +328,7 @@ export default class FullCalendar extends React.Component<Props, State> {
             />
           </div>
         </div>
+        <button className="button" onClick={()=>this.test()}>Add activity</button>
       </div>
     );
   }

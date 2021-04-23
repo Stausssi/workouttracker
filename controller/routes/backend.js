@@ -35,6 +35,8 @@ router.get('/users/getRelationship', authenticateJWT, users.getRelationship);
 
 router.get('/events/get', event.findAll); 
 
+router.get('/events/getactivity', event.findActivityEvents); 
+
 router.post('/events/add', event.create); 
 
 router.delete('/events/remove', event.remove);  //delete?

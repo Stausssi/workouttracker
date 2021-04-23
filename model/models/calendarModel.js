@@ -1,11 +1,11 @@
 const sql = require("../createConnection");
 
 const Event = function(event) {
-    this.title = event.title;
+    /*this.title = event.title;
     this.start= event.start;
     this.end = event.end;
     this.allDay = event.allDay;
-    this.user = event.user;
+    this.user = event.user;*/
 }
 
 Event.getAll = (response) => {
@@ -14,7 +14,7 @@ Event.getAll = (response) => {
             if(error) {
                 response(error, null)
             } else {
-                    let events = {};
+                    /*let events = {};
                     Object.values(JSON.parse(JSON.stringify(result))).forEach((item) => {
                         let event = item.id
                         let title = item.title
@@ -23,6 +23,28 @@ Event.getAll = (response) => {
                         let allDay = item.allDay
                         events = Object.assign({}, events, {[event]: [title, start,end,allDay]});
                     })
+  */
+                    console.log("events: ", result);
+                    response(null,result)
+            }
+    });
+}
+
+Event.getActivityEvents = (response) => {
+    sql.query("SELECT activity_id ,sport as title, startedAt,duration  FROM activity;",  //Where user = ?
+        function (error, result) {
+            if(error) {
+                response(error, null)
+            } else {
+                   /* let events = {};
+                    Object.values(JSON.parse(JSON.stringify(result))).forEach((item) => {
+                        let event = item.activity_id
+                        let title = item.sport
+                        let start = item.startedAt
+                        let end = item.duration
+                        let allDay = 1
+                        events = Object.assign({}, events, {[event]: [title, start,end,allDay]});
+                    })*/
   
                     console.log("events: ", result);
                     response(null,result)
@@ -54,20 +76,6 @@ Event.create = (newEvent, result) => {
              result(null, true);
                }
            }); 
-};
-
-Event.remove = function(id, result){
-     sql.query("DELETE FROM Events WHERE id = ?", [id], function (err, res) {
-
-                if(err) {
-                    console.log("error: ", err);
-                    result(null, err);
-                }
-                else{
-               
-                 result(null, res);
-                }
-            }); 
 };
 
 module.exports = Event;

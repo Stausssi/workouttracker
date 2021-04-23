@@ -15,6 +15,18 @@ exports.findAll = (request, response) => {
   });
 };
 
+exports.findActivityEvents = (request, response) => {
+  let username = request.username;
+  Event.getActivityEvents((error, data) => {
+    if (error) {
+      console.log(error);
+      response.sendStatus(500)
+    } else {
+      response.status(200).send({ body: JSON.stringify(data) });
+    }
+  });
+};
+
 //Create new event and add it to DB
 exports.create = (request, response) => {
   if (!request.body) {
