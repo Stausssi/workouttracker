@@ -145,6 +145,36 @@ interface props {
     activityData: activityData
 }
 
+const activityInfo = {
+    distance: {
+        title: 'Distance',
+        format: (DistanceInMeters: number) => {
+            if(DistanceInMeters < 1000){
+                return(DistanceInMeters + " m");
+            } else {
+                return((DistanceInMeters/1000).toFixed(1) + " km");
+            }
+        }
+    },
+    duration: {
+        title: 'Duration',
+        format: (DurationInSeconds: number) => {
+            let date = new Date(DurationInSeconds * 1000);
+
+            if(DurationInSeconds > 3600){
+                return(date.toISOString().substr(11, 5) + ' h');
+            }else{
+                return(date.toISOString().substr(14, 5) + ' m');
+            }
+        }
+    },
+    pace: {
+        title: 'Pace',
+        format: 0
+    }
+
+}
+
 //displays an activity table
 class ActivityTable extends React.Component<props, {}> {
     constructor(props: props) {
