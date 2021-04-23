@@ -327,7 +327,6 @@ export default class AddActivity extends Component<Props, State> {
     }
 
     render() {
-        this.validateInput();
         return (
             <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
                 <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
@@ -465,33 +464,24 @@ export default class AddActivity extends Component<Props, State> {
             mandatory = mandatory.reverse();
             optional = optional.reverse();
 
-            let fieldsHTML: JSX.Element[] = [];
-            if (mandatory.includes(true)) {
-                fieldsHTML = [<div className="divider" key={"input_divider_man"}>Mandatory</div>];
-                for (let index in mandatory) {
-                    if (mandatory[index]) {
-                        fieldsHTML.push(createInputField(inputFields[index]));
+            let fieldsHTML = [<div className="divider" key={"input_divider_man"}>Mandatory</div>];
+            for (let index in mandatory) {
+                if (mandatory[index]) {
+                    fieldsHTML.push(createInputField(inputFields[index]));
 
-                        // Remove param from optional to prevent double input
-                        if (optional[index]) {
-                            optional[index] = false;
-                        }
+                    // Remove param from optional to prevent double input
+                    if (optional[index]) {
+                        optional[index] = false;
                     }
                 }
             }
 
-            // Update global params
-            this.mandatoryParams = mandatory;
-            this.optParams = optional;
-
             // Only display optional params if there are any
-            if (optional.includes(true)) {
-                fieldsHTML.push(<div className="divider" key={"input_divider_opt"}>Optional</div>);
+            fieldsHTML.push(<div className="divider" key={"input_divider_opt"}>Optional</div>);
 
-                for (let index in optional) {
-                    if (optional[index]) {
-                        fieldsHTML.push(createInputField(inputFields[index]));
-                    }
+            for (let index in optional) {
+                if (optional[index]) {
+                    fieldsHTML.push(createInputField(inputFields[index]));
                 }
             }
 
@@ -519,21 +509,25 @@ export default class AddActivity extends Component<Props, State> {
                 />
             </div>);
 
+            // Update global params
+            this.mandatoryParams = mandatory;
+            this.optParams = optional;
+
+            // Validate Fields
+            this.validateInput();
+
             return fieldsHTML;
         }
         return <p className="tag is-info is-light" key={"inputField_sportInfo"}>Please select a sport</p>;
     }
 
     validateInput(returnValue?: boolean) {
-        let valid = false;
-        if (this.mandatoryParams.length === NUM_FIELDS) {
-            valid = this.isValid(this.state.sport, inputFields[NUM_FIELDS].validValues);
+        let valid = this.isValid(this.state.sport, inputFields[NUM_FIELDS].validValues);
 
-            for (let index in this.mandatoryParams) {
-                if (this.mandatoryParams[index]) {
-                    let inputParams = inputFields[index];
-                    valid = valid && this.isValid(this.state[inputParams.identifier], inputParams.validValues);
-                }
+        for (let index in this.mandatoryParams) {
+            if (this.mandatoryParams[index]) {
+                let inputParams = inputFields[index];
+                valid = valid && this.isValid(this.state[inputParams.identifier], inputParams.validValues);
             }
         }
 
