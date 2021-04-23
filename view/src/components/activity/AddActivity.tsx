@@ -275,10 +275,12 @@ export default class AddActivity extends Component<Props, State> {
                 bodyContent["pace"] = bodyContent["distance"] / bodyContent["duration"] * 3.6;
             }
 
-            // Check if date is valid
-            if (this.state.date < this.getMaxValidDate()) {
-                bodyContent.startedAt = this.state.date.toISOString().slice(0, 19).replace("T", " ");
-            }
+            // Check if date is valid, else use max valid date
+            bodyContent.startedAt =
+                (this.state.date < this.getMaxValidDate() ?
+                        this.state.date :
+                        this.getMaxValidDate()
+                ).toISOString().slice(0, 19).replace("T", " ");
 
             // Send post request
             fetch(BACKEND_URL + "activity/add", {
@@ -360,7 +362,6 @@ export default class AddActivity extends Component<Props, State> {
     createFormFields() {
         // Create HTML Fields template
         // Executed on the client -> no performance problem for now
-        // TODO: Fix 'Each child in a list should have a unique "key" prop.' warning
         let createInputField = (params: inputConfig) => {
             function createSelectOptions(dict: selectOptions) {
                 let options = [];
@@ -379,7 +380,7 @@ export default class AddActivity extends Component<Props, State> {
             if (identifier !== "pace") {
                 return (
                     params.multiplier ?
-                        <>
+                        <div key={"inputField_" + identifier}>
                             <label className="label">{params.inputLabel}</label>
                             <div className="field has-addons">
                                 <div className="control has-icons-right is-expanded">
@@ -408,9 +409,9 @@ export default class AddActivity extends Component<Props, State> {
                                     </div>
                                 </div>
                             </div>
-                        </>
+                        </div>
                         :
-                        <>
+                        <div key={"inputField_" + identifier}>
                             <label className="label">{params.inputLabel}</label>
                             <div className="field">
                                 <div className="control has-icons-right">
@@ -427,11 +428,11 @@ export default class AddActivity extends Component<Props, State> {
                                 </span>
                                 </div>
                             </div>
-                        </>
+                        </div>
                 );
             } else {
                 return (
-                    <></>
+                    <div key={"input_empty_div"}/>
                 );
             }
         };
@@ -457,7 +458,7 @@ export default class AddActivity extends Component<Props, State> {
             mandatory = mandatory.reverse();
             optional = optional.reverse();
 
-            let fieldsHTML = [<div className="divider">Mandatory</div>];
+            let fieldsHTML = [<div className="divider" key={"input_divider_man"}>Mandatory</div>];
             for (let index in mandatory) {
                 mandatory[index] = Boolean(Number(mandatory[index]));
                 optional[index] = Boolean(Number(optional[index]));
@@ -479,7 +480,7 @@ export default class AddActivity extends Component<Props, State> {
 
             // Only display optional params if there are any
             if (optional.includes(true)) {
-                fieldsHTML.push(<div className="divider">Optional</div>);
+                fieldsHTML.push(<div className="divider" key={"input_divider_opt"}>Optional</div>);
 
                 for (let index in optional) {
                     if (optional[index]) {
@@ -489,7 +490,7 @@ export default class AddActivity extends Component<Props, State> {
             }
 
             // Create date picker
-            fieldsHTML.push(<>
+            fieldsHTML.push(<div key={"inputField_date"}>
                 <label className="label">Date and Time</label>
                 <DatePicker
                     dateFormat="dd.MM.yyyy HH:mm"
@@ -510,11 +511,11 @@ export default class AddActivity extends Component<Props, State> {
                     }}
                     inline
                 />
-            </>);
+            </div>);
 
             return fieldsHTML;
         }
-        return <p className="tag is-info is-light">Please select a sport</p>;
+        return <p className="tag is-info is-light" key={"inputField_sportInfo"}>Please select a sport</p>;
     }
 
     validateInput(returnValue?: boolean) {

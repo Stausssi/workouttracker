@@ -3,6 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import AddActivity from "./AddActivity";
 import {BACKEND_URL} from "../../App";
+import SessionHandler from "../../utilities/SessionHandler";
 
 interface Props {}
 
@@ -35,7 +36,13 @@ export default class Modal extends React.Component<Props, State> {
 
         if (active) {
             // Fetch sports from database
-            fetch(BACKEND_URL + "sports/fetch").then((response) => {
+            fetch(BACKEND_URL + "sports/fetch", {
+                method: "GET",
+                headers: {
+                    Accepts: "application/json",
+                    Authorization: SessionHandler.getAuthToken()
+                }
+            }).then((response) => {
                 if (response.ok) {
                     return response.json().then((response) => {
                         this.setState({sports: JSON.parse(response.body)});
