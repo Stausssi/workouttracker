@@ -1,23 +1,34 @@
 import React, {Component} from "react";
 import {BACKEND_URL, FRONTEND_URL} from "../App";
 import SessionHandler from "../utilities/SessionHandler";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import NotificationBox from "./NotificationBox";
+
+function validateEmail(email: string)
+{
+    return /^[^@]+@\w+(\.\w+)+\w$/.test(email);
+}
 
 interface State {
     username: string,
     firstname: string,
     lastname: string,
     email: string,
-    age: number | string,
+    date: Date,
+    dateChange: Boolean,
     weight: number | string,
 
     firstnamePlaceholder: string;
     lastnamePlaceholder: string;
-    agePlaceholder: string;
     weightPlaceholder: string;
     emailPlaceholder: string;
+
+    errorMessage: string,
+
 }
 
-export default class ProfileSiteProfileSite  extends Component<{}, State> {
+export default class ProfileSite  extends Component<{}, State> {
     constructor(props: any) {
         super(props);
         var username = "undefined Username";
@@ -30,19 +41,22 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
               username: username,
               firstname: '',
               lastname: '',
-              age: '',      //it is now date
+              date: new Date(),      //it is now date
+              dateChange:false,
               weight: '',
               email: '',
 
               firstnamePlaceholder: 'Add your firstname',
               lastnamePlaceholder: 'Add your lastname',
-              agePlaceholder: 'Add your age',
               weightPlaceholder: 'Add your weight',
               emailPlaceholder: 'Add your email',
+
+              errorMessage: '',
         };
 
         this.getDefaultValues();
 
+        this.handleDateChange = this.handleDateChange.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -64,7 +78,7 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
         response.json().then((data) => {
             if(data[0].firstname) this.setState({firstnamePlaceholder: data[0].firstname});
             if(data[0].lastname) this.setState({lastnamePlaceholder: data[0].lastname});
-            if(data[0].age) this.setState({agePlaceholder: data[0].age});
+            if(data[0].date) this.setState({date: new Date(data[0].date)});
             if(data[0].weight) this.setState({weightPlaceholder: data[0].weight});
             if(data[0].email) this.setState({emailPlaceholder: data[0].email});
         });
@@ -84,7 +98,21 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
     
     handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
-        //coolen PUT REQUEST machen der die Daten auf das Backend schiebt und sie dort dann überprüfen
+        this.setState({errorMessage: ''});
+        var date = "";
+        if(this.state.dateChange){
+            this.setState({dateChange: false});
+            date = this.state.date.toISOString().slice(0, 10);
+        }
+        var email = "";
+        if(this.state.email) {
+            if (validateEmail(this.state.email)) {
+                email = this.state.email;
+                this.setState({emailPlaceholder: this.state.email});
+                this.setState({email: ''});
+            } else this.setState({errorMessage: 'Pleace fill out a valid email'});
+        }
+            //nice put req to parse the data in the DB
         fetch(BACKEND_URL + 'profilesiteupdate', {
             method: 'PUT',
             headers:{
@@ -95,9 +123,9 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
             body: JSON.stringify({
                 firstname: this.state.firstname,
                 lastname: this.state.lastname,
-                age: this.state.age,
+                date: date,
                 weight: this.state.weight,
-                email: this.state.email,
+                email: email,
             }),
         });
         if(this.state.firstname){
@@ -109,22 +137,16 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
             this.setState({lastnamePlaceholder: this.state.lastname});
             this.setState({lastname: ''});
 
-        } 
-        if(this.state.age){
-            this.setState({agePlaceholder: this.state.age.toString()});
-            this.setState({age: 1});
-        } 
+        }
         if(this.state.weight){
             this.setState({weightPlaceholder: this.state.weight.toString()});
-            this.setState({weight: 1});
-        } 
-        if(this.state.email){
-            this.setState({emailPlaceholder: this.state.email});
-            this.setState({email: ''});
-
-        } 
+            this.setState({weight: ''});
+        }
     }
 
+    handleDateChange(date: Date) {
+        this.setState({date:date, dateChange:true});
+    }
    
     render(){
         return (
@@ -141,8 +163,8 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
                             <input className="input" name='lastname' type='text' maxLength={30} placeholder={this.state.lastnamePlaceholder} value={this.state.lastname} onChange={this.handleChange} />
                         </div>
                         <div className='field'>
-                            <label className="label">age</label>
-                            <input className="input" name='age' type='number' min="0" max="140" placeholder={this.state.agePlaceholder} value={this.state.age} onChange={this.handleChange} />
+                            <label className="label">Date of Birth</label>
+                            <DatePicker  selected={this.state.date} onChange={this.handleDateChange} dateFormat="dd.MM.yyyy"/>
                         </div>
                         <div className='field'>
                             <label className="label">Weight</label>
@@ -152,6 +174,10 @@ export default class ProfileSiteProfileSite  extends Component<{}, State> {
                             <label className="label">e-mail</label>
                             <input className="input" name='email' type='email' maxLength={50} placeholder={this.state.emailPlaceholder} value={this.state.email} onChange={this.handleChange} />
                         </div>
+                        <br/>
+
+                        <NotificationBox message={this.state.errorMessage} type={"is-danger"} hasDelete={false}/>
+
                         <button type='submit' className='input is-black is-outlined' onClick={this.handleSubmit}>Change Data</button>
                     </form>
                 </div>

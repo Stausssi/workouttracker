@@ -20,8 +20,6 @@ GoogleFit.insertGoogleFItActivityInDB = (data, profileData) => {
                     data.avarageSpeed,
                     data.distance
                 ], function(error, rows, fields){
-                    console.log("BLLLLLLLLLLLLLLAAAAAAAAAAAAAAAAAAAAAAAAAA")
-                    console.log(error)
                     if(error) profileData(error);
                 });
             }

@@ -15,7 +15,7 @@ Comment.addCommentToDB = (req, isAdded) => {
 }
 
 Comment.selectCommentsFromDB = (req, commends) => {        // keine join benötigt
-    connection.query("SELECT comments.PrimaryKey AS id, comments.text, comments.timestamp, user.firstname AS name FROM `comments` INNER JOIN user ON comments.username=user.username WHERE `PKactivity`=?;" , [
+    connection.query("SELECT comments.PrimaryKey AS id, comments.text, comments.timestamp, comments.username AS name FROM `comments` WHERE `PKactivity`=?;" , [
         req.params.activity
     ], function(error, rows, fields){
         console.log(error);

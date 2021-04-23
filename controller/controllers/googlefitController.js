@@ -94,18 +94,18 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                     axios.post('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', body, authstuff)//get distance of a timespan
                     .then(res => {
                         try {
-                            const duration = session.endTimeMillis - session.startTimeMillis;
+                            const duration = (session.endTimeMillis - session.startTimeMillis) / 1000;
                             console.log("activityType:" + session.activityType + " timestamp:" +  session.startTimeMillis + " duration:" + duration);
                             console.log(res.data.bucket[0].dataset[0].point[0].value[0].fpVal);
-                            var sport = "something else"; //default something else
+                            var sport = "Other"; //default Other
                             //maping from google fit https://developers.google.com/fit/rest/v1/reference/activity-types
                             if(session.activityType == 56 || session.activityType == 8 || session.activityType == 57 || session.activityType == 58 || session.activityType == 7 || session.activityType == 93 || session.activityType == 94 || session.activityType == 95 || session.activityType == 116) sport = "Joggen";//jogging
-                            else if(session.activityType == 1 || session.activityType == 14 || session.activityType == 15 || session.activityType == 16) sport = "Radfahren";//biking
-                            else if(session.activityType == 82 || session.activityType == 84 || session.activityType == 83) sport = "Schwimmen";//swimming
-                            else if(session.activityType == 11 || session.activityType == 12 || session.activityType == 27 || session.activityType == 28 || session.activityType == 29 || session.activityType == 34 || session.activityType == 51 || session.activityType == 120 || session.activityType == 89 || session.activityType == 90 || session.activityType == 91) sport = "Ballsport";//ball
-                            else if(session.activityType == 24) sport = "Tanzen";//dancing
+                            else if(session.activityType == 1 || session.activityType == 14 || session.activityType == 15 || session.activityType == 16) sport = "Cycling";//Cycling
+                            else if(session.activityType == 82 || session.activityType == 84 || session.activityType == 83) sport = "Swimming";//Swimming
+                            else if(session.activityType == 11 || session.activityType == 12 || session.activityType == 27 || session.activityType == 28 || session.activityType == 29 || session.activityType == 34 || session.activityType == 51 || session.activityType == 120 || session.activityType == 89 || session.activityType == 90 || session.activityType == 91) sport = "Ball sports";//Ball sports
+                            else if(session.activityType == 24) sport = "Dancing";//Dancing
 
-                            const avarageSpeed = (res.data.bucket[0].dataset[0].point[0].value[0].fpVal / 1000) / (duration / 3600000);
+                            const avarageSpeed = (res.data.bucket[0].dataset[0].point[0].value[0].fpVal / 1000) / (duration / 3600);
 
                             //darabase insert
                             var insertObj = {

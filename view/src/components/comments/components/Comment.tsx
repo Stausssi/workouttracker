@@ -4,12 +4,17 @@ interface Props {
 //comment component formate timestamp and comment
 const Comment = ({ comment }: Props) => {
     return (
-        <div className='message'>
-            <div className='message-body'>
-                <h3>{comment.text}</h3>
-                <p>{comment.name} | {comment.timestamp.replace("T", " ").replace(".000Z", "")}</p>
+        <article className="media">
+            <div className="media-content">
+                <div className="content has-text-left">
+                        <strong>{comment.name}</strong>
+                        <br></br>
+                        {comment.text}
+                        <br></br>
+                        <p className="is-size-7">{comment.timestamp.replace("T", " ").replace(".000Z", "")}</p>
+                </div>
             </div>
-        </div>
+        </article>
     )
 }
 

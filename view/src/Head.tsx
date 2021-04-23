@@ -27,7 +27,7 @@ export const Head = () =>
                         </span>
                         <div>Home</div>
                     </a>
-                    <a className="navbar-item" href="/Profil">
+                    <a className="navbar-item" href="./components/ProfileSite">
                         <span className="icon">
                               <FontAwesomeIcon icon={faUser}/>
                         </span>

@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import NotificationBox from "../NotificationBox";
 import SessionHandler from "../../utilities/SessionHandler";
+import GoogleFit from "../GoogleFit";
 
 import {BACKEND_URL} from "../../App";
 
@@ -327,6 +328,8 @@ export default class AddActivity extends Component<Props, State> {
     render() {
         this.validateInput();
         return (
+            <>
+            <GoogleFit></GoogleFit>
             <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
                 <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
 
@@ -343,6 +346,7 @@ export default class AddActivity extends Component<Props, State> {
 
                 {this.createFormFields()}
             </form>
+            </>
         );
     }
 

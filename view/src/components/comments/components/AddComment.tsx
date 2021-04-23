@@ -19,16 +19,17 @@ const AddComment = ({ onAdd }: Props) => {
             return
         }
         var Now = new Date();
-        var Tag = Now.getDate();
-        var Monat = Now.getMonth() +1;
-        var Year = Now.getFullYear();
-        var Stunden = Now.getHours();
-        var Minuten = Now.getMinutes();
+        var Day = Now.getUTCDay();
+        var Month = Now.getUTCMonth() +1;
+        var Year = Now.getUTCFullYear();
+        var Hours = Now.getUTCHours();
+        var Munutes = Now.getUTCMinutes();
+        var Seconds = Now.getUTCSeconds();
         if (Year < 1900) {
             Year += 1900;
         }
-    
-        const timestamp = Tag + "." + Monat + "." + Year + " " + Stunden + ":" + Minuten;
+
+        const timestamp = Year + "-" + Month + "-" + Day + " " + Hours + ":" + Munutes + ":" + Seconds;
         //const timestamp = new Date().getTime();
         if(SessionHandler.getUser()){
             // @ts-ignore
