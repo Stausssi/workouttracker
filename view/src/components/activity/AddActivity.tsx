@@ -333,7 +333,7 @@ export default class AddActivity extends Component<Props, State> {
                 <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
 
                 <label className="label">Sport</label>
-                <div className={`select is-fullwidth mb-5 ${this.state.sportClass}`}>
+                <div className={`select is-fullwidth ${this.state.sportClass}`}>
                     <select name="sport" onChange={this.handleChange} value={this.state.sport}>
                         {
                             this.state.notifyMessage !== notifyMessages["fetchFailed"][0] ?
@@ -380,7 +380,7 @@ export default class AddActivity extends Component<Props, State> {
             if (identifier !== "pace") {
                 return (
                     params.multiplier ?
-                        <div key={"inputField_" + identifier}>
+                        <div key={"inputField_" + identifier} className="field">
                             <label className="label">{params.inputLabel}</label>
                             <div className="field has-addons">
                                 <div className="control has-icons-right is-expanded">
@@ -411,7 +411,7 @@ export default class AddActivity extends Component<Props, State> {
                             </div>
                         </div>
                         :
-                        <div key={"inputField_" + identifier}>
+                        <div key={"inputField_" + identifier} className="field">
                             <label className="label">{params.inputLabel}</label>
                             <div className="field">
                                 <div className="control has-icons-right">
@@ -439,11 +439,18 @@ export default class AddActivity extends Component<Props, State> {
 
         // Only create elements if a valid sport is selected
         if (this.state.sportClass === "is-success") {
-            // Get bitfields and split them into their bitwise representation
-            // reverse to fill zeros in the beginning
+            // Get bitfields
             let bitfieldArray: any = this.props.sports[this.state.sport];
-            let mandatory: boolean[] = bitfieldArray[1].toString(2).split("").reverse();
-            let optional: boolean[] = bitfieldArray[0].toString(2).split("").reverse();
+
+            // split them into their bitwise representation
+            // map the strings representing numbers to booleans
+            // reverse to fill zeros in the beginning
+            let mandatory: boolean[] = bitfieldArray[1].toString(2)
+                .split("").map((value: string) => Boolean(Number(value)))
+                .reverse();
+            let optional: boolean[] = bitfieldArray[0].toString(2)
+                .split("").map((value: string) => Boolean(Number(value)))
+                .reverse();
 
             // Fill missing zeros
             for (let i = 0; i < NUM_FIELDS - mandatory.length; i++) {
@@ -458,18 +465,17 @@ export default class AddActivity extends Component<Props, State> {
             mandatory = mandatory.reverse();
             optional = optional.reverse();
 
-            let fieldsHTML = [<div className="divider" key={"input_divider_man"}>Mandatory</div>];
-            for (let index in mandatory) {
-                mandatory[index] = Boolean(Number(mandatory[index]));
-                optional[index] = Boolean(Number(optional[index]));
+            let fieldsHTML: JSX.Element[] = [];
+            if (mandatory.includes(true)) {
+                fieldsHTML = [<div className="divider" key={"input_divider_man"}>Mandatory</div>];
+                for (let index in mandatory) {
+                    if (mandatory[index]) {
+                        fieldsHTML.push(createInputField(inputFields[index]));
 
-                let inputParams = inputFields[index];
-                if (mandatory[index]) {
-                    fieldsHTML.push(createInputField(inputParams));
-
-                    // Remove param from optional to prevent double input
-                    if (optional[index]) {
-                        optional[index] = false;
+                        // Remove param from optional to prevent double input
+                        if (optional[index]) {
+                            optional[index] = false;
+                        }
                     }
                 }
             }
