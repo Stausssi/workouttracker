@@ -19,6 +19,10 @@ export default class SessionHandler {
         });
     }
 
+    static getUsername() {
+        return sessionStorage.getItem("username");
+    }
+
     static logOut() {
         sessionStorage.clear();
         // Redirect
