@@ -114,7 +114,7 @@ exports.verifyEmail = (req, res) => {
     const token = req.params.hash;
 
     if (!token) {
-        res.status(400).send({message: "bad request"});
+        res.sendStatus(400);
     } else {
         User.verifyToken(token);
     }
@@ -130,7 +130,7 @@ exports.search = (req, res) => {
         User.find(query, (error, foundUsers) => {
             if (error) {
                 console.log(error);
-                res.status(500).send({message: "internal server error"});
+                res.sendStatus(500);
             } else {
                 let successful = foundUsers.length > 0;
                 let users = [];
@@ -182,13 +182,13 @@ exports.block = (req, res) => {
         User.unfollow(user, toBeBlocked, (error) => {
             if (error) {
                 console.log(error);
-                res.status(500).send({message: "internal server error"});
+                res.sendStatus(500);
             } else {
                 // Check whether the toBeBlocked user is already following the other user
                 User.getRelationship(toBeBlocked, user, (error, isFollowing, isBlocked) => {
                     if (error) {
                         console.log(error);
-                        res.status(500).send({message: "internal server error"});
+                        res.sendStatus(500);
                     } else {
                         User.block(user, toBeBlocked, isFollowing, (error) => basicSuccessErrorHandling(error, res, 204));
                     }
@@ -219,7 +219,7 @@ exports.getRelationship = (req, res) => {
         User.getRelationship(follower, followed, (error, isFollowing, isBlocked) => {
             if (error) {
                 console.log(error);
-                res.status(500).send({message: "internal server error"});
+                res.sendStatus(500);
             } else {
                 res.status(200).send({
                     following: isFollowing,
