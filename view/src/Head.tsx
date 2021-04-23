@@ -1,12 +1,12 @@
 import SearchBar from "./components/search/SearchBar";
-import Logo from "./img/WorkoutLogo.png";
-import NewLogo from "./img/TransarentLogo.png";
-import Icon from "./img/LogoIcon.png"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faSignInAlt, faUser } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./components/activity/Modal";
 import { Link } from "react-router-dom";
 import SessionHandler from "./utilities/SessionHandler";
+const Logo = require ("./img/WorkoutLogo.png")
+const NewLogo = require ("./img/TransarentLogo.png");
+const Icon = require("./img/LogoIcon.png")
 
 //Head of React app. Used on every page. Integration of Modal to create Activity and Search
 

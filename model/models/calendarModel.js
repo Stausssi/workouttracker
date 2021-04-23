@@ -56,18 +56,6 @@ Event.create = (newEvent, result) => {
            }); 
 };
 
-
-/*Event.updateById = function(id, Event, result){
-  sql.query("UPDATE Events SET Event = ? WHERE id = ?", [Event.Event, id], function (err, res) {
-          if(err) {
-              console.log("error: ", err);
-                result(null, err);
-             }
-           else{   
-             result(null, res);
-                }
-            }); 
-};
 Event.remove = function(id, result){
      sql.query("DELETE FROM Events WHERE id = ?", [id], function (err, res) {
 

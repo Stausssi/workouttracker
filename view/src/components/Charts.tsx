@@ -115,7 +115,7 @@ export default class Graphs extends React.Component<Props, State> {
   action = () => {
     //open and close modal
     let active = !this.state.active;
-    if (active == true) {
+    if (active === true) {
       this.fetchsports();
       this.setState(() => ({ active: active }));
     } else {
@@ -222,7 +222,7 @@ export default class Graphs extends React.Component<Props, State> {
 
   test() {
     fetch(
-      BACKEND_URL + "charts/dataset?category=effort&sport=Ballsport&year=2021"
+      BACKEND_URL + "charts/dataset?category=distance&sport=Ball sports&year=2021"
     )
       .then((response) => {
         if (response.ok) {
@@ -343,6 +343,7 @@ export default class Graphs extends React.Component<Props, State> {
 
   //Get inputs values then create charts
   configureChart() {
+    console.log(this.state.array)
     if (
       this.state.title &&
       this.state.type &&
@@ -351,7 +352,7 @@ export default class Graphs extends React.Component<Props, State> {
     ) {
       if (
         !this.state.array.find(
-          (title: { name: string }) => title.name == this.state.title //check if title already exists
+          (title: { name: string }) => title.name === this.state.title //check if title already exists
         )
       ) {
         var year = this.state.year.getFullYear();
@@ -366,13 +367,13 @@ export default class Graphs extends React.Component<Props, State> {
         console.log(chart);
         const params = new URLSearchParams();
         params.append("category", chart.category);
-        //params.append("sport", chart.param_sport);
+        params.append("sport", chart.param_sport);
         params.append("year", chart.year.toString());
         const url = BACKEND_URL + "charts/dataset?";
         console.log(url + params);
         this.getdatasets(url, params, chart);
         this.action();
-        //this.setcharts(chart);
+        this.setcharts(chart);
       } else {
         console.error(
           "Title was already given. Please choose an other title for your chart"

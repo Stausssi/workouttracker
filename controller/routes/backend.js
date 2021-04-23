@@ -7,8 +7,8 @@ const activity = require("../controllers/activityController");
 const sport = require("../controllers/sportController");
 
 const {authenticateJWT} = require("../utilities/authentication/MiddlewareAuthentication");
-const event = require("../calendarController");
-const chart = require("../chartController");
+const event = require("../controllers/calendarController");
+const chart = require("../controllers/chartController");
 
 router.get('/', function (req, res, next) {
     res.render('index')

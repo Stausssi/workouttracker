@@ -45,7 +45,7 @@ export default class FullCalendar extends React.Component<Props, State> {
   action = () => {
     //open and close modal
     let active = !this.state.active;
-    if (active == true) {
+    if (active === true) {
       this.setState(() => ({ active: active }));
     } else {
       this.setState(initialState);

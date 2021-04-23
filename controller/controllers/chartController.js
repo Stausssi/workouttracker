@@ -1,6 +1,6 @@
 const { request } = require('express');
-const Chart = require("../model/models/chartModel");
-const Data = require("../model/models/dataModel");
+const Chart = require("../../model/models/chartModel");
+const Data = require("../../model/models/dataModel");
 
 exports.findAll = (request, response) => {
   let username = request.username;
@@ -41,13 +41,18 @@ exports.create = (request, response) => {
         response.sendStatus(400)
       }
     else {
+      let sport = null
+      if(request.body.param_sport && !request.body.param_sport==="")
+      {
+        sport=request.body.param_sport
+      }
       let username = request.username;
         const chart = new Chart({
             name: request.body.name,
             type: request.body.type,
             category: request.body.category,
             fill: request.body.fill,
-            param_sport: request.body.param_sport,
+            param_sport: sport,
             year:request.body.year
             //user:request.username
           });
