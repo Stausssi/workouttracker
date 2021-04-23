@@ -5,6 +5,9 @@ const queryParser = require('query-string');
 const axios = require('axios');
 const GoogleFit = require("../../model/models/GoogleFitModel");
 
+/*Here is the hole logic of the google Fit import data stuff
+* First it generate the url to sing up with google to become the Permission to access there Data.
+* Then the Session and some data to the sessions were get by google over there REST api.*/
 
 exports.getFitURL = (req,res) => {
     const oauth2Client = new google.auth.OAuth2(
@@ -87,14 +90,14 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                         "dataTypeName": "com.google.distance.delta",
                         "dataSourceId": "derived:com.google.distance.delta:com.google.android.gms:merge_distance_delta"
                     }],
-                    "bucketByTime": { "durationMillis": 604800000 },//7Days as default max activitys to filter strange activitys
+                    "bucketByTime": { "durationMillis": 604800000 },//29030400000 7Days as default max activitys to filter strange activitys
                         "startTimeMillis": session.startTimeMillis,
                         "endTimeMillis": session.endTimeMillis
                     }
                     axios.post('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', body, authstuff)//get distance of a timespan
                     .then(res => {
                         try {
-                            const duration = (session.endTimeMillis - session.startTimeMillis) / 1000;
+                            const duration = parseInt((session.endTimeMillis - session.startTimeMillis) / 1000);
                             console.log("activityType:" + session.activityType + " timestamp:" +  session.startTimeMillis + " duration:" + duration);
                             console.log(res.data.bucket[0].dataset[0].point[0].value[0].fpVal);
                             var sport = "Other"; //default Other
@@ -113,10 +116,12 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                                 duration: duration,
                                 sport: sport,
                                 avarageSpeed: avarageSpeed,
-                                distance: res.data.bucket[0].dataset[0].point[0].value[0].fpVal
+                                distance: parseInt(res.data.bucket[0].dataset[0].point[0].value[0].fpVal),
+                                starttime: (new Date(parseInt(session.startTimeMillis))).toISOString().slice(0, 19).replace("T", " ")
                             };
 
                             console.log(insertObj);
+                            console.log(typeof(parseInt(session.startTimeMillis)));
 
                             GoogleFit.insertGoogleFItActivityInDB(insertObj, function (error) {
                                 if (error) dberror = true;

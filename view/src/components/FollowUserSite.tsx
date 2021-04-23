@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import {BACKEND_URL, FRONTEND_URL} from "../App";
 import SessionHandler from "../utilities/SessionHandler";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import NotificationBox from "./NotificationBox";
+
+/*Here is the component of the Follow UserProfile Site.
+* Here the user see the account values of any user you want*/
 
 function validateEmail(email: string)
 {
@@ -20,7 +20,7 @@ interface State {
     weight: number | string,
 }
 
-export default class FolowUserSite  extends Component<{}, State> {
+export default class FollowUserSite extends Component<{}, State> {
     constructor(props: any) {
         super(props);
         var username = "undefined Username";

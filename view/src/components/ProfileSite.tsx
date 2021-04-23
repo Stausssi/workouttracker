@@ -5,6 +5,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import NotificationBox from "./NotificationBox";
 
+/*Here is the component of the Profile Site.
+* Here the user can change his account Values*/
+
 function validateEmail(email: string)
 {
     return /^[^@]+@\w+(\.\w+)+\w$/.test(email);

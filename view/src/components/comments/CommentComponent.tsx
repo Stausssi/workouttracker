@@ -5,6 +5,10 @@ import Comments from './components/Comments'
 import AddComment from './components/AddComment'
 import SessionHandler from "../../utilities/SessionHandler";
 
+/*The component to add at a activity and has the hole comment stuff.
+* Here you can insert new comments and see all comments to a specified activity.
+* If you looking for a part of the comment component although look in the components folder of the comments*/
+
 interface State {
   showAddComent: boolean;
   showthumpsUp: boolean;
@@ -127,7 +131,7 @@ export default class CommmentComponent extends Component<{}, State> {
   }
 
 
-  //Count Thumps
+  //look at the beginning for the state
   async isThumpUpSet() {      //ggf als get
     fetch(BACKEND_URL + 'isthumpsupset/' + this.state.activity, {
       headers:{
