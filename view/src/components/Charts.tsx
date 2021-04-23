@@ -102,11 +102,11 @@ const initialState = {
 };
 
 export default class Graphs extends React.Component<Props, State> {
-  chart1: Chart | undefined;
+  //chart1: Chart | undefined;
   chart2: Chart | undefined;
-  charts: string[] = [];
-  colors: string[] = [];
-  data: number[] = [];
+  //charts: string[] = [];
+  //colors: string[] = [];
+  //data: number[] = [];
   constructor(props: Props) {
     super(props);
     this.state = initialState;
@@ -175,7 +175,7 @@ export default class Graphs extends React.Component<Props, State> {
       })
       .then((post) => {
         console.log(JSON.parse(post.body));
-        this.setState({ array: JSON.parse(post.body) });
+        this.setState({ array: JSON.parse(post.body) });      
         this.loopOverData();
       })
       .catch((error) => console.warn(error));
@@ -202,13 +202,20 @@ export default class Graphs extends React.Component<Props, State> {
         //console.log(year);
       }
       const url = BACKEND_URL + "charts/dataset?";
+      const chart = {
+        name: this.state.array[i].name,
+        type: this.state.array[i].type,
+        category: this.state.array[i].category,
+        fill: this.state.array[i].fill,
+        param_sport: this.state.array[i].sport, 
+        year: this.state.array[i].year,
+      };
+      console.log(chart)
       //console.log(url + params);
       this.getdatasets(
         url,
         params,
-        this.state.array[i].name,
-        this.state.array[i].type,
-        this.state.array[i].fill
+        chart
       );
     }
   }
@@ -234,9 +241,7 @@ export default class Graphs extends React.Component<Props, State> {
   getdatasets(
     url: string,
     params: any,
-    name: string,
-    type: string,
-    fill: boolean
+    chart:any
   ) {
     fetch(url + params, {
       method: "GET",
@@ -255,51 +260,44 @@ export default class Graphs extends React.Component<Props, State> {
       .then((chartsData) => {
         var data = JSON.parse(chartsData.body);
         console.log(data);
-        this.addElement(name, type, data, fill); //=> add dataset
+        this.addElement(chart, data); //=> add dataset
       })
       .catch((error) => console.warn(error));
   }
 
-  addElement(title: string, type: string, data: any, fill: boolean) {
-    var buttonnode = document.getElementById(title);
-    var chartnode = document.getElementById("chart_ID" + title);
-    if (!this.charts.includes(title) && !chartnode && !buttonnode) {
-      this.charts.push(title);
-      // erstelle ein neues div Element für jedes neues Chart
-      //if(!document.getElementById("canvas"+title) --> check if element exists
+  addElement(chart:any, data: any) {
+    var buttonnode = document.getElementById(chart.name);               //check if ID already exists (should be unique)
+    var chartnode = document.getElementById("chart_ID" + chart.name);
+    if (!chartnode && !buttonnode) {
+      // create new div and new button for each new chart
       var canvas = document.createElement("canvas");
-      canvas.id = "chartID_" + title;
-      canvas.className = title;
+      canvas.id = "chartID_" + chart.name;
+      canvas.className = chart.name;
       var button = document.createElement("button");
-      button.id = title;
+      button.id = chart.name;                         //Set button ID to chart title
       button.className = "button is-danger";
       button.innerHTML = "Delete " + canvas.id;
       button.onclick = (event: any) => this.removeChart(event.target.id);
-      // füge das neu erstellte Element und seinen Inhalt ins DOM ein
+      // add created elements to DOM
       var parent = document.getElementById("charts");
       parent?.appendChild(canvas);
       parent?.appendChild(button);
-      //console.log(document.getElementById(canvas.id));
-      //console.log(document.getElementById(button.id));
-      this.addcharts(canvas, title, type, data, fill);
+      this.addcharts(canvas, chart, data);
     } else {
       this.setState({
         informtext: "Element could not be added",
         informtype: "is-danger",
       });
     }
-    console.log(this.charts);
   }
 
   addcharts(
     canvas: HTMLCanvasElement,
-    title: string,
-    type: string,
-    data: any,
-    fill: boolean
+    chart:any,
+    data: any
   ) {
     let dataarray: any[] = new Array(labels.length);
-    let subtitle = "Hier etwas einfügen!";
+    let subtitle = this.subtitle(chart.category,"",chart.year);
     dataarray.fill(0, 0, labels.length);
     for (let i = 0; i < data.length; i++) {
       labels.forEach((item, index) => {
@@ -315,29 +313,25 @@ export default class Graphs extends React.Component<Props, State> {
             title: {
               display: true,
               color:"#808080",
-              text: [title, "Subtitle"],
+              text: [chart.name, subtitle],
               font: {
                 size: 20,
               }
             },
           },
         },
-      type: type, //Define chart type
+      type: chart.type, //Define chart type
       data: {
         labels: labels,
         datasets: [
           {
-            label: "My First dataset",
-            //new option, type will default to bar as that what is used to create the scale
-            // type: "line",
+            label: chart.name,
             backgroundColor: colors,
             data: dataarray,
-            fill: fill,
+            fill: chart.fill,
           },
           {
             label: "My second dataset",
-            //new option, type will default to bar as that what is used to create the scale
-            //type: "bar",
             backgroundColor: "rgba(220,20,220,0.2)",
             borderColor: "rgba(220,20,220,1)",
             data: [],
@@ -376,7 +370,7 @@ export default class Graphs extends React.Component<Props, State> {
         params.append("year", chart.year.toString());
         const url = BACKEND_URL + "charts/dataset?";
         console.log(url + params);
-        this.getdatasets(url, params, chart.name, chart.type, chart.fill);
+        this.getdatasets(url, params, chart);
         this.action();
         //this.setcharts(chart);
       } else {
@@ -433,95 +427,31 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  removeElement(title: string) {
-    console.log(title);
+  removeElement(name: string) {
+    console.log(name);
     console.log(document.getElementById("chartID_chart"));
     var canvas = document.getElementById(
-      "chartID_" + title
+      "chartID_" + name
     ) as HTMLCanvasElement;
-    var button = document.getElementById(title) as HTMLButtonElement;
+    var button = document.getElementById(name) as HTMLButtonElement;
     if (canvas.parentNode && button.parentNode) {
       // parent ist div id=charts
       canvas.parentNode.removeChild(canvas);
       button.parentNode.removeChild(button);
-      const id = this.charts.indexOf(title);
-      this.charts.splice(id, 1);
-      console.log(this.charts);
+      //const id = this.charts.indexOf(name);
+      //this.charts.splice(id, 1);
+      //console.log(this.charts);
     }
   }
 
-  subtitle(category: string, ylab: string) {
+  subtitle(category: string, ylab: string,year:number) {
     var subtitle = "";
     //bei getdatasets definieren
     if (categories.includes(category)) {
-      subtitle = `${category} in ${ylab} per month`;
+      subtitle = `${category} in ${ylab} per month for ${year}`;
     }
     return subtitle;
   }
-
-  /*##############################################################*/
-  /*OLD, Delete before merge*/
-
-  createchart(/*labels: string[], data: number[] /* color: string[]*/) {
-    if (this.chart2) {
-      console.log("chart already exist");
-      this.chart2.destroy();
-    }
-    const canvas = document.getElementById("myChart2") as HTMLCanvasElement;
-    this.chart2 = new Chart(canvas, {
-      type: this.state.type,
-      data: {
-        labels: labels, //x axis labels
-        datasets: [
-          {
-            label: "Datensatz Nummer1",
-            data: [34, 65],
-            type: "line",
-            backgroundColor: colors,
-            fill: false,
-          },
-        ],
-      },
-      options: {
-        //responsive:true,                    //resize Chart to container size
-        //maintainAspectRatio:false,          //disable width/height ratio when chart is resized
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-                stepSize: 5, //gap between scale ticks
-                maxTicksLimit: 5, //max amount of ticks           maxTick * stepSize = max data value
-                scaleLabel: {
-                  display: true,
-                  labelString: "value",
-                },
-              },
-            },
-          ],
-          xAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-                stepSize: 5,
-                maxTicksLimit: 5,
-                scaleLabel: {
-                  display: true,
-                  labelString: "Month",
-                },
-              },
-            },
-          ],
-        },
-        title: {
-          display: true,
-          text: ["Chart.js", "Line Chart"],
-        },
-      },
-    });
-  }
-  /* END of TODELETE */
-  /*##############################################################*/
 
   renderOptions(items: any[]) {
     return (
