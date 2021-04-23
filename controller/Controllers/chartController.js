@@ -1,6 +1,6 @@
 const { request } = require('express');
-const Chart = require("../model/chartModel");
-const Data = require("../model/dataModel");
+const Chart = require("../../model/chartModel");
+const Data = require("../../model/dataModel");
 
 exports.findAll = (request, response) => {
   let username = request.username;

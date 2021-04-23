@@ -1,5 +1,5 @@
 const { request } = require('express');
-const Event = require("../model/calendarModel");
+const Event = require("../../model/calendarModel");
 
 //TODO: Add user for event
 
