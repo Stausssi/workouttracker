@@ -77,10 +77,10 @@ const types = [
 ];
 
 const categories = [
-  "effort",
   "distance",
   "duration",
   "pace",
+  "effort",
   "averageHeartRate",
   "altitudeDifference",
 ];
@@ -175,7 +175,7 @@ export default class Graphs extends React.Component<Props, State> {
       })
       .then((post) => {
         console.log(JSON.parse(post.body));
-        this.setState({ array: JSON.parse(post.body) });      
+        this.setState({ array: JSON.parse(post.body) });
         this.loopOverData();
       })
       .catch((error) => console.warn(error));
@@ -207,22 +207,19 @@ export default class Graphs extends React.Component<Props, State> {
         type: this.state.array[i].type,
         category: this.state.array[i].category,
         fill: this.state.array[i].fill,
-        param_sport: this.state.array[i].sport, 
+        param_sport: this.state.array[i].sport,
         year: this.state.array[i].year,
       };
-      console.log(chart)
+      console.log(chart);
       //console.log(url + params);
-      this.getdatasets(
-        url,
-        params,
-        chart
-      );
+      this.getdatasets(url, params, chart);
     }
   }
 
   test() {
     fetch(
-      BACKEND_URL + "charts/dataset?category=distance&sport=Ball sports&year=2021"
+      BACKEND_URL +
+        "charts/dataset?category=distance&sport=Ball sports&year=2021"
     )
       .then((response) => {
         if (response.ok) {
@@ -238,11 +235,7 @@ export default class Graphs extends React.Component<Props, State> {
       .catch((error) => console.warn(error));
   }
 
-  getdatasets(
-    url: string,
-    params: any,
-    chart:any
-  ) {
+  getdatasets(url: string, params: any, chart: any) {
     fetch(url + params, {
       method: "GET",
       headers: {
@@ -265,8 +258,8 @@ export default class Graphs extends React.Component<Props, State> {
       .catch((error) => console.warn(error));
   }
 
-  addElement(chart:any, data: any) {
-    var buttonnode = document.getElementById(chart.name);               //check if ID already exists (should be unique)
+  addElement(chart: any, data: any) {
+    var buttonnode = document.getElementById(chart.name); //check if ID already exists (should be unique)
     var chartnode = document.getElementById("chart_ID" + chart.name);
     if (!chartnode && !buttonnode) {
       // create new div and new button for each new chart
@@ -274,7 +267,7 @@ export default class Graphs extends React.Component<Props, State> {
       canvas.id = "chartID_" + chart.name;
       canvas.className = chart.name;
       var button = document.createElement("button");
-      button.id = chart.name;                         //Set button ID to chart title
+      button.id = chart.name; //Set button ID to chart title
       button.className = "button is-danger";
       button.innerHTML = "Delete " + canvas.id;
       button.onclick = (event: any) => this.removeChart(event.target.id);
@@ -291,13 +284,22 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  addcharts(
-    canvas: HTMLCanvasElement,
-    chart:any,
-    data: any
-  ) {
+  addcharts(canvas: HTMLCanvasElement, chart: any, data: any) {
+    //disable yaxis for doughut, polarArea,radar
+    let display = true;
+    if (
+      chart.type === "pie" ||
+      chart.type === "doughut" ||
+      chart.type === "polarArea" ||
+      chart.type === "radar"
+    ) {
+      display = false;
+    }
+
     let dataarray: any[] = new Array(labels.length);
-    let subtitle = this.subtitle(chart.category,"",chart.year);
+    let ylab = this.yLab(chart.category);
+    let ytest = this.yLab("duration");
+    let subtitle = this.subtitle(chart.category, ylab, chart.year);
     dataarray.fill(0, 0, labels.length);
     for (let i = 0; i < data.length; i++) {
       labels.forEach((item, index) => {
@@ -309,17 +311,34 @@ export default class Graphs extends React.Component<Props, State> {
     console.log(dataarray);
     new Chart(canvas, {
       options: {
-          plugins: {
+        scales: {
+          x: {
+            display: display,
             title: {
-              display: true,
-              color:"#808080",
-              text: [chart.name, subtitle],
-              font: {
-                size: 20,
-              }
+              text: "Month",
+              display: display,
+              rotation: 90 
+            },
+          },
+          y: {
+            display: display,
+            title: {
+              display: display,
+              text: [ylab],
             },
           },
         },
+        plugins: {
+          title: {
+            display: true,
+            color: "#808080",
+            text: [chart.name, subtitle],
+            font: {
+              size: 20,
+            },
+          },
+        },
+      },
       type: chart.type, //Define chart type
       data: {
         labels: labels,
@@ -343,7 +362,7 @@ export default class Graphs extends React.Component<Props, State> {
 
   //Get inputs values then create charts
   configureChart() {
-    console.log(this.state.array)
+    console.log(this.state.array);
     if (
       this.state.title &&
       this.state.type &&
@@ -445,12 +464,47 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  subtitle(category: string, ylab: string,year:number) {
-    var subtitle = "";
+  yLab(category: string) {
+    var ylab = "";
     //bei getdatasets definieren
     if (categories.includes(category)) {
-      subtitle = `${category} in ${ylab} per month for ${year}`;
+      switch (category) {
+        case "distance":
+        case "altitudeDifference":
+          ylab = "meter";
+          break;
+        case "duration":
+          ylab = "seconds";
+          break;
+        case "pace":
+          ylab = "km/h";
+          break;
+        case "effort":
+          ylab = "calories";
+          break;
+        case "averageHeartRate":
+          ylab = "BPM";
+          break;
+      }
+      /*if (category === "distance") {
+        return (ylab = "m");
+      } else if (category === "duration") {
+        return (ylab = "s");
+      } else if (category === "pace") {
+        return (ylab = "km/h");
+      } else if (category === "effort") {
+        return (ylab = "cal");
+      } else if (category === "averageHeartRate") {
+        return (ylab = "BPM");
+      } else if (category === "altitudeDifference") {
+        return (ylab = "m");
+      }*/
     }
+    return ylab;
+  }
+
+  subtitle(category: string, ylab: string, year: number) {
+    var subtitle = `${category} in ${ylab} per month for ${year}`;
     return subtitle;
   }
 
@@ -502,7 +556,7 @@ export default class Graphs extends React.Component<Props, State> {
       <div className="container">
         <div className="divider">Chart</div>
         <div className="controls">
-          <button className="button" onClick={() => this.action()}>
+          <button className="button is-success" onClick={() => this.action()}>
             Open Modal
           </button>
           <button className="button" onClick={() => this.getcharts()}>

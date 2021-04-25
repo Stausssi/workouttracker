@@ -1,7 +1,7 @@
 //Foot of React app. Used on every page
 
 export const Footer = () => (
-  <footer className="footer">
+  <footer className="footer p-5">
     <div className="content has-text-centered">
       <p>
         Informationen für <a href="/#">Homepage</a>. The source code is licensed

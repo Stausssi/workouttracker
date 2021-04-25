@@ -93,22 +93,7 @@ export default class FullCalendar extends React.Component<Props, State> {
         hour12: false,
       },
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin], //add plugins to fullcalendar
-      events: [ // put the array in the `events` property
-      {
-        title  : 'event1',
-        start  : '2010-01-01'
-      },
-      {
-        title  : 'event2',
-        start  : '2010-01-05',
-        end    : '2010-01-07'
-      },
-      {
-        title  : 'event3',
-        start  : '2010-01-09T12:30:00',
-      }
-    ],
-//this.state.eventsarray, //eventsList
+      events: this.state.eventsarray, //eventsList
       height: "600px", //set height for table --> use auto?
       //selection
       selectable: true, //enable selection of dates
@@ -171,6 +156,7 @@ export default class FullCalendar extends React.Component<Props, State> {
             } 
             console.log(event)
             activityEvents.push(event)
+            return event
           })
           this.setState({activityEvents:activityEvents})
           this.calendar?.addEventSource(this.state.activityEvents); //add new events
@@ -328,7 +314,7 @@ export default class FullCalendar extends React.Component<Props, State> {
             />
           </div>
         </div>
-        <button className="button" onClick={()=>this.test()}>Add activity</button>
+        <button className="button is-success" onClick={()=>this.test()}>Add activity</button>
       </div>
     );
   }
