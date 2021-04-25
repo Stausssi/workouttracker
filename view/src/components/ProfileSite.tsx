@@ -168,6 +168,7 @@ export default class ProfileSite  extends Component<{}, State> {
                         <div className='field'>
                             <label className="label">Date of Birth</label>
                             <DatePicker  selected={this.state.date} onChange={this.handleDateChange} dateFormat="dd.MM.yyyy"/>
+                            <p className={this.state.dateChange ? 'initial-scale=7' : 'is-hidden'}>changed</p>
                         </div>
                         <div className='field'>
                             <label className="label">Weight</label>

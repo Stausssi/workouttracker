@@ -18,14 +18,16 @@ GoogleFit.insertGoogleFItActivityInDB = (data, profileData) => {
         else {
             //hier ist das ergebnis in rows
             if(rows.length == 0) {
-                connection.query("INSERT INTO `activity` (`activity_id`, `user`, `addedAt`, `startedAt`, `sport`, `duration`, `pace`, `distance`) VALUES (NULL, ?, current_timestamp(), ?, ?, ?, ?, ?)" , [
+                connection.query("INSERT INTO `activity` (`activity_id`, `user`, `addedAt`, `startedAt`, `sport`, `duration`, `pace`, `distance`, `averageHeartRate`) VALUES (NULL, ?, current_timestamp(), ?, ?, ?, ?, ?, ?)" , [
                     data.username,
                     data.starttime,
                     data.sport,
                     data.duration,
                     data.avarageSpeed,
-                    data.distance
+                    data.distance,
+                    data.averageHeartRate
                 ], function(error, rows, fields){
+                    console.log(error);
                     if(error) profileData(error);
                 });
             }

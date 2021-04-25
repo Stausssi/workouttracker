@@ -6,7 +6,7 @@ const Profile = function (profile) {
 
 Profile.selectProfileData = (req, profileData) => {
     connection.query("SELECT firstname, lastname, date, weight, email FROM user WHERE `username`=?;" , [
-        req.username
+        req.params.user
     ], function(error, rows, fields){
         if(error) profileData(error, "{}");
         else profileData(null, JSON.stringify(rows));

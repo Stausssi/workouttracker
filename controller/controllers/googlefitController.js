@@ -19,7 +19,7 @@ exports.getFitURL = (req,res) => {
         "http://localhost:9000/backend/googlefit/activity"
     );
         //generates URL
-        const scopes = [ "https://www.googleapis.com/auth/fitness.location.read https://www.googleapis.com/auth/fitness.activity.read profile email " ];
+        const scopes = [ "https://www.googleapis.com/auth/fitness.location.read https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.heart_rate.read profile email " ];
         const url = oauth2Client.generateAuthUrl({
             access_type: "offline",
             scope: scopes,
@@ -90,7 +90,7 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                         "dataTypeName": "com.google.distance.delta",
                         "dataSourceId": "derived:com.google.distance.delta:com.google.android.gms:merge_distance_delta"
                     }],
-                    "bucketByTime": { "durationMillis": 604800000 },//29030400000 7Days as default max activitys to filter strange activitys
+                    "bucketByTime": { "durationMillis": 604800000 },//7Days as default max activitys to filter strange activitys
                         "startTimeMillis": session.startTimeMillis,
                         "endTimeMillis": session.endTimeMillis
                     }
@@ -98,34 +98,53 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                     .then(res => {
                         try {
                             const duration = parseInt((session.endTimeMillis - session.startTimeMillis) / 1000);
+                            const avarageSpeed = (res.data.bucket[0].dataset[0].point[0].value[0].fpVal / 1000) / (duration / 3600);
+                            const distance = parseInt(res.data.bucket[0].dataset[0].point[0].value[0].fpVal);
+
                             console.log("activityType:" + session.activityType + " timestamp:" +  session.startTimeMillis + " duration:" + duration);
                             console.log(res.data.bucket[0].dataset[0].point[0].value[0].fpVal);
-                            var sport = "Other"; //default Other
-                            //maping from google fit https://developers.google.com/fit/rest/v1/reference/activity-types
-                            if(session.activityType == 56 || session.activityType == 8 || session.activityType == 57 || session.activityType == 58 || session.activityType == 7 || session.activityType == 93 || session.activityType == 94 || session.activityType == 95 || session.activityType == 116) sport = "Joggen";//jogging
-                            else if(session.activityType == 1 || session.activityType == 14 || session.activityType == 15 || session.activityType == 16) sport = "Cycling";//Cycling
-                            else if(session.activityType == 82 || session.activityType == 84 || session.activityType == 83) sport = "Swimming";//Swimming
-                            else if(session.activityType == 11 || session.activityType == 12 || session.activityType == 27 || session.activityType == 28 || session.activityType == 29 || session.activityType == 34 || session.activityType == 51 || session.activityType == 120 || session.activityType == 89 || session.activityType == 90 || session.activityType == 91) sport = "Ball sports";//Ball sports
-                            else if(session.activityType == 24) sport = "Dancing";//Dancing
 
-                            const avarageSpeed = (res.data.bucket[0].dataset[0].point[0].value[0].fpVal / 1000) / (duration / 3600);
+                            const body = {
+                                "aggregateBy": [{
+                                    "dataTypeName": "com.google.heart_rate",
+                                    "dataSourceId": "derived:com.google.heart_rate.bpm:com.google.android.gms:merge_heart_rate_bpm"//resting_heart_rate<-merge_heart_rate_bpm
+                                }],
+                                "bucketByTime": { "durationMillis": 604800000 },
+                                "startTimeMillis": session.startTimeMillis,
+                                "endTimeMillis": session.endTimeMillis
+                            }
+                            axios.post('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', body, authstuff)
+                                .then(res => {
+                                    try {
+                                        var averageHeartRate = null;
+                                        if(res.data.bucket[0].dataset[0].point[0]) averageHeartRate = res.data.bucket[0].dataset[0].point[0].value[0].fpVal;
+                                        else console.log("NÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ")
+                                        var sport = "Other"; //default Other
+                                        //maping from google fit https://developers.google.com/fit/rest/v1/reference/activity-types
+                                        if(session.activityType == 56 || session.activityType == 8 || session.activityType == 57 || session.activityType == 58 || session.activityType == 7 || session.activityType == 93 || session.activityType == 94 || session.activityType == 95 || session.activityType == 116) sport = "Running";//jogging
+                                        else if(session.activityType == 1 || session.activityType == 14 || session.activityType == 15 || session.activityType == 16) sport = "Cycling";//Cycling
+                                        else if(session.activityType == 82 || session.activityType == 84 || session.activityType == 83) sport = "Swimming";//Swimming
+                                        else if(session.activityType == 11 || session.activityType == 12 || session.activityType == 27 || session.activityType == 28 || session.activityType == 29 || session.activityType == 34 || session.activityType == 51 || session.activityType == 120 || session.activityType == 89 || session.activityType == 90 || session.activityType == 91) sport = "Ball sports";//Ball sports
+                                        else if(session.activityType == 24) sport = "Dancing";//Dancing
 
-                            //darabase insert
-                            var insertObj = {
-                                username: username,
-                                duration: duration,
-                                sport: sport,
-                                avarageSpeed: avarageSpeed,
-                                distance: parseInt(res.data.bucket[0].dataset[0].point[0].value[0].fpVal),
-                                starttime: (new Date(parseInt(session.startTimeMillis))).toISOString().slice(0, 19).replace("T", " ")
-                            };
+                                        //darabase insert
+                                        var insertObj = {
+                                            username: username,
+                                            duration: duration,
+                                            sport: sport,
+                                            avarageSpeed: avarageSpeed,
+                                            distance: distance,
+                                            starttime: (new Date(parseInt(session.startTimeMillis))).toISOString().slice(0, 19).replace("T", " "),
+                                            averageHeartRate: averageHeartRate,
+                                        };
 
-                            console.log(insertObj);
-                            console.log(typeof(parseInt(session.startTimeMillis)));
-
-                            GoogleFit.insertGoogleFItActivityInDB(insertObj, function (error) {
-                                if (error) dberror = true;
-                            });
+                                        GoogleFit.insertGoogleFItActivityInDB(insertObj, function (error) {
+                                            if (error) dberror = true;
+                                        });
+                                    } catch (e) {
+                                        console.log(e);
+                                    }
+                                })
                         } catch (e) {
                             console.log(e);
                         }
