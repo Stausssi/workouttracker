@@ -112,8 +112,7 @@ class ActivityBox extends React.Component<{ postData: postData }, any> {
                         </div>
 
                         <div className="content ">
-                            <ActivityTable
-                                activityData={props.activityData}/>
+                            <ActivityTable activityData={props.activityData}/>
                         </div>
                     </div>
                     <div className="card">
@@ -176,20 +175,20 @@ const activityInfo = {
         }
     },
     averageHeartRate: {
-        title: 'Average heart rate',
+        title: 'Average heartrate',
         format: (heartrate: number) => {
             return (heartrate + " bpm");
         }
     },
     altitudeDifference: {
-        title: 'altitude',
+        title: 'Altitude',
         format: (meters:number) => {
             return(meters + " m");
         }
     }
 }
 
-//displays an activity table
+//displays an activity table inside an activity feed box
 class ActivityTable extends React.Component<props, {}> {
     constructor(props: props) {
         super(props);
@@ -204,12 +203,15 @@ class ActivityTable extends React.Component<props, {}> {
 
     renderTableHeaders(activityData: activityData) {
         let keys = Object.keys(activityData) //get property keys
-        return keys.map((key) => <th>{key}</th>)
+        // @ts-ignore
+        return keys.map((key) => <th>{activityInfo[key].title}</th>)
     }
 
     renderTableContents(activityData: activityData) {
-        let values = Object.values(activityData) //get property values
-        return values.map((value) => <th>{value}</th>)
+        let keys = Object.keys(activityData) //get property keys
+        let values = Object.values(activityData) // get values
+        // @ts-ignore
+        return keys.map((key, index) => <th>{activityInfo[key].format(values[index])}</th>)
     }
 
     render() {
