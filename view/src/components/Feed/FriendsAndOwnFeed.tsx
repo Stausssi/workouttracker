@@ -96,12 +96,13 @@ class ActivityBox extends React.Component<{ postData: postData }, any> {
                     <div className="card-content">
                         <div className="media">
                             <figure className="image is-32x32">
-                                <img src={image_path} alt="product" />
+                                <img src={image_path} alt="product"/>
                             </figure>
                             <div className="media-content has-text-left	pl-2">
                                 <p className="title is-4">{props.sport}</p>
                                 <p className="subtitle is-6">
-                                    <time dateTime="2016-1-1">{new Date(props.addedAt).toLocaleString().slice(0,16)}</time>
+                                    <time
+                                        dateTime="2016-1-1">{new Date(props.addedAt).toLocaleString().slice(0, 16)}</time>
                                     - {props.username}
                                 </p>
                             </div>
@@ -146,33 +147,46 @@ interface props {
 }
 
 const activityInfo = {
-    distance: {
+    distance: { // db unit: Meters
         title: 'Distance',
         format: (DistanceInMeters: number) => {
-            if(DistanceInMeters < 1000){
-                return(DistanceInMeters + " m");
+            if (DistanceInMeters < 1000) {
+                return (DistanceInMeters + " m");
             } else {
-                return((DistanceInMeters/1000).toFixed(1) + " km");
+                return ((DistanceInMeters / 1000).toFixed(1) + " km");
             }
         }
     },
-    duration: {
+    duration: { //db unit: seconds
         title: 'Duration',
         format: (DurationInSeconds: number) => {
-            let date = new Date(DurationInSeconds * 1000);
+            const date = new Date(DurationInSeconds * 1000);
 
-            if(DurationInSeconds > 3600){
-                return(date.toISOString().substr(11, 5) + ' h');
-            }else{
-                return(date.toISOString().substr(14, 5) + ' m');
+            if (DurationInSeconds > 3600) {
+                return (date.toISOString().substr(11, 5) + ' h');
+            } else {
+                return (date.toISOString().substr(14, 5) + ' m');
             }
         }
     },
-    pace: {
+    pace: { // db unit: m/s * 3,6 = km/h
         title: 'Pace',
-        format: 0
+        format: (metersPerSecond: number) => {
+            return ((metersPerSecond * 3.6).toFixed(1) + " km/s");
+        }
+    },
+    averageHeartRate: {
+        title: 'Average heart rate',
+        format: (heartrate: number) => {
+            return (heartrate + " bpm");
+        }
+    },
+    altitudeDifference: {
+        title: 'altitude',
+        format: (meters:number) => {
+            return(meters + " m");
+        }
     }
-
 }
 
 //displays an activity table
@@ -185,7 +199,7 @@ class ActivityTable extends React.Component<props, {}> {
 
         //iterate over props and check if value exists --> delete if not
         // @ts-ignore
-        Object.keys(activityObject).forEach((k:any) => activityObject[k] == null && delete activityObject[k])
+        Object.keys(activityObject).forEach((k: any) => activityObject[k] == null && delete activityObject[k])
     }
 
     renderTableHeaders(activityData: activityData) {
