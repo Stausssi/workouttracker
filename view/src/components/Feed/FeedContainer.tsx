@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../css/App.css';
 import 'bulma-extensions'
-import {FriendsFeed, OwnFeed} from "./FriendsAndOwnFeed";
+import {Feed} from "./FeedContent";
 
 /*
 * Contains the Friends and Own Feed and has the ability to toggle between them.
@@ -35,7 +35,7 @@ export default class FeedContainer extends React.Component<Props, State> {
                            onChange={() => this.switchFeed()}/>
                     <label htmlFor="feedSwitch" className="is-unselectable">Friends Feed</label>
                 </div>
-                <div>{this.state.switch ? <FriendsFeed/> : <OwnFeed/>}</div>
+                <div>{this.state.switch ? <Feed key={"Feed1"} ownFeed={false}/> : <Feed key={"Feed2"} ownFeed={true}/>}</div>
             </section>
         )
     }

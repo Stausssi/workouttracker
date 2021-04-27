@@ -5,6 +5,16 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown} from "@fortawesome/free-solid-svg-icons";
 import InfiniteScroll from "react-infinite-scroll-component";
 
+// ------------------------------------------------------------------------------------------------------------------
+
+interface activityData {
+    distance?: number,
+    duration?: number,
+    pace?: number,
+    averageHeartRate?: number,
+    altitudeDifference?: number
+}
+
 type postData = {
     likes: number
     activityData: activityData
@@ -19,17 +29,21 @@ interface FeedState {
     hasMore: boolean
 }
 
-interface EmptyProps {
+interface FeedProps {
+    ownFeed: boolean // true: Ownfeed, false: Friendsfeed
+}
 
+interface ActivityTableProps {
+    activityData: activityData
 }
 
 // ------------------------------------------------------------------------------------------------------------------
 
-export class OwnFeed extends React.Component<EmptyProps, FeedState> {
-    constructor(props: EmptyProps) {
+export class Feed extends React.Component<FeedProps, FeedState> {
+    constructor(props: FeedProps) {
         super(props);
         this.state = {
-            postData: Array.from({length: 0}),
+            postData: [],
             loaded: false,
             hasMore: true
         }
@@ -40,13 +54,14 @@ export class OwnFeed extends React.Component<EmptyProps, FeedState> {
     }
 
     componentDidMount() {
-        this.getFeed()
-        this.setState({loaded: true})
+        this.getFeed();
+        this.setState({loaded: true});
     }
 
     getFeed() {
-        console.log(this.state.postData);
-        fetch(BACKEND_URL + "feed/own?offset=" + this.state.postData.length, {
+        const mode = this.props.ownFeed ? 'own' : 'following'; // determines the feed mode based on the bool prop ownFeed
+        const get_url = BACKEND_URL + "feed/" + mode + "?offset=" + this.state.postData.length;
+        fetch(get_url, {
             method: "GET",
             headers: {
                 Accepts: "application/json",
@@ -54,9 +69,6 @@ export class OwnFeed extends React.Component<EmptyProps, FeedState> {
             }
         }).then((response) => {
             if (response.ok) {
-
-                //increment elements counter !!!!!!
-
                 return response.json().then(response => {
                     const activities = response["activities"];
                     this.setState({
@@ -70,7 +82,7 @@ export class OwnFeed extends React.Component<EmptyProps, FeedState> {
 
     refresh() {
         //reset postData and
-        this.setState({postData: Array.from({length: 0})});
+        this.setState({postData: []});
         // load new activities
         this.getFeed()
     }
@@ -100,7 +112,7 @@ export class OwnFeed extends React.Component<EmptyProps, FeedState> {
                         >
 
                             {this.state.postData.map((activity: postData, index: number) => (
-                                <div className="mb-5" key={index}><ActivityBox postData={activity}/></div>))
+                                <div className="mb-5" key={index}><ActivityBox ownFeed={this.props.ownFeed} postData={activity}/></div>))
                             }
 
                         </InfiniteScroll>
@@ -114,21 +126,11 @@ export class OwnFeed extends React.Component<EmptyProps, FeedState> {
 
 // ------------------------------------------------------------------------------------------------------------------
 
-export class FriendsFeed extends React.Component<{}, {}> {
-    render() {
-        return (
-            <>
-            </>
-        );
-    }
-}
-
-// ------------------------------------------------------------------------------------------------------------------
-
 //Component for an activity Box, to contain a like button, comment section and an activity table
-class ActivityBox extends React.Component<{ postData: postData }, any> {
+class ActivityBox extends React.Component<{ postData: postData, ownFeed:boolean }, any> {
     render() {
         const props = this.props.postData;
+        const ownFeed = this.props.ownFeed;
         const image_path = props.sport + '.png';
         return (
             <>
@@ -143,7 +145,7 @@ class ActivityBox extends React.Component<{ postData: postData }, any> {
                                 <p className="subtitle is-6">
                                     <time
                                         dateTime="2016-1-1">{new Date(props.addedAt).toLocaleString().slice(0, 16)}</time>
-                                    - {props.username}
+                                     {ownFeed ? "" : " - " + props.username}
                                 </p>
                             </div>
                             <div className="">
@@ -174,6 +176,8 @@ class ActivityBox extends React.Component<{ postData: postData }, any> {
 }
 
 // ------------------------------------------------------------------------------------------------------------------
+
+// dictionary used by class ActivityTable to format the Activity data
 
 const activityInfo = {
     distance: { // db unit: Meters
@@ -222,23 +226,13 @@ const activityInfo = {
     }
 }
 
-interface activityData {
-    distance?: number,
-    duration?: number,
-    pace?: number,
-    averageHeartRate?: number,
-    altitudeDifference?: number
-}
-
-interface props {
-    activityData: activityData
-}
 
 // ------------------------------------------------------------------------------------------------------------------
 
+
 //displays an activity table inside an activity feed box
-class ActivityTable extends React.Component<props, {}> {
-    constructor(props: props) {
+class ActivityTable extends React.Component<ActivityTableProps, {}> {
+    constructor(props: ActivityTableProps) {
         super(props);
 
         //get props keys
