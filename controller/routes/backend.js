@@ -36,47 +36,14 @@ router.get('/users/getRelationship', authenticateJWT, users.getRelationship);
 router.get('/events/get', authenticateJWT,event.findAll); 
 router.get('/events/getactivity', authenticateJWT,event.findActivityEvents); 
 router.post('/events/add', authenticateJWT,event.create); 
-router.delete('/events/remove', authenticateJWT,event.remove);  //delete?
+router.delete('/events/remove', authenticateJWT,event.remove);  
 
 /* charts routes */
-router.get('/charts/get', chart.findAll); 
+router.get('/charts/get',authenticateJWT, chart.findAll); 
+router.get('/charts/dataset',authenticateJWT, chart.getdataset); 
+router.post('/charts/add',authenticateJWT, chart.create); 
+router.delete('/charts/remove',authenticateJWT, chart.remove);
 
-router.get('/charts/dataset', chart.getdataset); 
-
-router.post('/charts/add', chart.create); 
-
-router.delete('/charts/remove', chart.remove);
-
-
-/*
-
-//router.get('/charts/update', chart.findAll); 
-
-//router.post('/charts/remove', chart.create); 
-
-/* Calendar routes */
-
-router.get('/events/get', event.findAll); 
-
-router.post('/events/add', event.create); 
-
-router.delete('/events/remove', event.remove);  //delete?
-
-/* charts routes */
-router.get('/charts/get', chart.findAll); 
-
-router.get('/charts/dataset', chart.getdataset); 
-
-router.post('/charts/add', chart.create); 
-
-router.delete('/charts/remove', chart.remove);
-
-
-/*
-
-router.get('/charts/update', chart.findAll); 
-
-*/
 router.get('/testConnection', function (req, res, next) {
     res.send('Connection to the backend established!');
 })

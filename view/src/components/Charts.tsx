@@ -8,6 +8,7 @@ import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
 import SessionHandler from "../SessionHandler";
 import { BACKEND_URL } from "../App";
+import "bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css";
 
 interface Props {
   config?: {
@@ -31,6 +32,7 @@ interface State {
   secondtype: string; //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
   charts: {};
   sports: string[];
+  switchfunc: boolean;
   informtext: string;
   informtype: string;
   year: Date;
@@ -85,6 +87,16 @@ const categories = [
   "altitudeDifference",
 ];
 
+const averagecategories = ["averageHeartRate", "pace"];
+
+const amountcategories = [
+  //rename in categories
+  "distance",
+  "duration",
+  "effort",
+  "altitudeDifferences",
+];
+
 const initialState = {
   active: false,
   title: "",
@@ -96,17 +108,14 @@ const initialState = {
   secondtype: "", //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
   charts: {},
   sports: [],
+  switchfunc: false,
   informtext: "",
   informtype: "",
   year: new Date(),
 };
 
 export default class Graphs extends React.Component<Props, State> {
-  //chart1: Chart | undefined;
   chart2: Chart | undefined;
-  //charts: string[] = [];
-  //colors: string[] = [];
-  //data: number[] = [];
   constructor(props: Props) {
     super(props);
     this.state = initialState;
@@ -133,7 +142,7 @@ export default class Graphs extends React.Component<Props, State> {
       method: "GET",
       headers: {
         Accept: "application/json",
-        //Authorization: SessionHandler.getAuthToken()
+        Authorization: SessionHandler.getAuthToken(),
       },
     }).then((response) => {
       if (response.ok) {
@@ -161,7 +170,7 @@ export default class Graphs extends React.Component<Props, State> {
       method: "GET",
       headers: {
         Accept: "application/json",
-        //Authorization: SessionHandler.getAuthToken()
+        Authorization: SessionHandler.getAuthToken(),
       },
     })
       .then((response) => {
@@ -186,11 +195,15 @@ export default class Graphs extends React.Component<Props, State> {
       // Store the post data to a variable
       /* Check if user/sport are defined and query over all charts */
       //query parameter values from DB and set if not NULL. else, let values as undefined
-      var year, sport, category;
+      var year, sport, category, sqlfunc;
       const params = new URLSearchParams();
       if (this.state.array[i].category) {
         category = this.state.array[i].category;
         params.append("category", category);
+      }
+      if (this.state.array[i].sqlfunc) {
+        sqlfunc = this.state.array[i].sqlfunc;
+        params.append("sqlfunc", sqlfunc);
       }
       if (this.state.array[i].param_sport) {
         sport = this.state.array[i].param_sport;
@@ -209,9 +222,10 @@ export default class Graphs extends React.Component<Props, State> {
         fill: this.state.array[i].fill,
         param_sport: this.state.array[i].sport,
         year: this.state.array[i].year,
+        sqlfunc: this.state.array[i].sqlfunc,
       };
       console.log(chart);
-      //console.log(url + params);
+      console.log(url + params);
       this.getdatasets(url, params, chart);
     }
   }
@@ -219,7 +233,14 @@ export default class Graphs extends React.Component<Props, State> {
   test() {
     fetch(
       BACKEND_URL +
-        "charts/dataset?category=distance&sport=Ball sports&year=2021"
+        "charts/dataset?category=pace&sqlfunc=sum&year=2021",
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: SessionHandler.getAuthToken(),
+        },
+      }
     )
       .then((response) => {
         if (response.ok) {
@@ -240,7 +261,7 @@ export default class Graphs extends React.Component<Props, State> {
       method: "GET",
       headers: {
         Accept: "application/json",
-        //Authorization: SessionHandler.getAuthToken()
+        Authorization: SessionHandler.getAuthToken(),
       },
     })
       .then((response) => {
@@ -317,7 +338,7 @@ export default class Graphs extends React.Component<Props, State> {
             title: {
               text: "Month",
               display: display,
-              rotation: 90 
+              rotation: 90,
             },
           },
           y: {
@@ -374,6 +395,12 @@ export default class Graphs extends React.Component<Props, State> {
           (title: { name: string }) => title.name === this.state.title //check if title already exists
         )
       ) {
+        let sqlfunc;
+        if (this.state.switchfunc === true) {
+          sqlfunc = "sum";
+        } else {
+          sqlfunc = "avg";
+        }
         var year = this.state.year.getFullYear();
         const chart = {
           name: this.state.title,
@@ -382,6 +409,7 @@ export default class Graphs extends React.Component<Props, State> {
           fill: this.state.fill,
           param_sport: this.state.sport, //can be null
           year: year,
+          sqlfunc: sqlfunc,
         };
         console.log(chart);
         const params = new URLSearchParams();
@@ -409,7 +437,7 @@ export default class Graphs extends React.Component<Props, State> {
       headers: {
         accept: "application/json",
         "content-type": "application/json",
-        //Authorization: SessionHandler.getAuthToken()
+        Authorization: SessionHandler.getAuthToken(),
       },
       body: JSON.stringify(chart),
     }).then((response) => {
@@ -434,7 +462,7 @@ export default class Graphs extends React.Component<Props, State> {
         headers: {
           accept: "application/json",
           "content-type": "application/json",
-          //Authorization: SessionHandler.getAuthToken()
+          Authorization: SessionHandler.getAuthToken(),
         },
         body: JSON.stringify({ chartid: id }),
       }).then((response) => {
@@ -455,12 +483,8 @@ export default class Graphs extends React.Component<Props, State> {
     ) as HTMLCanvasElement;
     var button = document.getElementById(name) as HTMLButtonElement;
     if (canvas.parentNode && button.parentNode) {
-      // parent ist div id=charts
       canvas.parentNode.removeChild(canvas);
       button.parentNode.removeChild(button);
-      //const id = this.charts.indexOf(name);
-      //this.charts.splice(id, 1);
-      //console.log(this.charts);
     }
   }
 
@@ -486,19 +510,6 @@ export default class Graphs extends React.Component<Props, State> {
           ylab = "BPM";
           break;
       }
-      /*if (category === "distance") {
-        return (ylab = "m");
-      } else if (category === "duration") {
-        return (ylab = "s");
-      } else if (category === "pace") {
-        return (ylab = "km/h");
-      } else if (category === "effort") {
-        return (ylab = "cal");
-      } else if (category === "averageHeartRate") {
-        return (ylab = "BPM");
-      } else if (category === "altitudeDifference") {
-        return (ylab = "m");
-      }*/
     }
     return ylab;
   }
@@ -507,6 +518,8 @@ export default class Graphs extends React.Component<Props, State> {
     var subtitle = `${category} in ${ylab} per month for ${year}`;
     return subtitle;
   }
+
+  remndercategory() {}
 
   renderOptions(items: any[]) {
     return (
@@ -644,16 +657,43 @@ export default class Graphs extends React.Component<Props, State> {
                       inline
                     />
                   </div>
-                  <div>
-                    <label className="label">
+                  <div className="columns">
+                    <div className="column">
                       <input
                         type="checkbox"
                         name="fill"
-                        checked={this.state.fill}
+                        className="switch"
+                        id="fill"
                         onChange={(fill) => this.handleOnCheck(fill)}
                       />
-                      Fill Graph
-                    </label>
+                      <label className="label" htmlFor="fill">
+                        {this.state.fill ? (
+                          <span>Filled</span>
+                        ) : (
+                          <span>Not filled</span>
+                        )}
+                      </label>
+                    </div>
+                    <div className="column">
+                      <div className="field">
+                        <input
+                          type="checkbox"
+                          name="switchfunc"
+                          className="switch"
+                          id="switchfunc"
+                          onChange={(switchfunc) =>
+                            this.handleOnCheck(switchfunc)
+                          }
+                        />
+                        <label className="label" htmlFor="switchfunc">
+                          {this.state.switchfunc ? (
+                            <span>Sum</span>
+                          ) : (
+                            <span>Average</span>
+                          )}
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

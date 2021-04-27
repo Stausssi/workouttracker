@@ -9,10 +9,11 @@ const Chart = function(chart) {
     this.year=chart.year
 }
 
-Chart.getAll = (response) => {
+Chart.getAll = (user,response) => {
     sql.query("SELECT * FROM charts;",
         function (error, results) {
             if (error) {
+                console.log("error: ", error);
                 response(error, null)
             } else {
                 response(null, results)
@@ -32,7 +33,7 @@ Chart.create = (newChart, response) => {
     });
 }
 
-Chart.remove = (name, result) => {
+Chart.remove = (name,user, result) => {
     sql.query("DELETE FROM charts WHERE name = ?", name, (error, res) => {
         if (error) {
             console.log("error: ", error);

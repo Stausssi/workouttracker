@@ -14,7 +14,6 @@ Event.getAll = (user,response) => {
             if (error) {
                 response(error, null)
             } else {
-                console.log("events: ", result);
                 response(null, result)
             }
         });
@@ -26,7 +25,6 @@ Event.getActivityEvents = (response) => {
             if (error) {
                 response(error, null)
             } else {
-                console.log("events: ", result);
                 response(null, result)
             }
         });

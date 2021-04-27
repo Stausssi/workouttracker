@@ -2,15 +2,12 @@ const { request } = require('express');
 const Event = require("../../model/models/calendarModel");
 const { isParamMissing, basicSuccessErrorHandling } = require("../utilities/misc");
 
-//TODO: Add user for event
-
 exports.findAll = (request, response) => {
   let username = request.username;
   if (isParamMissing([username])) {
     request.sendStatus(400)
   }
   else {
-    //Event.getAll((error, data) => {
     Event.getAll(username,(error, data) => {  
       if (error) {
         console.log(error);
@@ -68,7 +65,7 @@ exports.create = (request, response) => {
 exports.remove = (request, response) => {
   const eventid = request.body.id
   let username = request.username;
-  if (!request.body || isParamMissing([username])) {
+  if (!request.body || isParamMissing([username,eventid])) {
     response.sendStatus(400)
   }
   else {
