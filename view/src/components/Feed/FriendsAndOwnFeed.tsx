@@ -84,9 +84,17 @@ export class OwnFeed extends React.Component<EmptyProps, FeedState> {
                             dataLength={this.state.postData.length}
                             next={this.getFeed}
                             hasMore={this.state.hasMore}
-                            loader={<p className="tag ">Loading...</p>}
-                            endMessage={<p className="tag is-info is-light is-inverted mb-5">No new activities
-                                found</p>}
+                            loader={
+                                <div className="box">
+                                    <div className="control is-loading">
+                                        <input className="input is-static" type="text" readOnly={true}
+                                               placeholder="Loading ... "/>
+                                    </div>
+                                </div>
+                            }
+                            endMessage={
+                                <p className="tag is-info is-light is-inverted mb-5">No new activities found</p>
+                            }
                             scrollThreshold={0.9}
                             scrollableTarget="col-1"
                         >
@@ -205,7 +213,11 @@ const activityInfo = {
     altitudeDifference: {
         title: 'Altitude',
         format: (meters: number) => {
-            return (meters + " m");
+            if (meters < 1000) {
+                return (meters + " m");
+            } else {
+                return ((meters / 1000).toFixed(1) + " km");
+            }
         }
     }
 }
