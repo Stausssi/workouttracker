@@ -29,10 +29,11 @@ export default class FeedContainer extends React.Component<Props, State> {
     render() {
         return (
             <section>
-                <div className="field">
-                    <input id="switchRoundedSuccess" type="checkbox" className="switch is-rounded is-success"
+                <div className="field mt-4">
+                    <label htmlFor="feedSwitch" className="is-size-5  is-unselectable">Own Feed </label>
+                    <input id="feedSwitch" type="checkbox" className="switch is-medium is-rounded is-success"
                            onChange={() => this.switchFeed()}/>
-                    <label htmlFor="switchRoundedSuccess">Switch rounded success</label>
+                    <label htmlFor="feedSwitch" className="is-unselectable">Friends Feed</label>
                 </div>
                 <div>{this.state.switch ? <FriendsFeed/> : <OwnFeed/>}</div>
             </section>

@@ -3,6 +3,7 @@ import {BACKEND_URL} from "../../App";
 import SessionHandler from "../../utilities/SessionHandler";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown} from "@fortawesome/free-solid-svg-icons";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 type postData = {
     likes: number
@@ -14,34 +15,38 @@ type postData = {
 
 interface FeedState {
     postData: postData[] | [],
-    //comments: string,
-    loaded: boolean
-    offset_page: number
+    loaded: boolean,
+    hasMore: boolean
 }
 
 interface EmptyProps {
 
 }
 
+// ------------------------------------------------------------------------------------------------------------------
+
 export class OwnFeed extends React.Component<EmptyProps, FeedState> {
     constructor(props: EmptyProps) {
         super(props);
         this.state = {
+            postData: Array.from({length: 0}),
             loaded: false,
-            postData: [],
-            offset_page: 0
+            hasMore: true
         }
+
+        // bind function scopes
+        this.getFeed = this.getFeed.bind(this);
+        this.refresh = this.refresh.bind(this);
     }
 
     componentDidMount() {
-        // fetch X activities from Backend
         this.getFeed()
-        //set loaded to true
-        this.setState({loaded: true});
+        this.setState({loaded: true})
     }
 
     getFeed() {
-        fetch(BACKEND_URL + "feed/own?offset=" + this.state.offset_page, {
+        console.log(this.state.postData);
+        fetch(BACKEND_URL + "feed/own?offset=" + this.state.postData.length, {
             method: "GET",
             headers: {
                 Accepts: "application/json",
@@ -49,41 +54,68 @@ export class OwnFeed extends React.Component<EmptyProps, FeedState> {
             }
         }).then((response) => {
             if (response.ok) {
+
+                //increment elements counter !!!!!!
+
                 return response.json().then(response => {
-                    this.setState({postData: response["activities"]});
+                    const activities = response["activities"];
+                    this.setState({
+                        postData: this.state.postData.concat(activities),
+                        hasMore: activities.length > 0
+                    });
                 });
             }
         });
     }
 
-    renderFeed() {
-        return this.state.postData.map((activity: postData) => <div><ActivityBox postData={activity}/><br/></div>);
+    refresh() {
+        //reset postData and
+        this.setState({postData: Array.from({length: 0})});
+        // load new activities
+        this.getFeed()
     }
 
     render() {
         return (
             <>
                 <div className="pr-4 pl-4 pt-1 pb-1">
-                    <div>Hier kommt die eigene Aktivität hin</div>
-                    <div>Weitere eigene Komponenten</div>
+                    {this.state.loaded ?
+                        <InfiniteScroll
+                            dataLength={this.state.postData.length}
+                            next={this.getFeed}
+                            hasMore={this.state.hasMore}
+                            loader={<p className="tag ">Loading...</p>}
+                            endMessage={<p className="tag is-info is-light is-inverted mb-5">No new activities
+                                found</p>}
+                            scrollThreshold={0.9}
+                            scrollableTarget="col-1"
+                        >
 
-                    {this.state.loaded ? this.renderFeed() : <p>not Working</p>}
+                            {this.state.postData.map((activity: postData, index: number) => (
+                                <div className="mb-5" key={index}><ActivityBox postData={activity}/></div>))
+                            }
+
+                        </InfiniteScroll>
+                        : <h1>Not loaded</h1>
+                    }
                 </div>
             </>
         );
     }
 }
 
+// ------------------------------------------------------------------------------------------------------------------
+
 export class FriendsFeed extends React.Component<{}, {}> {
     render() {
         return (
             <>
-                <div>Hier kommt die Aktivitäten der Freunde hin</div>
-                <div>Weitere andere Komponenten</div>
             </>
         );
     }
 }
+
+// ------------------------------------------------------------------------------------------------------------------
 
 //Component for an activity Box, to contain a like button, comment section and an activity table
 class ActivityBox extends React.Component<{ postData: postData }, any> {
@@ -133,17 +165,7 @@ class ActivityBox extends React.Component<{ postData: postData }, any> {
     }
 }
 
-interface activityData {
-    distance?: number,
-    duration?: number,
-    pace?: number,
-    averageHeartRate?: number,
-    altitudeDifference?: number
-}
-
-interface props {
-    activityData: activityData
-}
+// ------------------------------------------------------------------------------------------------------------------
 
 const activityInfo = {
     distance: { // db unit: Meters
@@ -182,11 +204,25 @@ const activityInfo = {
     },
     altitudeDifference: {
         title: 'Altitude',
-        format: (meters:number) => {
-            return(meters + " m");
+        format: (meters: number) => {
+            return (meters + " m");
         }
     }
 }
+
+interface activityData {
+    distance?: number,
+    duration?: number,
+    pace?: number,
+    averageHeartRate?: number,
+    altitudeDifference?: number
+}
+
+interface props {
+    activityData: activityData
+}
+
+// ------------------------------------------------------------------------------------------------------------------
 
 //displays an activity table inside an activity feed box
 class ActivityTable extends React.Component<props, {}> {
@@ -231,3 +267,5 @@ class ActivityTable extends React.Component<props, {}> {
         );
     }
 }
+
+// ------------------------------------------------------------------------------------------------------------------

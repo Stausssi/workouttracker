@@ -8,7 +8,7 @@ const elementPerRequest = 5; // number of activities that are sent within one re
 exports.getFeed = (req, res) => {
     const type = req.params.type;
     const user = req.username;
-    const start_offset = req.query.offset * elementPerRequest;
+    const start_offset = parseInt(req.query.offset);
 
     // handle INPUT !!!!!!!!!!!!!!!!!!!!!!!
 
