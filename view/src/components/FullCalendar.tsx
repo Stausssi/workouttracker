@@ -32,7 +32,7 @@ const initialState = {
   endDate: new Date(),
   allDay: false,
   eventsarray: [],
-  activityEvents:[],
+  activityEvents: [],
   date: new Date(),
   informtext: "",
   informtype: "",
@@ -72,7 +72,7 @@ export default class FullCalendar extends React.Component<Props, State> {
     this.calendar = new Calendar(canvas, {
       initialView: "dayGridMonth", //set initial view (Month view)
       firstDay: 1,
-      dayMaxEvents: 2, 
+      dayMaxEvents: 2,
       timeZone: "local",
       headerToolbar: {
         //set buttons for navigations/change views
@@ -129,36 +129,38 @@ export default class FullCalendar extends React.Component<Props, State> {
   }
 
   test() {
-    console.log(this.state.activityEvents)
+    console.log(this.state.activityEvents);
     fetch(BACKEND_URL + "/events/getactivity", {
       method: "GET",
       headers: {
         Accept: "application/json",
-        //Authorization: SessionHandler.getAuthToken()
+        Authorization: SessionHandler.getAuthToken()
       },
     }).then((response) => {
       if (response.ok) {
-        let activityEvents: any[]=[]
+        let activityEvents: any[] = [];
         return response.json().then((response) => {
           //this.setState({ eventsarray: JSON.parse(response.body) });
           console.log(JSON.parse(response.body));
-          let posts=JSON.parse(response.body)
-          posts.map((item:any)=>{
-            var end
+          let posts = JSON.parse(response.body);
+          posts.map((item: any) => {
+            var end;
             //console.log(item.duration)
-            end=moment(item.startedAt).add('seconds', item.duration).format('YYYY-MM-DD HH:mm:ss')
+            end = moment(item.startedAt)
+              .add("seconds", item.duration)
+              .format("YYYY-MM-DD HH:mm:ss");
             const event = {
-              id:item.activity_id,
-              title:item.title,
-              start:item.startedAt,
-              end:end,
-              allDay:1
-            } 
-            console.log(event)
-            activityEvents.push(event)
-            return event
-          })
-          this.setState({activityEvents:activityEvents})
+              id: item.activity_id,
+              title: item.title,
+              start: item.startedAt,
+              end: end,
+              allDay: 1
+            };
+            console.log(event);
+            activityEvents.push(event);
+            return event;
+          });
+          this.setState({ activityEvents: activityEvents });
           this.calendar?.addEventSource(this.state.activityEvents); //add new events
         });
       } else {
@@ -170,13 +172,12 @@ export default class FullCalendar extends React.Component<Props, State> {
     });
   }
 
-
   getEvents() {
     fetch(BACKEND_URL + "events/get", {
       method: "GET",
       headers: {
         Accept: "application/json",
-        //Authorization: SessionHandler.getAuthToken()
+        Authorization: SessionHandler.getAuthToken()
       },
     }).then((response) => {
       if (response.ok) {
@@ -194,7 +195,6 @@ export default class FullCalendar extends React.Component<Props, State> {
       }
     });
   }
-  
 
   setEvents(data: any) {
     /*Create call to backend route */
@@ -203,7 +203,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
-        //Authorization: SessionHandler.getAuthToken()
+        Authorization: SessionHandler.getAuthToken()
       },
       body: JSON.stringify(data),
     }).then((response) => {
@@ -229,13 +229,13 @@ export default class FullCalendar extends React.Component<Props, State> {
 
   removeEvent(element: any) {
     element.event.remove();
-    console.log(element.event.id)
+    console.log(element.event.id);
     fetch(BACKEND_URL + "events/remove", {
       method: "DELETE",
       headers: {
         accept: "application/json",
         "content-type": "application/json",
-        //Authorization: SessionHandler.getAuthToken()
+        Authorization: SessionHandler.getAuthToken()
       },
       body: JSON.stringify({ id: element.event.id }),
     }).then((response) => {
@@ -314,7 +314,9 @@ export default class FullCalendar extends React.Component<Props, State> {
             />
           </div>
         </div>
-        <button className="button is-success" onClick={()=>this.test()}>Add activity</button>
+        <button className="button is-success" onClick={() => this.test()}>
+          Add activity
+        </button>
       </div>
     );
   }

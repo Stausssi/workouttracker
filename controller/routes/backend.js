@@ -33,13 +33,10 @@ router.put('/users/follow', authenticateJWT, users.follow);
 router.put('/users/unfollow', authenticateJWT, users.unfollow);
 router.get('/users/getRelationship', authenticateJWT, users.getRelationship);
 
-router.get('/events/get', event.findAll); 
-
-router.get('/events/getactivity', event.findActivityEvents); 
-
-router.post('/events/add', event.create); 
-
-router.delete('/events/remove', event.remove);  //delete?
+router.get('/events/get', authenticateJWT,event.findAll); 
+router.get('/events/getactivity', authenticateJWT,event.findActivityEvents); 
+router.post('/events/add', authenticateJWT,event.create); 
+router.delete('/events/remove', authenticateJWT,event.remove);  //delete?
 
 /* charts routes */
 router.get('/charts/get', chart.findAll); 
