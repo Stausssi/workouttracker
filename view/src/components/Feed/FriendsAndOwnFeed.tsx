@@ -292,7 +292,10 @@ class Comments extends React.Component<CommentProps, CommentState> {
                         className="card-header-icon"
                         onClick={() => this.setState({showComments: !this.state.showComments})}
                         aria-label="more options"
-                        style={{border: "none"}}>
+                        style={{
+                            border: "none",
+                            backgroundColor: "inherit"
+                        }}>
                         <span className="icon">
                             <FontAwesomeIcon icon={this.state.showComments ? faAngleUp : faAngleDown}/>
                         </span>
