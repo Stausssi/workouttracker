@@ -5,11 +5,6 @@ import SessionHandler from "../utilities/SessionHandler";
 /*Here is the component of the Follow UserProfile Site.
 * Here the user see the account values of any user you want*/
 
-function validateEmail(email: string)
-{
-    return /^[^@]+@\w+(\.\w+)+\w$/.test(email);
-}
-
 interface State {
     username: string,
     firstname: string,
@@ -23,6 +18,9 @@ interface State {
 export default class FollowUserSite extends Component<{}, State> {
     constructor(props: any) {
         super(props);
+
+
+        //löschen und this.state übergabe Parameter einfügen
         var username = "undefined Username";
         if(SessionHandler.getUser()) {
             // @ts-ignore

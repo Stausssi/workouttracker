@@ -1,7 +1,7 @@
 interface Props {
     comment: any,
 }
-//comment component formate timestamp and comment
+//comment component format timestamp and comment and style with bulma comment component
 const Comment = ({ comment }: Props) => {
     return (
         <article className="media">

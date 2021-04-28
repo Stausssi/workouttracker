@@ -36,7 +36,7 @@ exports.getComment = (req, resp) => {
     });
 }
 
-//!thumpsup
+//!thumpsup if thumpsup button is pressed
 exports.thumpsup = (req, resp) => {
     Comment.invertThumpsUpInDB(req, function (error) {
         if (error) {

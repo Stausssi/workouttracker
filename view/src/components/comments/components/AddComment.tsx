@@ -18,23 +18,24 @@ const AddComment = ({ onAdd }: Props) => {
             alert('Please add text')
             return
         }
-        var Now = new Date();
-        var Day = Now.getUTCDay();
-        var Month = Now.getUTCMonth() +1;
+
+        //built timestamp formatted in the db to insert faster in the frontend
+        const Now = new Date();
+        const Day = Now.getUTCDay();
+        const Month = Now.getUTCMonth() +1;
         var Year = Now.getUTCFullYear();
-        var Hours = Now.getUTCHours();
-        var Munutes = Now.getUTCMinutes();
-        var Seconds = Now.getUTCSeconds();
+        const Hours = Now.getUTCHours();
+        const Minutes = Now.getUTCMinutes();
+        const Seconds = Now.getUTCSeconds();
         if (Year < 1900) {
             Year += 1900;
         }
+        const timestamp = Year + "-" + Month + "-" + Day + " " + Hours + ":" + Minutes + ":" + Seconds;
 
-        const timestamp = Year + "-" + Month + "-" + Day + " " + Hours + ":" + Munutes + ":" + Seconds;
-        //const timestamp = new Date().getTime();
         if(SessionHandler.getUser()){
             // @ts-ignore
             const name = SessionHandler.getUser().username.toString();
-            //insert in frontend
+            //insert in frontend to show the comment fast as possible
             onAdd({ text, name, timestamp })
 
             //insert in backend

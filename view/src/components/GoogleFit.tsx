@@ -12,6 +12,7 @@ export default class GoogleFit  extends Component<{}> {
 
     handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
+        //get url to redirect
         fetch(BACKEND_URL + 'googlefit/getURLTing', {
             headers:{
                 Accept: 'application/json',
@@ -26,7 +27,7 @@ export default class GoogleFit  extends Component<{}> {
             }
             // Examine the text in the response
             response.json().then((data) => {
-                window.location =data.url;//redirect to generated google url
+                window.location =data.url;//redirect to generated google url with all permissions tokens etc.
             });
           });
     }

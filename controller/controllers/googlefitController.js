@@ -79,12 +79,16 @@ exports.insertActivitysFromGoogle = async (req, res) => {
 
     var dberror = false;
 
+    //get Activity sessions from google in the time from start to end timestamp
     axios.get(`https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=${starttimestamp}&endTime=${endtimestamp}`, authstuff)//get activitys
         .then(res => {
             sessionArray = res.data.session;
 
             try {
+                //for each session from google
                 for(const session of sessionArray){
+                    //get the distance form google in the timespan from the session
+                    //therefore merge all distance from all devices to an float at google cloud
                     const body = {
                     "aggregateBy": [{
                         "dataTypeName": "com.google.distance.delta",
@@ -104,12 +108,14 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                             console.log("activityType:" + session.activityType + " timestamp:" +  session.startTimeMillis + " duration:" + duration);
                             console.log(res.data.bucket[0].dataset[0].point[0].value[0].fpVal);
 
+                            //get the heart rate in bpm form google in the timespan from the session
+                            //therefore merge all data points from to an float at google cloud and do count several points from different Devices only once
                             const body = {
                                 "aggregateBy": [{
                                     "dataTypeName": "com.google.heart_rate",
                                     "dataSourceId": "derived:com.google.heart_rate.bpm:com.google.android.gms:merge_heart_rate_bpm"//resting_heart_rate<-merge_heart_rate_bpm
                                 }],
-                                "bucketByTime": { "durationMillis": 604800000 },
+                                "bucketByTime": { "durationMillis": 604800000 },//7Days as default max activitys to filter strange activitys
                                 "startTimeMillis": session.startTimeMillis,
                                 "endTimeMillis": session.endTimeMillis
                             }
@@ -118,16 +124,15 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                                     try {
                                         var averageHeartRate = null;
                                         if(res.data.bucket[0].dataset[0].point[0]) averageHeartRate = res.data.bucket[0].dataset[0].point[0].value[0].fpVal;
-                                        else console.log("NÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ")
                                         var sport = "Other"; //default Other
-                                        //maping from google fit https://developers.google.com/fit/rest/v1/reference/activity-types
+                                        //mapping from google fit documented here: https://developers.google.com/fit/rest/v1/reference/activity-types
                                         if(session.activityType == 56 || session.activityType == 8 || session.activityType == 57 || session.activityType == 58 || session.activityType == 7 || session.activityType == 93 || session.activityType == 94 || session.activityType == 95 || session.activityType == 116) sport = "Running";//jogging
                                         else if(session.activityType == 1 || session.activityType == 14 || session.activityType == 15 || session.activityType == 16) sport = "Cycling";//Cycling
                                         else if(session.activityType == 82 || session.activityType == 84 || session.activityType == 83) sport = "Swimming";//Swimming
                                         else if(session.activityType == 11 || session.activityType == 12 || session.activityType == 27 || session.activityType == 28 || session.activityType == 29 || session.activityType == 34 || session.activityType == 51 || session.activityType == 120 || session.activityType == 89 || session.activityType == 90 || session.activityType == 91) sport = "Ball sports";//Ball sports
                                         else if(session.activityType == 24) sport = "Dancing";//Dancing
 
-                                        //darabase insert
+                                        //database insert Object
                                         var insertObj = {
                                             username: username,
                                             duration: duration,
@@ -138,6 +143,7 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                                             averageHeartRate: averageHeartRate,
                                         };
 
+                                        //insert in DB
                                         GoogleFit.insertGoogleFItActivityInDB(insertObj, function (error) {
                                             if (error) dberror = true;
                                         });

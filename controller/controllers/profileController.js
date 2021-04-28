@@ -3,7 +3,7 @@ const Mail = require("../utilities/mail/confirmationEmail");
 const config = require("../utilities/mail/emailConfirmation.config");
 const jwt = require("jsonwebtoken");
 
-//get data to Profile
+//get data to Profile with the username
 exports.profilesite = (req, resp) => {
     Profile.selectProfileData(req, function (error, profileData) {
         if (error) {
@@ -15,12 +15,12 @@ exports.profilesite = (req, resp) => {
     });
 }
 
-//update Profile
+//update Profile with new data
 exports.profileUpdate = (req, resp) => {
-    var newmail = false;
+    var newMail = false;
     var confirmationToken = "";
     if(req.body.email){
-        newmail = true;
+        newMail = true;
         confirmationToken = jwt.sign({email: req.body.email}, config.confirmSecret);
     }
     Profile.updateProfileInDB(req, confirmationToken, function (error, resMessage) {
@@ -30,7 +30,8 @@ exports.profileUpdate = (req, resp) => {
                 message: "Internal server error!"
             });
         } else{
-            if(newmail){
+            if(newMail){
+                //select all data to send a new confirmation mail if the mail was changed
                 Profile.selectAllProfileDataForEmail(req.username, function (error, profileData) {
                     if (error) {
                         resp.status(500).send({

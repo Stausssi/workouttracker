@@ -8,6 +8,8 @@ import NotificationBox from "./NotificationBox";
 /*Here is the component of the Profile Site.
 * Here the user can change his account Values*/
 
+
+//Validate email address from input to show a warning if something went Wrong
 function validateEmail(email: string)
 {
     return /^[^@]+@\w+(\.\w+)+\w$/.test(email);
@@ -64,6 +66,7 @@ export default class ProfileSite  extends Component<{}, State> {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    //get placeholders by loading the Page
     getDefaultValues() {
       fetch(BACKEND_URL + "profilesite/" + this.state.username, {//get as default
             headers:{
@@ -98,7 +101,8 @@ export default class ProfileSite  extends Component<{}, State> {
             [name]: value
         } as unknown as Pick<State, keyof State>);
     }
-    
+
+    //if submit new changes to the system
     handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
         this.setState({errorMessage: ''});
