@@ -3,6 +3,7 @@ const Chart = require("../../model/models/chartModel");
 const Data = require("../../model/models/dataModel");
 const { isParamMissing } = require("../utilities/misc");
 
+//find charts which matched to currently logged user
 exports.findAll = (request, response) => {
   let username = request.username;
   if (isParamMissing([username])) {
@@ -20,6 +21,7 @@ exports.findAll = (request, response) => {
   }
 };
 
+//find datasets for chart
 exports.getdataset = (request, response) => {
   let username = request.username;
   let sqlfunc = request.query.sqlfunc
@@ -31,8 +33,8 @@ exports.getdataset = (request, response) => {
     sport = request.query.sport
     category = request.query.category
     year = request.query.year
-    if (sqlfunc === "sum") {
-      Data.getamount(category, sport, year, (error, data) => {
+    if (sqlfunc === "sum") {    //get datasets with sql funcrtion sum 
+      Data.getamount(category, sport, year, username,(error, data) => {
         if (error) {
           console.log(error);
           response.sendStatus(500)
@@ -41,8 +43,8 @@ exports.getdataset = (request, response) => {
         }
       });
     }
-    else if (sqlfunc === "avg") {
-      Data.getaverage  (category, sport, year, (error, data) => {
+    else if (sqlfunc === "avg") { //get datasets with sql funcrtion avg 
+      Data.getaverage  (category, sport, year, username,(error, data) => {
         if (error) {
           console.log(error);
           response.sendStatus(500)
@@ -51,13 +53,13 @@ exports.getdataset = (request, response) => {
         }
       });
     }
-    else {
+    else {                //send bad request error if neither sum nor avg is set
       response.sendStatus(400)
     }
   }
 };
 
-
+//create chart 
 exports.create = (request, response) => {
   let username = request.username;
   if (!request.body || isParamMissing([username])) {
@@ -68,7 +70,7 @@ exports.create = (request, response) => {
     if (request.body.param_sport && !request.body.param_sport === "") {
       sport = request.body.param_sport
     }
-    const chart = new Chart({
+    const chart = new Chart({   //chart constructor
       name: request.body.name,
       type: request.body.type,
       category: request.body.category,
@@ -88,6 +90,7 @@ exports.create = (request, response) => {
   }
 };
 
+//remove chart with name of chart as id
 exports.remove = (request, response) => {
   const chartid = request.body.chartid
   let username = request.username;

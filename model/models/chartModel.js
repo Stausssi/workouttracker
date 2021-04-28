@@ -1,16 +1,18 @@
 const sql = require("../createConnection");
 
-const Chart = function(chart) {
+const Chart = function(chart) { //chart constructor
     this.name = chart.name
     this.type = chart.type
     this.category = chart.category
     this.fill = chart.fill
     this.param_sport = chart.param_sport
-    this.year=chart.year
+    this.year=chart.year,
+    this.user=chart.user,
+    this.sqlfunc=chart.sqlfunc
 }
 
-Chart.getAll = (user,response) => {
-    sql.query("SELECT * FROM charts;",
+Chart.getAll = (user,response) => {     //get all events
+    sql.query("SELECT * FROM charts where user = ?",[user],
         function (error, results) {
             if (error) {
                 console.log("error: ", error);
@@ -21,8 +23,8 @@ Chart.getAll = (user,response) => {
         });
 }
 
-Chart.create = (newChart, response) => {
-    sql.query("INSERT INTO charts SET ?", newChart, (error, results) => {
+Chart.create = (newChart, response) => {    //insert new chart into db   
+    sql.query("INSERT INTO charts SET ?", [newChart], (error, results) => {
         if (error) {
             console.log("There was an error during inserting new chart: ", error);
             response(error, false);
@@ -33,8 +35,8 @@ Chart.create = (newChart, response) => {
     });
 }
 
-Chart.remove = (name,user, result) => {
-    sql.query("DELETE FROM charts WHERE name = ?", name, (error, res) => {
+Chart.remove = (name,user, result) => {     //remove chart depending on unique name as identifier
+    sql.query("DELETE FROM charts WHERE name = ? AND user = ?", [name,user], (error, res) => {
         if (error) {
             console.log("error: ", error);
             result(error, null);
