@@ -205,19 +205,18 @@ export default class Graphs extends React.Component<Props, State> {
         Accept: "application/json",
         Authorization: SessionHandler.getAuthToken(),
       },
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          return Promise.reject(response);
-        }
-      })
-      .then((chartsData) => {
-        var data = JSON.parse(chartsData.body);
-        console.log(data);
-      })
-      .catch((error) => console.warn(error));
+    }).then((response) => {
+      if (response.ok) {
+        return response.json().then((response) => {
+          var data = JSON.parse(response.body);
+          console.log(data);
+        });
+      } else {
+        return response.json().then((response) => {
+          console.error("Fetch has failed:", response);
+        });
+      }
+    });
   }
 
   getdatasets(url: string, params: any, chart: any) {
@@ -228,20 +227,19 @@ export default class Graphs extends React.Component<Props, State> {
         Accept: "application/json",
         Authorization: SessionHandler.getAuthToken(),
       },
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          return Promise.reject(response);
-        }
-      })
-      .then((chartsData) => {
-        var data = JSON.parse(chartsData.body);
-        console.log(data);
-        this.addElement(chart, data); //create chart with data on frontend
-      })
-      .catch((error) => console.warn(error));
+    }).then((response) => {
+      if (response.ok) {
+        return response.json().then((response) => {
+          var data = JSON.parse(response.body);
+          console.log(data);
+          this.addElement(chart, data); //create chart with data on frontend
+        });
+      } else {
+        return response.json().then((response) => {
+          console.error("Fetch has failed:", response);
+        });
+      }
+    });
   }
 
   addElement(chart: any, data: any) {
@@ -281,7 +279,8 @@ export default class Graphs extends React.Component<Props, State> {
     ) {
       display = false;
     }
-    if (chart.fill === 1) {   //Set fill value to ture or false
+    if (chart.fill === 1) {
+      //Set fill value to ture or false
       chart.fill = true;
     } else {
       chart.fill = false;
@@ -346,7 +345,8 @@ export default class Graphs extends React.Component<Props, State> {
 
   //Get inputs values then create charts
   configureChart() {
-    if (                    //Check if mandatory values are set else reject request 
+    if (
+      //Check if mandatory values are set else reject request
       this.state.title &&
       this.state.type &&
       this.state.year &&
@@ -358,13 +358,15 @@ export default class Graphs extends React.Component<Props, State> {
         )
       ) {
         let sqlfunc;
-        if (this.state.switchfunc === true) {     //Set sql function depending on switch button value
+        if (this.state.switchfunc === true) {
+          //Set sql function depending on switch button value
           sqlfunc = "sum";
         } else {
           sqlfunc = "avg";
         }
         var year = this.state.year.getFullYear(); //filter date on year
-        const chart = {                           //build chart
+        const chart = {
+          //build chart
           name: this.state.title,
           type: this.state.type,
           category: this.state.category,
@@ -373,14 +375,14 @@ export default class Graphs extends React.Component<Props, State> {
           year: year,
           sqlfunc: sqlfunc,
         };
-        const params = new URLSearchParams();       //Add query params to request
+        const params = new URLSearchParams(); //Add query params to request
         params.append("category", chart.category);
         params.append("sport", chart.param_sport);
         params.append("year", chart.year.toString());
         const url = BACKEND_URL + "charts/dataset?";
-        this.getdatasets(url, params, chart);       //Display chart with data on frontend
+        this.getdatasets(url, params, chart); //Display chart with data on frontend
         this.action();
-        this.setcharts(chart);                      //Add new chart to DB
+        this.setcharts(chart); //Add new chart to DB
       } else {
         console.error(
           "Title was already given. Please choose an other title for your chart"
@@ -391,7 +393,8 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  setcharts(chart: any) {     //Add new chart to DB
+  setcharts(chart: any) {
+    //Add new chart to DB
     fetch(BACKEND_URL + "charts/add", {
       method: "POST",
       headers: {
@@ -408,13 +411,14 @@ export default class Graphs extends React.Component<Props, State> {
     });
   }
 
-  removeChart(id: string) {   //remove chart 
+  removeChart(id: string) {
+    //remove chart
     var chart = null;
     const chartID = "chartID_" + id;
-    chart = Chart.getChart(chartID);  //get chart object
-    if (chart) { 
-      chart.destroy();                //Destroy chart object on frontend
-      this.removeElement(id);         //remove element created with chart
+    chart = Chart.getChart(chartID); //get chart object
+    if (chart) {
+      chart.destroy(); //Destroy chart object on frontend
+      this.removeElement(id); //remove element created with chart
       fetch(BACKEND_URL + "charts/remove", {
         method: "DELETE",
         headers: {
@@ -433,18 +437,20 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  removeElement(name: string) { //remove chart elements
-    var canvas = document.getElementById(   
+  removeElement(name: string) {
+    //remove chart elements
+    var canvas = document.getElementById(
       "chartID_" + name
     ) as HTMLCanvasElement;
-    var button = document.getElementById(name) as HTMLButtonElement;  
+    var button = document.getElementById(name) as HTMLButtonElement;
     if (canvas.parentNode && button.parentNode) {
-      canvas.parentNode.removeChild(canvas);      //remove canvas element
-      button.parentNode.removeChild(button);      ////remove button element
+      canvas.parentNode.removeChild(canvas); //remove canvas element
+      button.parentNode.removeChild(button); ////remove button element
     }
   }
 
-  yLab(category: string) {        //get unit of measurement depending on category
+  yLab(category: string) {
+    //get unit of measurement depending on category
     var ylab = "";
     if (categories.includes(category)) {
       switch (category) {
@@ -470,11 +476,12 @@ export default class Graphs extends React.Component<Props, State> {
   }
 
   subtitle(category: string, ylab: string, year: number) {
-    var subtitle = `${category} in ${ylab} per month for ${year}`;  //create subtitle for chart
+    var subtitle = `${category} in ${ylab} per month for ${year}`; //create subtitle for chart
     return subtitle;
   }
 
-  fill() {    //render fill switch button if specific chart type is selected
+  fill() {
+    //render fill switch button if specific chart type is selected
     if (this.state.type === "line" || this.state.type === "radar") {
       return (
         <div className="m-2">
@@ -495,7 +502,8 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  renderOptions(items: any[]) { //render options for dropdown
+  renderOptions(items: any[]) {
+    //render options for dropdown
     return (
       items &&
       items.length > 0 &&
@@ -505,11 +513,13 @@ export default class Graphs extends React.Component<Props, State> {
     );
   }
 
-  handleDateOnChange(date: any) { //Update date on change
+  handleDateOnChange(date: any) {
+    //Update date on change
     this.setState({ year: date });
   }
 
-  handleOnChange( //update input fields on change
+  handleOnChange(
+    //update input fields on change
     event:
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>
@@ -522,7 +532,8 @@ export default class Graphs extends React.Component<Props, State> {
     } as unknown) as Pick<State, keyof State>);
   }
 
-  handleOnCheck(event: any) { //update checkbox/ switch button on change
+  handleOnCheck(event: any) {
+    //update checkbox/ switch button on change
     const target = event.target;
     const name = target.name;
     var check = target.checked;
@@ -531,7 +542,8 @@ export default class Graphs extends React.Component<Props, State> {
     } as unknown) as Pick<State, keyof State>);
   }
 
-  handleCategories() {  //update categories on siwth buttons
+  handleCategories() {
+    //update categories on siwth buttons
     let newcategories = categories;
     if (this.state.switchfunc === false) {
       newcategories = newcategories.concat(averagecategories);

@@ -11,6 +11,10 @@
 
 body > #root > div {
     height: 100vh;
+  }
+  
+  html {
+  overflow-y: hidden !important;
 }
 
 .App,.children  {
