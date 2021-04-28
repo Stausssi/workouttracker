@@ -2,10 +2,11 @@ import React from "react";
 import {BACKEND_URL} from "../../App";
 import SessionHandler from "../../utilities/SessionHandler";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faAngleDown} from "@fortawesome/free-solid-svg-icons";
+import {faAngleDown, faAngleUp, faThumbsUp} from "@fortawesome/free-solid-svg-icons";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 type postData = {
+    activity_id: number,
     likes: number
     activityData: activityData
     username: string
@@ -45,7 +46,6 @@ export class OwnFeed extends React.Component<EmptyProps, FeedState> {
     }
 
     getFeed() {
-        console.log(this.state.postData);
         fetch(BACKEND_URL + "feed/own?offset=" + this.state.postData.length, {
             method: "GET",
             headers: {
@@ -77,29 +77,26 @@ export class OwnFeed extends React.Component<EmptyProps, FeedState> {
 
     render() {
         return (
-            <>
-                <div className="pr-4 pl-4 pt-1 pb-1">
-                    {this.state.loaded ?
-                        <InfiniteScroll
-                            dataLength={this.state.postData.length}
-                            next={this.getFeed}
-                            hasMore={this.state.hasMore}
-                            loader={<p className="tag ">Loading...</p>}
-                            endMessage={<p className="tag is-info is-light is-inverted mb-5">No new activities
-                                found</p>}
-                            scrollThreshold={0.9}
-                            scrollableTarget="col-1"
-                        >
-
-                            {this.state.postData.map((activity: postData, index: number) => (
-                                <div className="mb-5" key={index}><ActivityBox postData={activity}/></div>))
-                            }
-
-                        </InfiniteScroll>
-                        : <h1>Not loaded</h1>
-                    }
-                </div>
-            </>
+            <div className="pr-4 pl-4 pt-1 pb-1">
+                {this.state.loaded ?
+                    <InfiniteScroll
+                        dataLength={this.state.postData.length}
+                        next={this.getFeed}
+                        hasMore={this.state.hasMore}
+                        loader={<p className="tag ">Loading...</p>}
+                        endMessage={<p className="tag is-info is-light is-inverted mb-5">No new activities found</p>}
+                        scrollThreshold={0.9}
+                        scrollableTarget="col-1"
+                    >
+                        {
+                            this.state.postData.map((activity: postData, index: number) => (
+                                <div className="mb-5" key={index}><ActivityBox postData={activity}/></div>
+                            ))
+                        }
+                    </InfiniteScroll> :
+                    <h1>Not loaded</h1>
+                }
+            </div>
         );
     }
 }
@@ -119,48 +116,45 @@ export class FriendsFeed extends React.Component<{}, {}> {
 
 //Component for an activity Box, to contain a like button, comment section and an activity table
 class ActivityBox extends React.Component<{ postData: postData }, any> {
+    // TODO: like button pressed
     render() {
         const props = this.props.postData;
         const image_path = props.sport + '.png';
         return (
-            <>
-                <div className="card">
-                    <div className="card-content">
-                        <div className="media">
-                            <figure className="image is-32x32">
-                                <img src={image_path} alt="product"/>
-                            </figure>
-                            <div className="media-content has-text-left	pl-2">
-                                <p className="title is-4">{props.sport}</p>
-                                <p className="subtitle is-6">
-                                    <time
-                                        dateTime="2016-1-1">{new Date(props.addedAt).toLocaleString().slice(0, 16)}</time>
-                                    - {props.username}
-                                </p>
-                            </div>
-                            <div className="">
-                                <button className="button is-success is-rounded">Like {props.likes}</button>
-                            </div>
-                        </div>
-
-                        <div className="content ">
-                            <ActivityTable activityData={props.activityData}/>
-                        </div>
-                    </div>
-                    <div className="card">
-                        <header className="card-header">
-                            <p className="card-header-title">
-                                Comments
+            <div className="card">
+                <div className="card-content">
+                    <div className="media">
+                        <figure className="image is-32x32">
+                            <img src={image_path} alt="product"/>
+                        </figure>
+                        <div className="media-content has-text-left	pl-2">
+                            <p className="title is-4">{props.sport}</p>
+                            <p className="subtitle is-6">
+                                <time
+                                    dateTime="2016-1-1">{new Date(props.addedAt).toLocaleString().slice(0, 16)}</time>
+                                - {props.username}
                             </p>
-                            <button className="card-header-icon button is-white is-large" aria-label="more options">
+                        </div>
+                        <div className="field has-addons">
+                            <button className="button is-success is-rounded">
+                                <span>
+                                    {Number(props.likes)}
+                                </span>
                                 <span className="icon">
-                                    <FontAwesomeIcon icon={faAngleDown}/>
+                                    <FontAwesomeIcon icon={faThumbsUp}/>
                                 </span>
                             </button>
-                        </header>
+                        </div>
+                    </div>
+
+                    <div className="content ">
+                        <ActivityTable activityData={props.activityData}/>
                     </div>
                 </div>
-            </>
+                <div className="card-footer">
+                    <Comments activity_id={props.activity_id}/>
+                </div>
+            </div>
         );
     }
 }
@@ -218,15 +212,15 @@ interface activityData {
     altitudeDifference?: number
 }
 
-interface props {
+interface TableProps {
     activityData: activityData
 }
 
 // ------------------------------------------------------------------------------------------------------------------
 
 //displays an activity table inside an activity feed box
-class ActivityTable extends React.Component<props, {}> {
-    constructor(props: props) {
+class ActivityTable extends React.Component<TableProps, {}> {
+    constructor(props: TableProps) {
         super(props);
 
         //get props keys
@@ -269,3 +263,63 @@ class ActivityTable extends React.Component<props, {}> {
 }
 
 // ------------------------------------------------------------------------------------------------------------------
+
+interface CommentState {
+    showComments: boolean
+}
+
+interface CommentProps {
+    activity_id: number
+}
+
+class Comments extends React.Component<CommentProps, CommentState> {
+    constructor(props: CommentProps) {
+        super(props);
+
+        this.state = {
+            showComments: false
+        }
+    }
+
+    render() {
+        // TODO: fill comments content
+        // TODO: input textarea, etc.
+        return (
+            <div className="card is-flex-grow-1">
+                <header className="card-header">
+                    <p className="card-header-title">Comments</p>
+                    <button
+                        className="card-header-icon"
+                        onClick={() => this.setState({showComments: !this.state.showComments})}
+                        aria-label="more options"
+                        style={{border: "none"}}>
+                        <span className="icon">
+                            <FontAwesomeIcon icon={this.state.showComments ? faAngleUp : faAngleDown}/>
+                        </span>
+                    </button>
+                </header>
+                {this.state.showComments ?
+                    <>
+                        <div className="card-content">
+                            <p className="title">Comments go here</p>
+                        </div>
+                        <footer className="card-footer">
+                            <div className="card-footer-item">
+                        <span>
+                            Text Input goes here
+                        </span>
+                            </div>
+                            <div className="card-footer-item">
+                        <span>
+                            Submit Button goes here
+                        </span>
+                            </div>
+                        </footer>
+                    </>
+                    :
+                    <></>
+                }
+            </div>
+        );
+    }
+}

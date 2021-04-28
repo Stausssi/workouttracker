@@ -9,6 +9,7 @@ const Feed = function (activity_array) {
 
     activity_array.forEach((row) => {
         this.activities.push({
+            activity_id: row.activity_id,
             likes: row.likes,
             activityData: {
                 distance: row.distance,
