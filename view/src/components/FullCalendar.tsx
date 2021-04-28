@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import NotificationBox from "./NotificationBox";
-import { BACKEND_URL } from "../App"; //TODO add Backend URL const to fetch
+import { BACKEND_URL } from "../App"; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import SessionHandler from "../SessionHandler";
@@ -51,34 +51,31 @@ export default class FullCalendar extends React.Component<Props, State> {
     if (active === true) {
       this.setState(() => ({ active: active }));
     } else {
-      this.setState(initialState);
+      this.setState(initialState);            // reset state on close
     }
   };
 
-  componentDidMount() {
+  componentDidMount() {       // init calendar and render events on mount
     this.initCalendar();
     this.getEvents();
   }
 
-  initCalendar() {
-    //create calendar
-    if (typeof this.calendar !== "undefined") {
-      //check if calendar already exists. If exits: destroy old calendar and create new
-      console.log("Calendar already exist. Creating a new Calendar...");
+  initCalendar() {                                    //create calendar
+    if (typeof this.calendar !== "undefined") {       //check if calendar already exists. If exits: destroy old calendar and create new
       this.calendar.destroy();
     }
     const canvas = document.getElementById("calendarFull") as HTMLCanvasElement; //get Canvas Element where Calendar will be displayed
 
-    this.calendar = new Calendar(canvas, {
+    this.calendar = new Calendar(canvas, {                              //configure calendar
       initialView: "dayGridMonth", //set initial view (Month view)
-      firstDay: 1,
-      dayMaxEvents: 2,
-      timeZone: "local",
+      firstDay: 1,                //set first day on Monday
+      dayMaxEvents: 2,            //set max events to show per day. Other events display in popup
+      timeZone: "local", 
       headerToolbar: {
         //set buttons for navigations/change views
         left: "prev,next",
         center: "title",
-        right: "dayGridMonth,timeGridWeek,today", //views: month, week, today (display month/week of actual Day)
+        right: "dayGridMonth,today", //views: month, week, today (display month/week of actual Day)
       },
       eventTimeFormat: {
         //event time format
@@ -94,16 +91,12 @@ export default class FullCalendar extends React.Component<Props, State> {
       },
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin], //add plugins to fullcalendar
       events: this.state.eventsarray, //eventsList
-      height: "600px", //set height for table --> use auto?
-      //selection
+      height: "600px", //set height for table
       selectable: true, //enable selection of dates
-      select: (info) => this.create(info), //function on select --> run create function
-      //eventClick: (properties) => this.updateevent(properties),
-      eventDidMount: (element) => {
-        //console.log(element.event.id);
-        //console.log(element.event.title);
+      select: (info) => this.create(info), //Open create function on select date range
+      eventDidMount: (element) => {        // add delete button to events
         var deleteButton = document.createElement("button");
-        deleteButton.onclick = () => this.removeEvent(element);
+        deleteButton.onclick = () => this.removeEvent(element); //remove event
         deleteButton.className = "delete";
         element.el.append(deleteButton);
       },
@@ -111,20 +104,18 @@ export default class FullCalendar extends React.Component<Props, State> {
     this.calendar.render(); //render calendar on document
   }
 
-  create(info: any) {
-    //open modal to set title of new event
+  create(info: any) { //Get selected dates and open modal to set title of new event
     this.setState({ startDate: info.startStr, endDate: info.endStr });
     this.action();
   }
 
-  createEvent() {
+  createEvent() {   //create event
     const event = {
       title: this.state.title,
       start: this.state.startDate,
       end: this.state.endDate,
       allDay: 1, //this.state.allDay
     };
-    console.log(event);
     this.setEvents(event);
   }
 
@@ -172,7 +163,7 @@ export default class FullCalendar extends React.Component<Props, State> {
     });
   }
 
-  getEvents() {
+  getEvents() {   //get events from DB
     fetch(BACKEND_URL + "events/get", {
       method: "GET",
       headers: {
@@ -184,20 +175,19 @@ export default class FullCalendar extends React.Component<Props, State> {
         return response.json().then((response) => {
           this.setState({ eventsarray: JSON.parse(response.body) });
           console.log(this.state.eventsarray);
-          this.calendar?.removeAllEventSources(); //remove old events
-          this.calendar?.addEventSource(this.state.eventsarray); //add new events
+          this.calendar?.removeAllEventSources();                   //remove old events
+          this.calendar?.addEventSource(this.state.eventsarray);    //add new events
         });
       } else {
         return response.json().then((response) => {
           console.error("Fetch has failed:", response);
-          this.setState({ eventsarray: [] });
+          this.setState({ eventsarray: [] });                     //Clear array on error
         });
       }
     });
   }
 
-  setEvents(data: any) {
-    /*Create call to backend route */
+  setEvents(data: any) {          //Add new event to DB
     fetch(BACKEND_URL + "events/add", {
       method: "POST",
       headers: {
@@ -207,12 +197,12 @@ export default class FullCalendar extends React.Component<Props, State> {
       },
       body: JSON.stringify(data),
     }).then((response) => {
-      if (response.ok) {
+      if (response.ok) {    //if event was successfully added, display success message
         this.setState({
           informtext: "Event was successfully added to Database",
           informtype: "is-success",
         });
-      } else {
+      } else {          //if error on add event, display error message
         return response.json().then((response) => {
           this.setState({
             informtext:
@@ -222,15 +212,13 @@ export default class FullCalendar extends React.Component<Props, State> {
           });
         });
       }
-      this.action(); //reset state when setEvents has end
-      this.getEvents();
+      this.getEvents();         //render events to update 
     });
   }
 
-  removeEvent(element: any) {
-    element.event.remove();
-    console.log(element.event.id);
-    fetch(BACKEND_URL + "events/remove", {
+  removeEvent(element: any) { 
+    element.event.remove();   //remove on frontend
+    fetch(BACKEND_URL + "events/remove", {  //remove an event from DB
       method: "DELETE",
       headers: {
         accept: "application/json",
@@ -238,16 +226,16 @@ export default class FullCalendar extends React.Component<Props, State> {
         Authorization: SessionHandler.getAuthToken()
       },
       body: JSON.stringify({ id: element.event.id }),
-    }).then((response) => {
+    }).then((response) => {                               //Displays information message on console
       if (response.ok) {
-        console.log("Delete request has been submitted successfully");
+        console.log("Delete request has been submitted successfully");  
       } else {
         console.log("Delete request has failed");
       }
     });
   }
 
-  handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
+  handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {      //Update state on change in a input field
     const target = event.target;
     const value = target.value;
     const name = target.name;
@@ -262,7 +250,7 @@ export default class FullCalendar extends React.Component<Props, State> {
     return (
       <div className="container">
         <div id="calendarFull"></div>
-        <div className={`modal ${active}`} id="CalendarModal">
+        <div className={`modal ${active}`} id="CalendarModal">  
           <div className="modal-background"></div>
           <div className="modal-card">
             <header className="modal-card-head">

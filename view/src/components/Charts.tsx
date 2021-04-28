@@ -10,16 +10,7 @@ import SessionHandler from "../SessionHandler";
 import { BACKEND_URL } from "../App";
 import "bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css";
 
-interface Props {
-  config?: {
-    label: string[];
-    datasets: {
-      label: string;
-      fill: boolean;
-      data: string[];
-    }[];
-  }[];
-}
+interface Props {}
 
 interface State {
   active: boolean;
@@ -27,14 +18,13 @@ interface State {
   type: string;
   category: string;
   sport: string;
+  year: Date;
   fill: boolean;
   array: any;
-  secondtype: string; //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
   sports: string[];
   switchfunc: boolean;
   informtext: string;
   informtype: string;
-  year: Date;
 }
 
 const colors = [
@@ -89,7 +79,6 @@ const initialState = {
   sport: "",
   fill: false,
   array: "",
-  secondtype: "", //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
   sports: [],
   switchfunc: false,
   informtext: "",
@@ -100,22 +89,22 @@ const initialState = {
 export default class Graphs extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = initialState;
+    this.state = initialState; //init state
   }
 
   action = () => {
     //open and close modal
     let active = !this.state.active;
     if (active === true) {
-      this.fetchsports();
+      this.fetchsports(); //fetch sports from DB when modal opens
       this.setState(() => ({ active: active }));
     } else {
-      this.setState(initialState);
+      this.setState(initialState); //reset state on close
     }
   };
 
   componentDidMount() {
-    this.getcharts();
+    this.getcharts(); //get charts with data on mount
   }
 
   fetchsports() {
@@ -147,6 +136,7 @@ export default class Graphs extends React.Component<Props, State> {
   }
 
   getcharts() {
+    //get charts
     // Call the API
     fetch(BACKEND_URL + "charts/get", {
       method: "GET",
@@ -160,25 +150,23 @@ export default class Graphs extends React.Component<Props, State> {
           return response.json();
         } else {
           return response.json().then((response) => {
-            console.log("Failed to get charts: ", response);
+            console.log("Failed to get charts: ", response); //error message in console on error
           });
         }
       })
-      .then((post) => {
-        console.log(JSON.parse(post.body));
-        this.setState({ array: JSON.parse(post.body) });
-        this.loopOverData();
+      .then((data) => {
+        console.log(JSON.parse(data.body));
+        this.setState({ array: JSON.parse(data.body) }); //add charts to array
+        this.loopOverData(); //get data for each chart
       })
       .catch((error) => console.warn(error));
   }
 
   loopOverData() {
     for (let i = 0; i < this.state.array.length; i++) {
-      // Store the post data to a variable
-      /* Check if user/sport are defined and query over all charts */
-      //query parameter values from DB and set if not NULL. else, let values as undefined
+      //loop over each chart
       var year, sport, category, sqlfunc;
-      const params = new URLSearchParams();
+      const params = new URLSearchParams(); //create query params for request
       if (this.state.array[i].category) {
         category = this.state.array[i].category;
         params.append("category", category);
@@ -194,10 +182,10 @@ export default class Graphs extends React.Component<Props, State> {
       if (this.state.array[i].year) {
         year = this.state.array[i].year;
         params.append("year", year);
-        //console.log(year);
       }
       const url = BACKEND_URL + "charts/dataset?";
       const chart = {
+        //build chart constructor
         name: this.state.array[i].name,
         type: this.state.array[i].type,
         category: this.state.array[i].category,
@@ -206,9 +194,7 @@ export default class Graphs extends React.Component<Props, State> {
         year: this.state.array[i].year,
         sqlfunc: this.state.array[i].sqlfunc,
       };
-      console.log(chart);
-      console.log(url + params);
-      this.getdatasets(url, params, chart);
+      this.getdatasets(url, params, chart); //fetch values from DB
     }
   }
 
@@ -236,6 +222,7 @@ export default class Graphs extends React.Component<Props, State> {
 
   getdatasets(url: string, params: any, chart: any) {
     fetch(url + params, {
+      //build URL with params to make request depending on chart
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -252,7 +239,7 @@ export default class Graphs extends React.Component<Props, State> {
       .then((chartsData) => {
         var data = JSON.parse(chartsData.body);
         console.log(data);
-        this.addElement(chart, data); //=> add dataset
+        this.addElement(chart, data); //create chart with data on frontend
       })
       .catch((error) => console.warn(error));
   }
@@ -261,17 +248,17 @@ export default class Graphs extends React.Component<Props, State> {
     var buttonnode = document.getElementById(chart.name); //check if ID already exists (should be unique)
     var chartnode = document.getElementById("chart_ID" + chart.name);
     if (!chartnode && !buttonnode) {
-      // create new div and new button for each new chart
-      var canvas = document.createElement("canvas");
-      canvas.id = "chartID_" + chart.name;
+      // create new unique div and new unique button for each new chart
+      var canvas = document.createElement("canvas"); //Canvas, where chart will be displayed
+      canvas.id = "chartID_" + chart.name; // use chart title to create id for div
       canvas.className = chart.name;
-      var button = document.createElement("button");
+      var button = document.createElement("button"); //Button, to delete chart
       button.id = chart.name; //Set button ID to chart title
       button.className = "button is-danger";
       button.innerHTML = "Delete " + canvas.id;
-      button.onclick = (event: any) => this.removeChart(event.target.id);
+      button.onclick = (event: any) => this.removeChart(event.target.id); //add delete fnction to function
       // add created elements to DOM
-      var parent = document.getElementById("charts");
+      var parent = document.getElementById("charts"); //append every charts to parent div
       parent?.appendChild(canvas);
       parent?.appendChild(button);
       this.addcharts(canvas, chart, data);
@@ -284,45 +271,50 @@ export default class Graphs extends React.Component<Props, State> {
   }
 
   addcharts(canvas: HTMLCanvasElement, chart: any, data: any) {
-    console.log(chart.fill)
     let display = true;
-    if (                                //disable yaxis for doughut, polarArea,radar
+    if (
+      //disable xaxis and yaxis for doughut, polarArea, radar, pie
       chart.type === "pie" ||
-      chart.type === "doughut" ||       
+      chart.type === "doughut" ||
       chart.type === "polarArea" ||
       chart.type === "radar"
     ) {
       display = false;
     }
+    if (chart.fill === 1) {   //Set fill value to ture or false
+      chart.fill = true;
+    } else {
+      chart.fill = false;
+    }
 
     let dataarray: any[] = new Array(labels.length);
-    let ylab = this.yLab(chart.category);
-    let subtitle = this.subtitle(chart.category, ylab, chart.year);
-    dataarray.fill(0, 0, labels.length);
+    let ylab = this.yLab(chart.category); //get unit of measurement for chart
+    let subtitle = this.subtitle(chart.category, ylab, chart.year); //create subtitle to add information for displayed chart
+    dataarray.fill(0, 0, labels.length); //init  charts values
     for (let i = 0; i < data.length; i++) {
+      //Assign value to labels. Set value position depending on label position
       labels.forEach((item, index) => {
         if (data[i].month === index && data[i].amount) {
           dataarray.splice(index - 1, 1, data[i].amount);
         }
       });
     }
-    console.log(dataarray);
     new Chart(canvas, {
+      //Create chart
       options: {
         scales: {
           x: {
-            display: display,
+            display: display, //enable/disable axis dependind on chart type
             title: {
               text: "Month",
               display: display,
-              rotation: 90,
             },
           },
           y: {
             display: display,
             title: {
               display: display,
-              text: [ylab],
+              text: [ylab], //Display unit
             },
           },
         },
@@ -342,17 +334,10 @@ export default class Graphs extends React.Component<Props, State> {
         labels: labels,
         datasets: [
           {
-            label: chart.name,
-            backgroundColor: colors,
-            data: dataarray,
-            fill: true,
-            colors:colors
-          },
-          {
-            label: "My second dataset",
-            backgroundColor: "rgba(220,20,220,0.2)",
-            borderColor: "rgba(220,20,220,1)",
-            data: [],
+            label: chart.name, //Set chart title
+            backgroundColor: colors, //Set charts colors
+            data: dataarray, //Set chart data
+            fill: chart.fill, //Fill chart
           },
         ],
       },
@@ -361,8 +346,7 @@ export default class Graphs extends React.Component<Props, State> {
 
   //Get inputs values then create charts
   configureChart() {
-    console.log(this.state.array);
-    if (
+    if (                    //Check if mandatory values are set else reject request 
       this.state.title &&
       this.state.type &&
       this.state.year &&
@@ -370,17 +354,17 @@ export default class Graphs extends React.Component<Props, State> {
     ) {
       if (
         !this.state.array.find(
-          (title: { name: string }) => title.name === this.state.title //check if title already exists
+          (title: { name: string }) => title.name === this.state.title //Accepts request if title is unique
         )
       ) {
         let sqlfunc;
-        if (this.state.switchfunc === true) {
+        if (this.state.switchfunc === true) {     //Set sql function depending on switch button value
           sqlfunc = "sum";
         } else {
           sqlfunc = "avg";
         }
-        var year = this.state.year.getFullYear();
-        const chart = {
+        var year = this.state.year.getFullYear(); //filter date on year
+        const chart = {                           //build chart
           name: this.state.title,
           type: this.state.type,
           category: this.state.category,
@@ -389,16 +373,14 @@ export default class Graphs extends React.Component<Props, State> {
           year: year,
           sqlfunc: sqlfunc,
         };
-        console.log(chart);
-        const params = new URLSearchParams();
+        const params = new URLSearchParams();       //Add query params to request
         params.append("category", chart.category);
         params.append("sport", chart.param_sport);
         params.append("year", chart.year.toString());
         const url = BACKEND_URL + "charts/dataset?";
-        console.log(url + params);
-        this.getdatasets(url, params, chart);
+        this.getdatasets(url, params, chart);       //Display chart with data on frontend
         this.action();
-        this.setcharts(chart);
+        this.setcharts(chart);                      //Add new chart to DB
       } else {
         console.error(
           "Title was already given. Please choose an other title for your chart"
@@ -409,7 +391,7 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  setcharts(chart: any) {
+  setcharts(chart: any) {     //Add new chart to DB
     fetch(BACKEND_URL + "charts/add", {
       method: "POST",
       headers: {
@@ -426,15 +408,13 @@ export default class Graphs extends React.Component<Props, State> {
     });
   }
 
-  removeChart(id: string) {
+  removeChart(id: string) {   //remove chart 
     var chart = null;
     const chartID = "chartID_" + id;
-    chart = Chart.getChart(chartID);
-    console.log(chart);
-    console.log(chartID);
-    if (chart) {
-      chart.destroy();
-      this.removeElement(id);
+    chart = Chart.getChart(chartID);  //get chart object
+    if (chart) { 
+      chart.destroy();                //Destroy chart object on frontend
+      this.removeElement(id);         //remove element created with chart
       fetch(BACKEND_URL + "charts/remove", {
         method: "DELETE",
         headers: {
@@ -453,20 +433,18 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  removeElement(name: string) {
-    console.log(name);
-    console.log(document.getElementById("chartID_chart"));
-    var canvas = document.getElementById(
+  removeElement(name: string) { //remove chart elements
+    var canvas = document.getElementById(   
       "chartID_" + name
     ) as HTMLCanvasElement;
-    var button = document.getElementById(name) as HTMLButtonElement;
+    var button = document.getElementById(name) as HTMLButtonElement;  
     if (canvas.parentNode && button.parentNode) {
-      canvas.parentNode.removeChild(canvas);
-      button.parentNode.removeChild(button);
+      canvas.parentNode.removeChild(canvas);      //remove canvas element
+      button.parentNode.removeChild(button);      ////remove button element
     }
   }
 
-  yLab(category: string) {
+  yLab(category: string) {        //get unit of measurement depending on category
     var ylab = "";
     if (categories.includes(category)) {
       switch (category) {
@@ -492,11 +470,11 @@ export default class Graphs extends React.Component<Props, State> {
   }
 
   subtitle(category: string, ylab: string, year: number) {
-    var subtitle = `${category} in ${ylab} per month for ${year}`;
+    var subtitle = `${category} in ${ylab} per month for ${year}`;  //create subtitle for chart
     return subtitle;
   }
 
-  fill() {
+  fill() {    //render fill switch button if specific chart type is selected
     if (this.state.type === "line" || this.state.type === "radar") {
       return (
         <div className="m-2">
@@ -517,7 +495,7 @@ export default class Graphs extends React.Component<Props, State> {
     }
   }
 
-  renderOptions(items: any[]) {
+  renderOptions(items: any[]) { //render options for dropdown
     return (
       items &&
       items.length > 0 &&
@@ -527,11 +505,11 @@ export default class Graphs extends React.Component<Props, State> {
     );
   }
 
-  handleDateOnChange(date: any) {
+  handleDateOnChange(date: any) { //Update date on change
     this.setState({ year: date });
   }
 
-  handleOnChange(
+  handleOnChange( //update input fields on change
     event:
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>
@@ -544,7 +522,7 @@ export default class Graphs extends React.Component<Props, State> {
     } as unknown) as Pick<State, keyof State>);
   }
 
-  handleOnCheck(event: any) {
+  handleOnCheck(event: any) { //update checkbox/ switch button on change
     const target = event.target;
     const name = target.name;
     var check = target.checked;
@@ -553,7 +531,7 @@ export default class Graphs extends React.Component<Props, State> {
     } as unknown) as Pick<State, keyof State>);
   }
 
-  handleCategories() {
+  handleCategories() {  //update categories on siwth buttons
     let newcategories = categories;
     if (this.state.switchfunc === false) {
       newcategories = newcategories.concat(averagecategories);
@@ -598,16 +576,16 @@ export default class Graphs extends React.Component<Props, State> {
             <section className="modal-card-body">
               <div className="content">
                 <div className="control">
-                    <label className="label">Chart Name</label>
-                    <input
-                      className="input"
-                      id="charttitle"
-                      name="title"
-                      type="text"
-                      placeholder="Chart title"
-                      value={this.state.title}
-                      onChange={(title) => this.handleOnChange(title)}
-                    />
+                  <label className="label">Chart Name</label>
+                  <input
+                    className="input"
+                    id="charttitle"
+                    name="title"
+                    type="text"
+                    placeholder="Chart title"
+                    value={this.state.title}
+                    onChange={(title) => this.handleOnChange(title)}
+                  />
                   <div className="columns is-centered m-2">
                     <div className="column is-one-quarter">
                       <label className="label">Chart function</label>
