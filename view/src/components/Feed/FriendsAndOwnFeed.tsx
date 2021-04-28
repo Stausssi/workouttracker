@@ -233,28 +233,28 @@ class ActivityTable extends React.Component<TableProps, {}> {
 
     renderTableHeaders(activityData: activityData) {
         let keys = Object.keys(activityData) //get property keys
+
         // @ts-ignore
-        return keys.map((key) => <th>{activityInfo[key].title}</th>)
+        return keys.map((key) => <th key={key}>{activityInfo[key].title}</th>)
     }
 
     renderTableContents(activityData: activityData) {
         let keys = Object.keys(activityData) //get property keys
         let values = Object.values(activityData) // get values
+
         // @ts-ignore
-        return keys.map((key, index) => <th>{activityInfo[key].format(values[index])}</th>)
+        return keys.map((key, index) => <th key={key}>{activityInfo[key].format(values[index])}</th>)
     }
 
     render() {
         return (
             <>
                 <table className="table is-narrow">
-                    <thead>
-                    {this.renderTableHeaders(this.props.activityData)}
+                    <thead><tr>
+                        {this.renderTableHeaders(this.props.activityData)}</tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        {this.renderTableContents(this.props.activityData)}
-                    </tr>
+                    <tbody><tr>
+                        {this.renderTableContents(this.props.activityData)}</tr>
                     </tbody>
                 </table>
             </>
