@@ -85,7 +85,7 @@ interface inputConfig {
 const inputFields: inputConfig[] = [
     {
         identifier: "distance",
-        validValues: [0, null],
+        validValues: [0, 40075000], // -> earth circumference
         hasIcon: true,
         inputLabel: "Distance",
         inputType: "number",
@@ -97,7 +97,7 @@ const inputFields: inputConfig[] = [
     },
     {
         identifier: "duration",
-        validValues: [0, null],
+        validValues: [0, 604800], // Max 1 week -> 604800 seconds
         hasIcon: true,
         inputLabel: "Duration",
         inputType: "number",
@@ -123,7 +123,7 @@ const inputFields: inputConfig[] = [
     },
     {
         identifier: "altitudeDifference",
-        validValues: [0, null],
+        validValues: [0, 40075000], // -> earth circumference
         hasIcon: true,
         inputLabel: "Altitude Difference",
         inputType: "number",
@@ -211,7 +211,7 @@ export default class AddActivity extends Component<Props, State> {
 
         // Check whether the property has inputParams
         if (inputParams) {
-            let valid = this.isValid(value, inputParams.validValues);
+            let valid = this.isValid(value, inputParams.validValues, name === "sport", this.state[name + "Mul"]);
             let icon = inputParams.hasIcon;
 
             this.setState({[name + "Class"]: (valid ? "is-success" : "")});
@@ -228,7 +228,10 @@ export default class AddActivity extends Component<Props, State> {
                 // Calculate property depending on multiplier
                 let multiplyWith = this.state[name] / value;
                 let param = name.replace("Mul", "");
-                this.setState({[param]: this.state[param] * multiplyWith})
+
+                // Round to the last 2 decimal places
+                let rounded = Math.round((this.state[param] * multiplyWith) * 100) / 100;
+                this.setState({[param]: rounded})
             }
         }
 
@@ -256,10 +259,10 @@ export default class AddActivity extends Component<Props, State> {
             for (let index in this.mandatoryParams) {
                 let inputParams = inputFields[index];
                 let value = this.state[inputParams.identifier];
+                let mul = this.state[inputParams.identifier + "Mul"];
 
-                if (this.mandatoryParams[index] || (this.optParams[index] && this.isValid(value, inputParams.validValues))) {
+                if (this.mandatoryParams[index] || (this.optParams[index] && this.isValid(value, inputParams.validValues, false, mul))) {
                     // Apply multiplier
-                    let mul = this.state[inputParams.identifier + "Mul"];
                     if (mul > 1) {
                         value *= mul;
                     }
@@ -275,10 +278,12 @@ export default class AddActivity extends Component<Props, State> {
                 bodyContent["pace"] = bodyContent["distance"] / bodyContent["duration"] * 3.6;
             }
 
-            // Check if date is valid
-            if (this.state.date < this.getMaxValidDate()) {
-                bodyContent.startedAt = this.state.date.toISOString().slice(0, 19).replace("T", " ");
-            }
+            // Check if date is valid, else use max valid date
+            bodyContent.startedAt =
+                (this.state.date < this.getMaxValidDate() ?
+                        this.state.date :
+                        this.getMaxValidDate()
+                ).toISOString().slice(0, 19).replace("T", " ");
 
             // Send post request
             fetch(BACKEND_URL + "activity/add", {
@@ -325,13 +330,12 @@ export default class AddActivity extends Component<Props, State> {
     }
 
     render() {
-        this.validateInput();
         return (
             <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
                 <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
 
                 <label className="label">Sport</label>
-                <div className={`select is-fullwidth mb-5 ${this.state.sportClass}`}>
+                <div className={`select is-fullwidth ${this.state.sportClass}`}>
                     <select name="sport" onChange={this.handleChange} value={this.state.sport}>
                         {
                             this.state.notifyMessage !== notifyMessages["fetchFailed"][0] ?
@@ -360,7 +364,6 @@ export default class AddActivity extends Component<Props, State> {
     createFormFields() {
         // Create HTML Fields template
         // Executed on the client -> no performance problem for now
-        // TODO: Fix 'Each child in a list should have a unique "key" prop.' warning
         let createInputField = (params: inputConfig) => {
             function createSelectOptions(dict: selectOptions) {
                 let options = [];
@@ -379,7 +382,7 @@ export default class AddActivity extends Component<Props, State> {
             if (identifier !== "pace") {
                 return (
                     params.multiplier ?
-                        <>
+                        <div key={"inputField_" + identifier} className="field">
                             <label className="label">{params.inputLabel}</label>
                             <div className="field has-addons">
                                 <div className="control has-icons-right is-expanded">
@@ -389,16 +392,17 @@ export default class AddActivity extends Component<Props, State> {
                                         name={identifier}
                                         placeholder={params.inputPlaceholder}
                                         value={Number(this.state[identifier]) === 0 ? "" : this.state[identifier]}
+                                        min={params.validValues[0]}
+                                        max={params.validValues[1]}
                                         onChange={this.handleChange}
                                     />
                                     <span className={`icon is-right ${this.state[identifier + "IconClass"]}`}>
-                                    <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
-                                </span>
+                                        <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
+                                    </span>
                                 </div>
                                 <div className="control">
-                                    <div className="select is-fullwidth">
+                                    <div className={`select ${this.state[identifier + "Class"]} is-fullwidth`}>
                                         <select
-                                            className="select"
                                             name={identifier + "Mul"}
                                             value={this.state[identifier + "Mul"]}
                                             onChange={this.handleChange}
@@ -408,9 +412,9 @@ export default class AddActivity extends Component<Props, State> {
                                     </div>
                                 </div>
                             </div>
-                        </>
+                        </div>
                         :
-                        <>
+                        <div key={"inputField_" + identifier} className="field">
                             <label className="label">{params.inputLabel}</label>
                             <div className="field">
                                 <div className="control has-icons-right">
@@ -420,29 +424,38 @@ export default class AddActivity extends Component<Props, State> {
                                         name={identifier}
                                         placeholder={params.inputPlaceholder}
                                         value={Number(this.state[identifier]) === 0 ? "" : this.state[identifier]}
+                                        min={params.validValues[0]}
+                                        max={params.validValues[1]}
                                         onChange={this.handleChange}
                                     />
                                     <span className={`icon is-right ${this.state[identifier + "IconClass"]}`}>
-                                    <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
-                                </span>
+                                        <FontAwesomeIcon icon={this.state[identifier + "Icon"]}/>
+                                    </span>
                                 </div>
                             </div>
-                        </>
+                        </div>
                 );
             } else {
                 return (
-                    <></>
+                    <div key={"input_empty_div"}/>
                 );
             }
         };
 
         // Only create elements if a valid sport is selected
         if (this.state.sportClass === "is-success") {
-            // Get bitfields and split them into their bitwise representation
-            // reverse to fill zeros in the beginning
+            // Get bitfields
             let bitfieldArray: any = this.props.sports[this.state.sport];
-            let mandatory: boolean[] = bitfieldArray[1].toString(2).split("").reverse();
-            let optional: boolean[] = bitfieldArray[0].toString(2).split("").reverse();
+
+            // split them into their bitwise representation
+            // map the strings representing numbers to booleans
+            // reverse to fill zeros in the beginning
+            let mandatory: boolean[] = bitfieldArray[1].toString(2)
+                .split("").map((value: string) => Boolean(Number(value)))
+                .reverse();
+            let optional: boolean[] = bitfieldArray[0].toString(2)
+                .split("").map((value: string) => Boolean(Number(value)))
+                .reverse();
 
             // Fill missing zeros
             for (let i = 0; i < NUM_FIELDS - mandatory.length; i++) {
@@ -457,14 +470,10 @@ export default class AddActivity extends Component<Props, State> {
             mandatory = mandatory.reverse();
             optional = optional.reverse();
 
-            let fieldsHTML = [<div className="divider">Mandatory</div>];
+            let fieldsHTML = [<div className="divider" key={"input_divider_man"}>Mandatory</div>];
             for (let index in mandatory) {
-                mandatory[index] = Boolean(Number(mandatory[index]));
-                optional[index] = Boolean(Number(optional[index]));
-
-                let inputParams = inputFields[index];
                 if (mandatory[index]) {
-                    fieldsHTML.push(createInputField(inputParams));
+                    fieldsHTML.push(createInputField(inputFields[index]));
 
                     // Remove param from optional to prevent double input
                     if (optional[index]) {
@@ -473,23 +482,17 @@ export default class AddActivity extends Component<Props, State> {
                 }
             }
 
-            // Update global params
-            this.mandatoryParams = mandatory;
-            this.optParams = optional;
-
             // Only display optional params if there are any
-            if (optional.includes(true)) {
-                fieldsHTML.push(<div className="divider">Optional</div>);
+            fieldsHTML.push(<div className="divider" key={"input_divider_opt"}>Optional</div>);
 
-                for (let index in optional) {
-                    if (optional[index]) {
-                        fieldsHTML.push(createInputField(inputFields[index]));
-                    }
+            for (let index in optional) {
+                if (optional[index]) {
+                    fieldsHTML.push(createInputField(inputFields[index]));
                 }
             }
 
             // Create date picker
-            fieldsHTML.push(<>
+            fieldsHTML.push(<div key={"inputField_date"}>
                 <label className="label">Date and Time</label>
                 <DatePicker
                     dateFormat="dd.MM.yyyy HH:mm"
@@ -510,23 +513,28 @@ export default class AddActivity extends Component<Props, State> {
                     }}
                     inline
                 />
-            </>);
+            </div>);
+
+            // Update global params
+            this.mandatoryParams = mandatory;
+            this.optParams = optional;
+
+            // Validate Fields
+            this.validateInput();
 
             return fieldsHTML;
         }
-        return <p className="tag is-info is-light">Please select a sport</p>;
+        return <p className="tag is-info mt-4" key={"inputField_sportInfo"}>Please select a sport</p>;
     }
 
     validateInput(returnValue?: boolean) {
-        let valid = false;
-        if (this.mandatoryParams.length === NUM_FIELDS) {
-            valid = this.isValid(this.state.sport, inputFields[NUM_FIELDS].validValues);
+        let valid = this.isValid(this.state.sport, inputFields[NUM_FIELDS].validValues, true);
 
-            for (let index in this.mandatoryParams) {
-                if (this.mandatoryParams[index]) {
-                    let inputParams = inputFields[index];
-                    valid = valid && this.isValid(this.state[inputParams.identifier], inputParams.validValues);
-                }
+        for (let index in this.mandatoryParams) {
+            if (this.mandatoryParams[index]) {
+                let inputParams = inputFields[index];
+                let identifier = inputParams.identifier;
+                valid = valid && this.isValid(this.state[identifier], inputParams.validValues, identifier === "pace", this.state[identifier + "Mul"]);
             }
         }
 
@@ -539,13 +547,20 @@ export default class AddActivity extends Component<Props, State> {
         }
     }
 
-    isValid(value: number, validValues: any[]) {
+    isValid(value: number, validValues: any[], possibleNaN: boolean = false, multiplier: number | undefined | null = 1) {
         let min = validValues[0];
         let max = validValues[1];
         value = Number(value);
 
         // Check whether the value is in range of the params or is NaN (sports)
-        return (min < value && (max ? value < max : true)) || isNaN(value);
+        if (isNaN(value)) {
+            return possibleNaN;
+        } else {
+            if (multiplier && multiplier > 0) {
+                value *= multiplier;
+            }
+            return (min < value && (max ? value < max : true));
+        }
     }
 
     allowSubmit(state: boolean) {

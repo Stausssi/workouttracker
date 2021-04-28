@@ -16,7 +16,6 @@ Sport.getAll = (setSports) => {
                     let sport = item.sport;
                     let bitfield = item.BitfieldValues;
                     let bitfieldMust = item.BitfieldMustBeSet;
-                    // let icon = item.Icon; --> Ignore for now
 
                     sports = Object.assign({}, sports, {[sport]: [bitfield, bitfieldMust]});
                 })
