@@ -30,7 +30,6 @@ interface State {
   fill: boolean;
   array: any;
   secondtype: string; //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
-  charts: {};
   sports: string[];
   switchfunc: boolean;
   informtext: string;
@@ -39,6 +38,8 @@ interface State {
 }
 
 const colors = [
+  "silver",
+  "gold",
   "red",
   "blue",
   "orange",
@@ -48,8 +49,6 @@ const colors = [
   "orange",
   "black",
   "pink",
-  "gold",
-  "silver",
   "navy",
 ];
 
@@ -78,24 +77,9 @@ const types = [
   "pie",
 ];
 
-const categories = [
-  "distance",
-  "duration",
-  "pace",
-  "effort",
-  "averageHeartRate",
-  "altitudeDifference",
-];
+const categories = ["distance", "duration", "effort", "altitudeDifferences"];
 
 const averagecategories = ["averageHeartRate", "pace"];
-
-const amountcategories = [
-  //rename in categories
-  "distance",
-  "duration",
-  "effort",
-  "altitudeDifferences",
-];
 
 const initialState = {
   active: false,
@@ -106,7 +90,6 @@ const initialState = {
   fill: false,
   array: "",
   secondtype: "", //use later to add second chart ==> https://www.chartjs.org/docs/latest/charts/mixed.html
-  charts: {},
   sports: [],
   switchfunc: false,
   informtext: "",
@@ -115,7 +98,6 @@ const initialState = {
 };
 
 export default class Graphs extends React.Component<Props, State> {
-  chart2: Chart | undefined;
   constructor(props: Props) {
     super(props);
     this.state = initialState;
@@ -231,17 +213,13 @@ export default class Graphs extends React.Component<Props, State> {
   }
 
   test() {
-    fetch(
-      BACKEND_URL +
-        "charts/dataset?category=pace&sqlfunc=sum&year=2021",
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Authorization: SessionHandler.getAuthToken(),
-        },
-      }
-    )
+    fetch(BACKEND_URL + "charts/dataset?category=pace&sqlfunc=sum&year=2021", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: SessionHandler.getAuthToken(),
+      },
+    })
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -306,11 +284,11 @@ export default class Graphs extends React.Component<Props, State> {
   }
 
   addcharts(canvas: HTMLCanvasElement, chart: any, data: any) {
-    //disable yaxis for doughut, polarArea,radar
+    console.log(chart.fill)
     let display = true;
-    if (
+    if (                                //disable yaxis for doughut, polarArea,radar
       chart.type === "pie" ||
-      chart.type === "doughut" ||
+      chart.type === "doughut" ||       
       chart.type === "polarArea" ||
       chart.type === "radar"
     ) {
@@ -319,7 +297,6 @@ export default class Graphs extends React.Component<Props, State> {
 
     let dataarray: any[] = new Array(labels.length);
     let ylab = this.yLab(chart.category);
-    let ytest = this.yLab("duration");
     let subtitle = this.subtitle(chart.category, ylab, chart.year);
     dataarray.fill(0, 0, labels.length);
     for (let i = 0; i < data.length; i++) {
@@ -368,7 +345,8 @@ export default class Graphs extends React.Component<Props, State> {
             label: chart.name,
             backgroundColor: colors,
             data: dataarray,
-            fill: chart.fill,
+            fill: true,
+            colors:colors
           },
           {
             label: "My second dataset",
@@ -490,7 +468,6 @@ export default class Graphs extends React.Component<Props, State> {
 
   yLab(category: string) {
     var ylab = "";
-    //bei getdatasets definieren
     if (categories.includes(category)) {
       switch (category) {
         case "distance":
@@ -519,7 +496,26 @@ export default class Graphs extends React.Component<Props, State> {
     return subtitle;
   }
 
-  remndercategory() {}
+  fill() {
+    if (this.state.type === "line" || this.state.type === "radar") {
+      return (
+        <div className="m-2">
+          <input
+            type="checkbox"
+            name="fill"
+            className="switch"
+            id="fill"
+            onChange={(fill) => this.handleOnCheck(fill)}
+          />
+          <label className="label" htmlFor="fill">
+            {this.state.fill ? <span>Filled</span> : <span>Not filled</span>}
+          </label>
+        </div>
+      );
+    } else {
+      return "";
+    }
+  }
 
   renderOptions(items: any[]) {
     return (
@@ -540,8 +536,6 @@ export default class Graphs extends React.Component<Props, State> {
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) {
-    console.log(event.target.value);
-    console.log(event.target.name);
     const target = event.target;
     const value = target.value;
     const name = target.name;
@@ -554,13 +548,17 @@ export default class Graphs extends React.Component<Props, State> {
     const target = event.target;
     const name = target.name;
     var check = target.checked;
-    console.log(check);
-    console.log(target);
-    console.log(name);
-    console.log(check);
     this.setState(({
       [name]: check,
     } as unknown) as Pick<State, keyof State>);
+  }
+
+  handleCategories() {
+    let newcategories = categories;
+    if (this.state.switchfunc === false) {
+      newcategories = newcategories.concat(averagecategories);
+    }
+    return this.renderOptions(newcategories);
   }
 
   render() {
@@ -600,16 +598,41 @@ export default class Graphs extends React.Component<Props, State> {
             <section className="modal-card-body">
               <div className="content">
                 <div className="control">
-                  <label className="label">Chart Name</label>
-                  <input
-                    className="input"
-                    id="charttitle"
-                    name="title"
-                    type="text"
-                    placeholder="Chart title"
-                    value={this.state.title}
-                    onChange={(title) => this.handleOnChange(title)}
-                  />
+                    <label className="label">Chart Name</label>
+                    <input
+                      className="input"
+                      id="charttitle"
+                      name="title"
+                      type="text"
+                      placeholder="Chart title"
+                      value={this.state.title}
+                      onChange={(title) => this.handleOnChange(title)}
+                    />
+                  <div className="columns is-centered m-2">
+                    <div className="column is-one-quarter">
+                      <label className="label">Chart function</label>
+                    </div>
+                    <div className="column is-one-quarter">
+                      <div className="field">
+                        <input
+                          type="checkbox"
+                          name="switchfunc"
+                          className="switch"
+                          id="switchfunc"
+                          onChange={(switchfunc) =>
+                            this.handleOnCheck(switchfunc)
+                          }
+                        />
+                        <label className="label" htmlFor="switchfunc">
+                          {this.state.switchfunc ? (
+                            <span>Sum</span>
+                          ) : (
+                            <span>Average</span>
+                          )}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
                   <label className="label">Chart Type</label>
                   <div className="select is-fullwidth mb-5">
                     <select
@@ -629,7 +652,7 @@ export default class Graphs extends React.Component<Props, State> {
                       id="category"
                       onChange={(category) => this.handleOnChange(category)}
                     >
-                      {this.renderOptions(categories)}
+                      {this.handleCategories()}
                     </select>
                   </div>
                   <div className="is-divider" data-content="Optional"></div>
@@ -657,44 +680,7 @@ export default class Graphs extends React.Component<Props, State> {
                       inline
                     />
                   </div>
-                  <div className="columns">
-                    <div className="column">
-                      <input
-                        type="checkbox"
-                        name="fill"
-                        className="switch"
-                        id="fill"
-                        onChange={(fill) => this.handleOnCheck(fill)}
-                      />
-                      <label className="label" htmlFor="fill">
-                        {this.state.fill ? (
-                          <span>Filled</span>
-                        ) : (
-                          <span>Not filled</span>
-                        )}
-                      </label>
-                    </div>
-                    <div className="column">
-                      <div className="field">
-                        <input
-                          type="checkbox"
-                          name="switchfunc"
-                          className="switch"
-                          id="switchfunc"
-                          onChange={(switchfunc) =>
-                            this.handleOnCheck(switchfunc)
-                          }
-                        />
-                        <label className="label" htmlFor="switchfunc">
-                          {this.state.switchfunc ? (
-                            <span>Sum</span>
-                          ) : (
-                            <span>Average</span>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-                  </div>
+                  <div>{this.fill()}</div>
                 </div>
               </div>
             </section>

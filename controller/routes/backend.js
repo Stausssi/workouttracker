@@ -5,10 +5,10 @@ const router = express.Router();
 const users = require("../controllers/userController");
 const activity = require("../controllers/activityController");
 const sport = require("../controllers/sportController");
-
-const {authenticateJWT} = require("../utilities/authentication/MiddlewareAuthentication");
 const event = require("../controllers/calendarController");
 const chart = require("../controllers/chartController");
+
+const {authenticateJWT} = require("../utilities/authentication/MiddlewareAuthentication");
 
 router.get('/', function (req, res, next) {
     res.render('index')

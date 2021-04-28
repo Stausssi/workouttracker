@@ -1,6 +1,6 @@
 const { request } = require('express');
 const Event = require("../../model/models/calendarModel");
-const { isParamMissing, basicSuccessErrorHandling } = require("../utilities/misc");
+const { isParamMissing } = require("../utilities/misc");
 
 exports.findAll = (request, response) => {
   let username = request.username;

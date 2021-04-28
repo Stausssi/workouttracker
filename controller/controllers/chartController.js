@@ -1,7 +1,7 @@
 const { request } = require('express');
 const Chart = require("../../model/models/chartModel");
 const Data = require("../../model/models/dataModel");
-const { isParamMissing, basicSuccessErrorHandling } = require("../utilities/misc");
+const { isParamMissing } = require("../utilities/misc");
 
 exports.findAll = (request, response) => {
   let username = request.username;
