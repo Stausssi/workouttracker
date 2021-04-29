@@ -5,7 +5,6 @@ const nodemailer = require('nodemailer');
 const config = require("./emailConfirmation.config");
 
 exports.sendConfirmationEmail = (user) => {
-    user.email
     const mailOptions = {
         from: config.auth.user,
         to: user.email,

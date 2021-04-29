@@ -6,6 +6,9 @@ const users = require("../controllers/userController");
 const activity = require("../controllers/activityController");
 const sport = require("../controllers/sportController");
 const feed = require("../controllers/feedController");
+const comment = require("../controllers/commentController");
+const profile = require("../controllers/profileController");
+const googlefit = require("../controllers/googlefitController");
 
 const {authenticateJWT} = require("../utilities/authentication/MiddlewareAuthentication");
 
@@ -16,9 +19,23 @@ router.get('/', function (req, res, next) {
 router.post('/login', users.login);
 router.post('/signup', users.signup);
 
-router.get('/verify/:hash', function (req, res) {
-    users.verifyEmail(req, res);
-    res.redirect('http://localhost:3000/verify');
+router.post('/commend', authenticateJWT, comment.addCommend);
+router.get('/commendisnew/:activity', authenticateJWT, comment.getComment);
+
+router.post('/thumpsup', authenticateJWT, comment.thumpsup);
+router.get('/isthumpsupset/:activity', authenticateJWT, comment.isthumpsupset);
+router.get('/countThumps/:activity', authenticateJWT, comment.countThumps);
+
+router.get('/profilesite/:user', authenticateJWT, profile.profilesite);
+router.put('/profilesiteupdate', authenticateJWT, profile.profileUpdate);
+
+router.get('/googlefit/getURLTing', googlefit.getFitURL);
+router.get('/googlefit/activity', googlefit.insertActivitysFromGoogle);
+
+
+router.get('/verify/:hash', function(req, res){
+  users.verifyEmail(req, res);
+  res.redirect('http://localhost:3000/verify');
 });
 
 router.post('/activity/add', authenticateJWT, activity.add);
