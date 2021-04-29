@@ -271,6 +271,7 @@ interface CommentProps {
 
 // TODO: Send comment on enter press
 class ActivityComments extends React.Component<CommentProps, CommentState> {
+    private commentContainerChild: React.RefObject<CommentContainer>;
     constructor(props: CommentProps) {
         super(props);
 
@@ -280,26 +281,19 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
         }
 
         this.handleCommentSubmit = this.handleCommentSubmit.bind(this);
+
+        this.commentContainerChild = React.createRef();
     }
 
     handleCommentSubmit(event: any) {
-        if (this.state.commentText.length > 0) {
-            // TODO: insert in frontend to show the comment fast as possible
-            //built timestamp formatted in the db to insert faster in the frontend
-            // const Now = new Date();
-            // const Day = Now.getUTCDay();
-            // const Month = Now.getUTCMonth() + 1;
-            // let Year = Now.getUTCFullYear();
-            // const Hours = Now.getUTCHours();
-            // const Minutes = Now.getUTCMinutes();
-            // const Seconds = Now.getUTCSeconds();
-            // if (Year < 1900) {
-            //     Year += 1900;
-            // }
-
-            // const timestamp = Year + "-" + Month + "-" + Day + " " + Hours + ":" + Minutes + ":" + Seconds;
-            // const name = SessionHandler.getUsername();
-            //onAdd({text, name, timestamp})
+        let commentText = this.state.commentText;
+        if (commentText.length > 0) {
+            // Add comment to comment container to display it instantly
+            this.commentContainerChild.current?.addComment({
+                text: commentText,
+                name: SessionHandler.getUsername(),
+                timestamp: new Date().toISOString().slice(0, 19).replace("T", " ")
+            });
 
             // insert in backend
             fetch(BACKEND_URL + 'comment', {
@@ -310,7 +304,7 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
                     Authorization: SessionHandler.getAuthToken()
                 },
                 body: JSON.stringify({
-                    text: this.state.commentText,
+                    text: commentText,
                     activity: this.props.activity_id,
                 })
             }).then((response) => {
@@ -344,7 +338,7 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
                 {this.state.showComments ?
                     <>
                         <div className="card-content">
-                            <CommentContainer activityNr={this.props.activity_id}/>
+                            <CommentContainer activityNr={this.props.activity_id} ref={this.commentContainerChild} />
                         </div>
                         <footer className="card-footer">
                             <div className="card-footer-item">

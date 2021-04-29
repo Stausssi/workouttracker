@@ -45,9 +45,9 @@ export default class CommentContainer extends Component<{ activityNr: number }, 
 
     //Add comment
     addComment(comment: any) {
-        const id = Math.floor(Math.random() * 10000) + 1
+        const id = Math.floor(Math.random() * 10000) + 1;
         const newComment = {id, ...comment};
-        console.log(newComment);
+        // console.log(newComment);
         const comments = this.state.comments;
         this.setState({comments: [...comments, newComment]});
     }
