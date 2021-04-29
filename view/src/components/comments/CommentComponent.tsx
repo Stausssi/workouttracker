@@ -17,7 +17,7 @@ interface State {
   activity: number;
 }
 
-export default class CommmentComponent extends Component<{}, State> {
+export default class CommmentComponent extends Component<{activityNr: number}, State> {
   constructor(props: any) {
       super(props);
 
@@ -26,7 +26,7 @@ export default class CommmentComponent extends Component<{}, State> {
             showthumpsUp: false,
             thumpsUpCounter: 0,
             comments: [],
-            activity: 48    //an onAdd ändern
+            activity: props.activityNr
       };
 
       this.refreshComment();
@@ -167,7 +167,7 @@ export default class CommmentComponent extends Component<{}, State> {
             ) : (
               'No Comments To Show'
             )}
-            {this.state.showAddComent && <AddComment onAdd={this.addComment} />}
+            {this.state.showAddComent && <AddComment  activityNr={this.state.activity} onAdd={this.addComment}/>}
           </div>
           <footer className="card-footer-item">
             <Header thumpsUpCounter={this.state.thumpsUpCounter} thumpsUp={() => this.thumpIsPresed()} showthumpsUp={this.state.showthumpsUp} onAdd={() => this.setState({showAddComent: !this.state.showAddComent})} />

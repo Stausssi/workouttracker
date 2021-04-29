@@ -109,7 +109,10 @@ export default class ProfileSite  extends Component<{}, State> {
         var date = "";
         if(this.state.dateChange){
             this.setState({dateChange: false});
-            date = this.state.date.toISOString().slice(0, 10);
+
+            // add a day because the minutes toISOString converts it not right
+            const datePusOneDay = new Date(this.state.date.getTime() + 86400000);
+            date = datePusOneDay.toISOString().slice(0, 10);
         }
         var email = "";
         if(this.state.email) {
@@ -171,7 +174,7 @@ export default class ProfileSite  extends Component<{}, State> {
                         </div>
                         <div className='field'>
                             <label className="label">Date of Birth</label>
-                            <DatePicker  selected={this.state.date} onChange={this.handleDateChange} dateFormat="dd.MM.yyyy"/>
+                            <DatePicker maxDate={new Date()} selected={this.state.date} onChange={this.handleDateChange} dateFormat="dd.MM.yyyy"/>
                             <p className={this.state.dateChange ? 'initial-scale=7' : 'is-hidden'}>changed</p>
                         </div>
                         <div className='field'>

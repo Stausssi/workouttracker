@@ -4,10 +4,11 @@ import SessionHandler from "../../../utilities/SessionHandler";
 
 interface Props {
     onAdd: any,
+    activityNr: number,
 }
 
 //add new comment in the front and backend
-const AddComment = ({ onAdd }: Props) => {
+const AddComment = ({ onAdd, activityNr }: Props) => {
     const [text, setText] = useState('')
     const [countLengt, setCountLengt] = useState(500)
 
@@ -48,7 +49,7 @@ const AddComment = ({ onAdd }: Props) => {
                 },
                 body: JSON.stringify({
                     text: text,
-                    activity: 48,
+                    activity: activityNr,
                 }),
             });
         }
