@@ -269,9 +269,9 @@ interface CommentProps {
     activity_id: number
 }
 
-// TODO: Send comment on enter press
 class ActivityComments extends React.Component<CommentProps, CommentState> {
-    private commentContainerChild: React.RefObject<CommentContainer>;
+    private readonly commentContainerChild: React.RefObject<CommentContainer>;
+
     constructor(props: CommentProps) {
         super(props);
 
@@ -350,7 +350,12 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
                                             value={this.state.commentText}
                                             maxLength={500}
                                             placeholder='Add your comment'
-                                            onChange={(event: any) => this.setState({commentText: event.target.value})}/>
+                                            onChange={(event: any) => this.setState({commentText: event.target.value})}
+                                            onKeyUp={(event: any) => {
+                                                // 13 is enter
+                                                if (event.keyCode === 13) this.handleCommentSubmit(event);
+                                            }}
+                                        />
                                     </div>
                                     <div className="control">
                                         <button
