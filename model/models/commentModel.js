@@ -14,33 +14,33 @@ Comment.addCommentToDB = (req, isAdded) => {
     });
 }
 
-Comment.selectCommentsFromDB = (req, commends) => {        // keine join benötigt
+Comment.selectCommentsFromDB = (req, comments) => {        // keine join benötigt
     connection.query("SELECT comments.PrimaryKey AS id, comments.text, comments.timestamp, comments.username AS name FROM `comments` WHERE `PKactivity`=?;" , [
         req.params.activity
     ], function(error, rows, fields){
         console.log(error);
 
-        if (error) commends(error, null);
-        else commends(null, "{" + "\"Rowdata\":" + JSON.stringify(rows) + "}");
+        if (error) comments(error, null);
+        else comments(null, "{" + "\"Rowdata\":" + JSON.stringify(rows) + "}");
     });
 }
 
-Comment.invertThumpsUpInDB = (req, errorInDB) => {
-    connection.query("SELECT * FROM `thumbsup` WHERE  `username_fk`=? AND `activity_id`=?;" , [
+Comment.invertThumbsUpInDB = (req, errorInDB) => {
+    connection.query("SELECT * FROM thumbsUp WHERE  `username_fk`=? AND `activity_id`=?;" , [
         req.username,
         req.body.activity
     ], function(error, rows, fields){
         if(error) errorInDB(error);
         else {
-            if(rows.length == 0) {
-                connection.query("INSERT INTO `thumbsup` (`PrimaryKey`, `username_fk`, `activity_id`) VALUES (NULL, ?, ?);" , [
+            if(rows.length === 0) {
+                connection.query("INSERT INTO thumbsUp (`PrimaryKey`, `username_fk`, `activity_id`) VALUES (NULL, ?, ?);" , [
                     req.username,
                     req.body.activity
                 ], function(error, rows, fields){
                     if(error) errorInDB(error);
                 });
             }else{
-                connection.query("DELETE FROM `thumbsup` WHERE `username_fk`=? AND `activity_id`=?;" , [
+                connection.query("DELETE FROM thumbsUp WHERE `username_fk`=? AND `activity_id`=?;" , [
                     req.username,
                     req.body.activity
                 ], function(error, rows, fields){
@@ -52,21 +52,21 @@ Comment.invertThumpsUpInDB = (req, errorInDB) => {
     });
 }
 
-Comment.isThumpsUpSetInDB = (req, isSet) => {       
-    connection.query("SELECT * FROM `thumbsup` WHERE  `username_fk`=? AND `activity_id`=?;" , [
+Comment.isThumbsUpSetInDB = (req, isSet) => {
+    connection.query("SELECT * FROM thumbsUp WHERE  `username_fk`=? AND `activity_id`=?;" , [
         req.username,
         req.params.activity
     ], function(error, rows, fields){
         if (error) isSet(error, false);
         else {
-            if(rows.length == 0) isSet(null, false);
+            if(rows.length === 0) isSet(null, false);
             else isSet(null, true);
         }
     });
 }
 
-Comment.countThumpsUpInAnActivity = (req, count) => {       
-    connection.query("SELECT COUNT(PrimaryKey) AS counter FROM `thumbsup` WHERE `activity_id`=?;" , [
+Comment.countThumbsUpInAnActivity = (req, count) => {
+    connection.query("SELECT COUNT(PrimaryKey) AS counter FROM thumbsUp WHERE `activity_id`=?;" , [
         req.params.activity
     ], function(error, rows, fields){
         if(error) count(error, "{}");

@@ -36,7 +36,7 @@ Feed.getOwnFeed = (user, start, amount, result) => {
     sql.query('SELECT * FROM ' +
         '(SELECT * FROM activity WHERE user=? ORDER BY addedAt DESC LIMIT ?, ?) activities ' +
         'LEFT OUTER JOIN ' +
-        '(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsup GROUP BY activity_id) likecount ' +
+        '(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsUp GROUP BY activity_id) likecount ' +
         'USING(activity_id)',
         [
             user,
@@ -63,7 +63,7 @@ Feed.getFollowingFeed = (user, start, amount, result) => {
         '(SELECT followed FROM following WHERE follower=?) ' +
         'ORDER BY addedAt DESC LIMIT ?, ?) activities ' +
         'LEFT OUTER JOIN ' +
-        '(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsup GROUP BY activity_id) likecount ' +
+        '(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsUp GROUP BY activity_id) likecount ' +
         'USING(activity_id)',
         [
             user,

@@ -333,7 +333,7 @@ export default class AddActivity extends Component<Props, State> {
     render() {
         return (
             <>
-            <GoogleFit></GoogleFit>
+            <GoogleFit />
             <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
                 <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
 

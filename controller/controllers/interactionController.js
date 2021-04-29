@@ -1,7 +1,7 @@
 const Comment = require("../../model/models/commentModel");
 
 //add new comment
-exports.addCommend = (req, resp) => {
+exports.addComment = (req, resp) => {
     Comment.addCommentToDB(req, function (error, isAdded) {
         if (error) {
             resp.status(500).send({
@@ -36,9 +36,9 @@ exports.getComment = (req, resp) => {
     });
 }
 
-//!thumpsup if thumpsup button is pressed
-exports.thumpsup = (req, resp) => {
-    Comment.invertThumpsUpInDB(req, function (error) {
+//!thumbsUp if thumbsUp button is pressed
+exports.thumbsUp = (req, resp) => {
+    Comment.invertThumbsUpInDB(req, function (error) {
         if (error) {
             resp.status(500).send({
                 errno: 2,
@@ -51,9 +51,9 @@ exports.thumpsup = (req, resp) => {
 }
 
 
-//is thumpsup set ?
-exports.isthumpsupset = (req, resp) => {
-    Comment.isThumpsUpSetInDB(req, function (error, isSet) {
+//is thumbsup set ?
+exports.isThumbsUpSet = (req, resp) => {
+    Comment.isThumbsUpSetInDB(req, function (error, isSet) {
         if (error) {
             resp.status(500).send({
                 errno: 2,
@@ -63,9 +63,9 @@ exports.isthumpsupset = (req, resp) => {
     });
 }
 
-//count thumpsup set
-exports.countThumps = (req, resp) => {
-    Comment.countThumpsUpInAnActivity(req, function (error, count) {
+//count thumbsup set
+exports.countThumbs = (req, resp) => {
+    Comment.countThumbsUpInAnActivity(req, function (error, count) {
         if (error) {
             resp.status(500).send({
                 errno: 2,

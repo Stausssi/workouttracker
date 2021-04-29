@@ -6,7 +6,7 @@ const users = require("../controllers/userController");
 const activity = require("../controllers/activityController");
 const sport = require("../controllers/sportController");
 const feed = require("../controllers/feedController");
-const comment = require("../controllers/commentController");
+const comment = require("../controllers/interactionController");
 const profile = require("../controllers/profileController");
 const googlefit = require("../controllers/googlefitController");
 
@@ -19,12 +19,12 @@ router.get('/', function (req, res, next) {
 router.post('/login', users.login);
 router.post('/signup', users.signup);
 
-router.post('/commend', authenticateJWT, comment.addCommend);
-router.get('/commendisnew/:activity', authenticateJWT, comment.getComment);
+router.post('/comment', authenticateJWT, comment.addComment);
+router.get('/commentIsNew/:activity', authenticateJWT, comment.getComment);
 
-router.post('/thumpsup', authenticateJWT, comment.thumpsup);
-router.get('/isthumpsupset/:activity', authenticateJWT, comment.isthumpsupset);
-router.get('/countThumps/:activity', authenticateJWT, comment.countThumps);
+router.post('/thumbsUp', authenticateJWT, comment.thumbsUp);
+router.get('/isThumbsUpSet/:activity', authenticateJWT, comment.isThumbsUpSet);
+router.get('/countThumbs/:activity', authenticateJWT, comment.countThumbs);
 
 router.get('/profilesite/:user', authenticateJWT, profile.profilesite);
 router.put('/profilesiteupdate', authenticateJWT, profile.profileUpdate);

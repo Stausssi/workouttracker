@@ -1,7 +1,11 @@
 import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown, faAngleUp, faThumbsUp} from "@fortawesome/free-solid-svg-icons";
+
 import {postData} from "../Feed/FriendsAndOwnFeed";
+import CommentContainer from "../comments/CommentContainer";
+import SessionHandler from "../../utilities/SessionHandler";
+import {BACKEND_URL} from "../../App";
 
 const activityInfo = {
     distance: { // db unit: Meters
@@ -54,9 +58,110 @@ export interface activityData {
     altitudeDifference?: number
 }
 
+interface ActivityProps {
+    postData: postData
+}
+
+interface ActivityState {
+    showThumbsUp: boolean,
+    thumbsUpCounter: number
+}
+
 //Component for an activity Box, to contain a like button, comment section and an activity table
-export class ActivityBox extends React.Component<{ postData: postData }, any> {
-    // TODO: like button pressed
+export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
+    private readonly thumbInterval: any;
+
+    constructor(props: ActivityProps) {
+        super(props);
+
+        this.state = {
+            showThumbsUp: false,
+            thumbsUpCounter: 0
+        }
+
+        // Check whether the user has liked the activity
+        fetch(BACKEND_URL + 'isThumbsUpSet/' + this.props.postData.activity_id, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: SessionHandler.getAuthToken()
+            },
+        }).then((response) => {
+            if (response.ok) {
+                // Examine the text in the response
+                response.json().then((data) => {
+                    this.setState({showThumbsUp: data});
+                });
+            } else {
+                console.log('Looks like there was a problem. Status Code: ' + response.status);
+            }
+
+        });
+        this.countThumbs();
+
+        this.thumbInterval = setInterval(() => {
+            this.countThumbs();
+        }, 30000);
+
+        this.countThumbs = this.countThumbs.bind(this);
+        this.thumbIsPressed = this.thumbIsPressed.bind(this);
+    }
+
+    //Count Thumbs
+    countThumbs() {
+        fetch(BACKEND_URL + "countThumbs/" + this.props.postData.activity_id, {//get as default
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: SessionHandler.getAuthToken()
+            },
+        }).then((response) => {
+            if (response.ok) {
+                // Examine the text in the response
+                response.json().then((data) => {
+                    this.setState({thumbsUpCounter: data[0].counter});
+                });
+            } else {
+                console.log('Looks like there was a problem. Status Code: ' + response.status);
+            }
+        });
+    }
+
+    thumbIsPressed(event: any) {
+        // TODO: As put
+        console.log("thumb pressed");
+
+        fetch(BACKEND_URL + 'thumbsUp', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: SessionHandler.getAuthToken()
+            },
+            body: JSON.stringify({
+                activity: this.props.postData.activity_id,
+            }),
+        }).then((response) => {
+            console.log(response);
+
+            if (response.ok) {
+                let likedBefore = this.state.showThumbsUp;
+
+                this.setState({
+                    showThumbsUp: !likedBefore,
+                    thumbsUpCounter: (likedBefore ? this.state.thumbsUpCounter - 1 : this.state.thumbsUpCounter + 1)
+                });
+            } else {
+                console.log(response);
+            }
+        });
+        console.log("after fetch");
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.thumbInterval);
+    }
+
     render() {
         const props = this.props.postData;
         const image_path = props.sport + '.png';
@@ -76,9 +181,11 @@ export class ActivityBox extends React.Component<{ postData: postData }, any> {
                             </p>
                         </div>
                         <div className="field has-addons">
-                            <button className="button is-success is-rounded">
+                            <button
+                                className={`button is-rounded ${this.state.showThumbsUp ? "is-success" : ""}`}
+                                onClick={this.thumbIsPressed}>
                                 <span>
-                                    {Number(props.likes)}
+                                    {Number(this.state.thumbsUpCounter)}
                                 </span>
                                 <span className="icon">
                                     <FontAwesomeIcon icon={faThumbsUp}/>
@@ -92,7 +199,7 @@ export class ActivityBox extends React.Component<{ postData: postData }, any> {
                     </div>
                 </div>
                 <div className="card-footer">
-                    <Comments activity_id={props.activity_id}/>
+                    <ActivityComments activity_id={props.activity_id}/>
                 </div>
             </div>
         );
@@ -137,10 +244,12 @@ class ActivityTable extends React.Component<TableProps, {}> {
         return (
             <>
                 <table className="table is-narrow">
-                    <thead><tr>
+                    <thead>
+                    <tr>
                         {this.renderTableHeaders(this.props.activityData)}</tr>
                     </thead>
-                    <tbody><tr>
+                    <tbody>
+                    <tr>
                         {this.renderTableContents(this.props.activityData)}</tr>
                     </tbody>
                 </table>
@@ -152,25 +261,69 @@ class ActivityTable extends React.Component<TableProps, {}> {
 // ------------------------------------------------------------------------------------------------------------------
 
 interface CommentState {
-    showComments: boolean
+    showComments: boolean,
+    commentText: string
 }
 
 interface CommentProps {
     activity_id: number
 }
 
-class Comments extends React.Component<CommentProps, CommentState> {
+// TODO: Send comment on enter press
+class ActivityComments extends React.Component<CommentProps, CommentState> {
     constructor(props: CommentProps) {
         super(props);
 
         this.state = {
-            showComments: false
+            showComments: false,
+            commentText: ""
+        }
+
+        this.handleCommentSubmit = this.handleCommentSubmit.bind(this);
+    }
+
+    handleCommentSubmit(event: any) {
+        if (this.state.commentText.length > 0) {
+            // TODO: insert in frontend to show the comment fast as possible
+            //built timestamp formatted in the db to insert faster in the frontend
+            // const Now = new Date();
+            // const Day = Now.getUTCDay();
+            // const Month = Now.getUTCMonth() + 1;
+            // let Year = Now.getUTCFullYear();
+            // const Hours = Now.getUTCHours();
+            // const Minutes = Now.getUTCMinutes();
+            // const Seconds = Now.getUTCSeconds();
+            // if (Year < 1900) {
+            //     Year += 1900;
+            // }
+
+            // const timestamp = Year + "-" + Month + "-" + Day + " " + Hours + ":" + Minutes + ":" + Seconds;
+            // const name = SessionHandler.getUsername();
+            //onAdd({text, name, timestamp})
+
+            // insert in backend
+            fetch(BACKEND_URL + 'comment', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: SessionHandler.getAuthToken()
+                },
+                body: JSON.stringify({
+                    text: this.state.commentText,
+                    activity: this.props.activity_id,
+                })
+            }).then((response) => {
+                if (response.ok) {
+                    this.setState({
+                        commentText: ""
+                    })
+                }
+            });
         }
     }
 
     render() {
-        // TODO: fill comments content
-        // TODO: input textarea, etc.
         return (
             <div className="card is-flex-grow-1">
                 <header className="card-header">
@@ -191,18 +344,29 @@ class Comments extends React.Component<CommentProps, CommentState> {
                 {this.state.showComments ?
                     <>
                         <div className="card-content">
-                            <p className="title">Comments go here</p>
+                            <CommentContainer activityNr={this.props.activity_id}/>
                         </div>
                         <footer className="card-footer">
                             <div className="card-footer-item">
-                                <span>
-                                    Text Input goes here
-                                </span>
-                            </div>
-                            <div className="card-footer-item">
-                                <span>
-                                    Submit Button goes here
-                                </span>
+                                <div className="field has-addons is-flex-grow-1">
+                                    <div className="control is-expanded">
+                                        <input
+                                            className="input"
+                                            type='text'
+                                            value={this.state.commentText}
+                                            maxLength={500}
+                                            placeholder='Add your comment'
+                                            onChange={(event: any) => this.setState({commentText: event.target.value})}/>
+                                    </div>
+                                    <div className="control">
+                                        <button
+                                            className="button is-primary"
+                                            disabled={this.state.commentText.length === 0}
+                                            onClick={this.handleCommentSubmit}>
+                                            Send
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </footer>
                     </>
