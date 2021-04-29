@@ -69,7 +69,8 @@ interface ActivityState {
 
 //Component for an activity Box, to contain a like button, comment section and an activity table
 export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
-    private readonly thumbInterval: any;
+    private readonly thumbsRefreshInterval: any;
+    private readonly abortController: AbortController;
 
     constructor(props: ActivityProps) {
         super(props);
@@ -79,13 +80,16 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
             thumbsUpCounter: 0
         }
 
-        // Check whether the user has liked the activity
+        this.abortController = new AbortController();
+
+        // Check whether the user has already liked the activity
         fetch(BACKEND_URL + 'isThumbsUpSet/' + this.props.postData.activity_id, {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
                 Authorization: SessionHandler.getAuthToken()
             },
+            signal: this.abortController.signal
         }).then((response) => {
             if (response.ok) {
                 // Examine the text in the response
@@ -96,10 +100,16 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
                 console.log('Looks like there was a problem. Status Code: ' + response.status);
             }
 
+        }).catch((error: any) => {
+            if (error.name !== "AbortError") {
+                console.log("Fetch failed:", error);
+            }
         });
+
         this.countThumbs();
 
-        this.thumbInterval = setInterval(() => {
+        // Refresh thumbs every 30s
+        this.thumbsRefreshInterval = setInterval(() => {
             this.countThumbs();
         }, 30000);
 
@@ -115,6 +125,7 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
                 'Content-Type': 'application/json',
                 Authorization: SessionHandler.getAuthToken()
             },
+            signal: this.abortController.signal
         }).then((response) => {
             if (response.ok) {
                 // Examine the text in the response
@@ -124,15 +135,17 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
             } else {
                 console.log('Looks like there was a problem. Status Code: ' + response.status);
             }
+        }).catch((error: any) => {
+            if (error.name !== "AbortError") {
+                console.log("Fetch failed:", error);
+            }
         });
     }
 
     thumbIsPressed(event: any) {
         // TODO: As put
-        console.log("thumb pressed");
-
         fetch(BACKEND_URL + 'thumbsUp', {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
@@ -141,9 +154,8 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
             body: JSON.stringify({
                 activity: this.props.postData.activity_id,
             }),
+            signal: this.abortController.signal
         }).then((response) => {
-            console.log(response);
-
             if (response.ok) {
                 let likedBefore = this.state.showThumbsUp;
 
@@ -154,12 +166,19 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
             } else {
                 console.log(response);
             }
+        }).catch((error: any) => {
+            if (error.name !== "AbortError") {
+                console.log("Fetch failed:", error);
+            }
         });
-        console.log("after fetch");
     }
 
     componentWillUnmount() {
-        clearTimeout(this.thumbInterval);
+        // Dont refresh thumbs
+        clearTimeout(this.thumbsRefreshInterval);
+
+        // Abort all running requests
+        this.abortController.abort();
     }
 
     render() {

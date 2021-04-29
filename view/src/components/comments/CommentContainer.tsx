@@ -13,7 +13,9 @@ interface State {
 }
 
 export default class CommentContainer extends Component<{ activityNr: number }, State> {
-    private readonly commentInterval: any;
+    private readonly commentRefreshInterval: any;
+    private readonly abortController: AbortController;
+
     constructor(props: any) {
         super(props);
 
@@ -22,9 +24,11 @@ export default class CommentContainer extends Component<{ activityNr: number }, 
             activity: props.activityNr
         };
 
+        this.abortController = new AbortController();
+
         this.refreshComment();
 
-        this.commentInterval = setInterval(() => {  //set interval
+        this.commentRefreshInterval = setInterval(() => {  //set interval
             this.refreshComment();
         }, 15000);
 
@@ -60,6 +64,7 @@ export default class CommentContainer extends Component<{ activityNr: number }, 
                 'Content-Type': 'application/json',
                 Authorization: SessionHandler.getAuthToken()
             },
+            signal: this.abortController.signal
         }).then((response) => {
             if (response.status !== 200) {
                 console.log('Looks like there was a problem. Status Code: ' +
@@ -71,6 +76,10 @@ export default class CommentContainer extends Component<{ activityNr: number }, 
                 //console.log(data.Rowdata);
                 this.setState({comments: data.Rowdata});
             });
+        }).catch((error: any) => {
+            if (error.name !== "AbortError") {
+                console.log("Fetch failed:", error);
+            }
         });
     }
 
@@ -88,10 +97,13 @@ export default class CommentContainer extends Component<{ activityNr: number }, 
     }
 
     componentWillUnmount() {
-        clearTimeout(this.commentInterval);
+        clearTimeout(this.commentRefreshInterval);
+
+        this.abortController.abort();
     }
 
     render() {
+        // TODO: display as infinite scroll component with "load more" button on top
         return (
             <div className="container">
                 {this.renderComments()}

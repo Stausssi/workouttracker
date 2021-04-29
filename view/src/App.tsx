@@ -10,7 +10,6 @@ import LoginContainer from "./pages/LoginContainer";
 import ProtectedRoute from "./utilities/Routing";
 import Verify from "./components/login/Verify";
 import SuccessfulSignup from "./components/login/SuccessfulSignUp";
-import Profile from "./pages/Profil";
 
 interface Props {}
 

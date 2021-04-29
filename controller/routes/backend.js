@@ -22,7 +22,7 @@ router.post('/signup', users.signup);
 router.post('/comment', authenticateJWT, comment.addComment);
 router.get('/commentIsNew/:activity', authenticateJWT, comment.getComment);
 
-router.post('/thumbsUp', authenticateJWT, comment.thumbsUp);
+router.put('/thumbsUp', authenticateJWT, comment.thumbsUp);
 router.get('/isThumbsUpSet/:activity', authenticateJWT, comment.isThumbsUpSet);
 router.get('/countThumbs/:activity', authenticateJWT, comment.countThumbs);
 
@@ -33,9 +33,9 @@ router.get('/googlefit/getURLTing', googlefit.getFitURL);
 router.get('/googlefit/activity', googlefit.insertActivitysFromGoogle);
 
 
-router.get('/verify/:hash', function(req, res){
-  users.verifyEmail(req, res);
-  res.redirect('http://localhost:3000/verify');
+router.get('/verify/:hash', function (req, res) {
+    users.verifyEmail(req, res);
+    res.redirect('http://localhost:3000/verify');
 });
 
 router.post('/activity/add', authenticateJWT, activity.add);

@@ -17,9 +17,9 @@ exports.profilesite = (req, resp) => {
 
 //update Profile with new data
 exports.profileUpdate = (req, resp) => {
-    var newMail = false;
-    var confirmationToken = "";
-    if(req.body.email){
+    let newMail = false;
+    let confirmationToken = "";
+    if (req.body.email) {
         newMail = true;
         confirmationToken = jwt.sign({email: req.body.email}, config.confirmSecret);
     }
@@ -29,8 +29,8 @@ exports.profileUpdate = (req, resp) => {
                 errno: 2,
                 message: "Internal server error!"
             });
-        } else{
-            if(newMail){
+        } else {
+            if (newMail) {
                 //select all data to send a new confirmation mail if the mail was changed
                 Profile.selectAllProfileDataForEmail(req.username, function (error, profileData) {
                     if (error) {
@@ -38,7 +38,7 @@ exports.profileUpdate = (req, resp) => {
                             errno: 2,
                             message: "Internal server error!"
                         });
-                    } else{
+                    } else {
                         console.log(profileData[0].email);
 
                         Mail.sendConfirmationEmail(profileData[0]);
@@ -48,8 +48,6 @@ exports.profileUpdate = (req, resp) => {
             }
         }
     });
-
-
 
 
 }

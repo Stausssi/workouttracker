@@ -1,76 +1,53 @@
-const Comment = require("../../model/models/commentModel");
+const Comment = require("../../model/models/interactionModel");
 
 //add new comment
-exports.addComment = (req, resp) => {
+exports.addComment = (req, res) => {
     Comment.addCommentToDB(req, function (error, isAdded) {
-        if (error) {
-            resp.status(500).send({
-                errno: 2,
-                message: "Internal server error!"
-            });
-        } else {
-            if (isAdded) {
-                resp.status(200).send({message: "Comment added!"});
-            } else {
-                resp.status(500).send({message: "Comment not added!"});
-            }
-        }
+        res.sendStatus(error || !isAdded ? 500 : 201);
     });
 }
 
 //get all comments
-exports.getComment = (req, resp) => { 
+exports.getComment = (req, res) => {
     Comment.selectCommentsFromDB(req, function (error, comments) {
         if (error) {
-            resp.status(500).send({
-                errno: 2,
-                message: "Internal server error!"
-            });
+            res.sendStatus(500);
         } else {
             if (comments) {
-                resp.status(200).send(comments);
+                res.status(200).send(comments);
             } else {
-                resp.status(500).send({message: "No comment found!"});
+                res.status(500).send({message: "No comment found!"});
             }
         }
     });
 }
 
 //!thumbsUp if thumbsUp button is pressed
-exports.thumbsUp = (req, resp) => {
+exports.thumbsUp = (req, res) => {
     Comment.invertThumbsUpInDB(req, function (error) {
+        res.sendStatus(error ? 500 : 200);
+    });
+}
+
+
+//is thumbsUp set ?
+exports.isThumbsUpSet = (req, res) => {
+    Comment.isThumbsUpSetInDB(req, function (error, isSet) {
         if (error) {
-            resp.status(500).send({
-                errno: 2,
-                message: "Internal server error!"
-            });
+            res.sendStatus(500);
         } else {
-            resp.status(200).send('New Thumps State set!');
+            res.status(200).send(isSet);
         }
     });
 }
 
-
-//is thumbsup set ?
-exports.isThumbsUpSet = (req, resp) => {
-    Comment.isThumbsUpSetInDB(req, function (error, isSet) {
-        if (error) {
-            resp.status(500).send({
-                errno: 2,
-                message: "Internal server error!"
-            });
-        } else resp.status(200).send(isSet);
-    });
-}
-
-//count thumbsup set
-exports.countThumbs = (req, resp) => {
+//count thumbsUp set
+exports.countThumbs = (req, res) => {
     Comment.countThumbsUpInAnActivity(req, function (error, count) {
         if (error) {
-            resp.status(500).send({
-                errno: 2,
-                message: "Internal server error!"
-            });
-        } else resp.status(200).send(count);
+            res.sendStatus(500);
+        } else {
+            res.status(200).send(count);
+        }
     });
 }
