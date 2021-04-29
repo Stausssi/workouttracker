@@ -19,7 +19,7 @@ Comment.addCommentToDB = (req, isAdded) => {
 
 Comment.selectCommentsFromDB = (req, comments) => {        // keine join benötigt
     connection.query("SELECT comments.PrimaryKey AS id, comments.text, comments.timestamp, comments.username AS name FROM `comments` WHERE `PKactivity`=?;", [
-        req.params.activity
+        req.query.activity
     ], function (error, rows, fields) {
         if (error) {
             comments(error, null);
@@ -59,7 +59,7 @@ Comment.invertThumbsUpInDB = (req, errorInDB) => {
 Comment.isThumbsUpSetInDB = (req, isSet) => {
     connection.query("SELECT * FROM thumbsUp WHERE  `username_fk`=? AND `activity_id`=?;", [
         req.username,
-        req.params.activity
+        req.query.activity
     ], function (error, rows, fields) {
         if (error) {
             isSet(error, false);
@@ -75,7 +75,7 @@ Comment.isThumbsUpSetInDB = (req, isSet) => {
 
 Comment.countThumbsUpInAnActivity = (req, count) => {
     connection.query("SELECT COUNT(PrimaryKey) AS counter FROM thumbsUp WHERE `activity_id`=?;", [
-        req.params.activity
+        req.query.activity
     ], function (error, rows, fields) {
         if (error) {
             count(error, "{}");

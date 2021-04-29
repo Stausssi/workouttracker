@@ -83,7 +83,7 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
         this.abortController = new AbortController();
 
         // Check whether the user has already liked the activity
-        fetch(BACKEND_URL + 'isThumbsUpSet/' + this.props.postData.activity_id, {
+        fetch(BACKEND_URL + 'interaction/isThumbsUpSet?activity=' + this.props.postData.activity_id, {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
 
     //Count Thumbs
     countThumbs() {
-        fetch(BACKEND_URL + "countThumbs/" + this.props.postData.activity_id, {//get as default
+        fetch(BACKEND_URL + "interaction/countThumbs?activity=" + this.props.postData.activity_id, {//get as default
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
 
     thumbIsPressed(event: any) {
         // TODO: As put
-        fetch(BACKEND_URL + 'thumbsUp', {
+        fetch(BACKEND_URL + 'interaction/thumbsUp', {
             method: 'PUT',
             headers: {
                 Accept: 'application/json',
@@ -315,7 +315,7 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
             });
 
             // insert in backend
-            fetch(BACKEND_URL + 'comment', {
+            fetch(BACKEND_URL + 'interaction/addComment', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
