@@ -15,20 +15,12 @@ interface State {
     weight: number | string,
 }
 
-export default class FollowUserSite extends Component<{}, State> {
+export default class FollowUserSite extends Component<{username: string}, State> {
     constructor(props: any) {
         super(props);
 
-
-        //löschen und this.state übergabe Parameter einfügen
-        var username = "undefined Username";
-        if(SessionHandler.getUser()) {
-            // @ts-ignore
-            username = SessionHandler.getUser().username.toString();
-        }
-
         this.state = {
-              username: username,
+              username: props.username,
               firstname: '',
               lastname: '',
               date: new Date(),

@@ -31,7 +31,7 @@ export default class App extends Component<Props, State> {
                 <div className="App">
                     <div className="children">
                         <Route exact path="/">
-                            {SessionHandler.isLoggedIn() ? <><Route exact path="/"><Homepage /></Route><Route exact path="/profile"><Profile /></Route></> : <LoginContainer />}
+                            {SessionHandler.isLoggedIn() ? <Homepage /> : <LoginContainer />}
                         </Route>
 
 
