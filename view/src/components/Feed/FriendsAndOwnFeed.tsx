@@ -90,7 +90,9 @@ export class OwnFeed extends React.Component<EmptyProps, FeedState> {
                     >
                         {
                             this.state.postData.map((activity: postData, index: number) => (
-                                <div className="mb-5" key={index}><ActivityBox postData={activity}/></div>
+                                <div className="mb-5" key={index}>
+                                    <ActivityBox postData={activity}/>
+                                </div>
                             ))
                         }
                     </InfiniteScroll> :
@@ -308,14 +310,14 @@ class Comments extends React.Component<CommentProps, CommentState> {
                         </div>
                         <footer className="card-footer">
                             <div className="card-footer-item">
-                        <span>
-                            Text Input goes here
-                        </span>
+                                <span>
+                                    Text Input goes here
+                                </span>
                             </div>
                             <div className="card-footer-item">
-                        <span>
-                            Submit Button goes here
-                        </span>
+                                <span>
+                                    Submit Button goes here
+                                </span>
                             </div>
                         </footer>
                     </>
