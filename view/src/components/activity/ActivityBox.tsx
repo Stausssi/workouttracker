@@ -41,9 +41,9 @@ const activityInfo = {
         }
     },
     pace: { // db unit: m/s * 3,6 = km/h
-        title: 'Pace',
+        title: 'Speed',
         format: (metersPerSecond: number) => {
-            return ((metersPerSecond * 3.6).toFixed(1) + " km/s");
+            return ((metersPerSecond * 3.6).toFixed(1) + " km/h");
         }
     },
     averageHeartRate: {
