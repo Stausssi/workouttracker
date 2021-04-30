@@ -1,9 +1,10 @@
 import React from 'react';
 import './css/App.css';
-import ToggleButton from './components/ToggleButton'
+import FeedContainer from './components/Feed/FeedContainer'
 import 'bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css'
 
-interface Props {}
+interface Props {
+}
 
 interface State {
     showPopup: boolean
@@ -23,10 +24,7 @@ export default class Body extends React.Component<Props, State> {
         return (
             <section id="body-content">
                 <div id="col-1">
-                    <h1>This is half of a page</h1>
-                    <div>
-                        <ToggleButton/>
-                    </div>
+                    <FeedContainer/>
                 </div>
                 <div id="col-2">
                     <h1>Hier kommen Statistiken, Analytik, Charts und Kalender</h1>

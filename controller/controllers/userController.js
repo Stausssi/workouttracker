@@ -10,30 +10,37 @@ const {isParamMissing, basicSuccessErrorHandling} = require("../utilities/misc")
 //creates a new user if the email/username doesn´t already exist
 exports.signup = (req, res) => {
     //validate request --> add more checks !!!!!!!!!!!!!!!!!!!!!!!!!!
-    console.log(req.body);
-    if (!req.body && !req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password && !req.body.username && !req.body.date && !req.body.weight) {
-        res.status(400).send({message: "bad request"});
-    } else {
+    // console.log(req.body);
+    let username = req.body.username;
+    let password = req.body.password;
+    let firstname = req.body.firstname;
+    let lastname = req.body.lastname;
+    let date = req.body.date;
+    let weight = req.body.weight;
+    let email = req.body.email;
 
+    if (isParamMissing([req.body, username, password, firstname, lastname, date, weight, email])) {
+        res.sendStatus(400);
+    } else {
         //create a user object
-        const newuser = new User({
-            username: req.body.username,
-            password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10)), // hash password with bcrypt
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            date: req.body.date,
-            weight: req.body.weight,
-            email: req.body.email,
+        const newUser = new User({
+            username: username,
+            password: bcrypt.hashSync(password, bcrypt.genSaltSync(10)), // hash password with bcrypt
+            firstname: firstname,
+            lastname: lastname,
+            date: date,
+            weight: weight,
+            email: email,
             emailVerify: 0,
             confirmationToken: ''
         });
 
         //check if the user already exists in the database: Attention: async !!!
-        User.exists(newuser, function (err, exists) {
+        User.exists(newUser, function (err, exists) {
             if (err) {
                 // Internal Server Error, could not check if user already exists
                 console.log(err);
-                res.status(500).send({message: "internal server error"});
+                res.sendStatus(500);
             } else {
                 // no error occured
 
@@ -48,13 +55,13 @@ exports.signup = (req, res) => {
                     // create confirmation token for user (jwt) which will be integrated into a confirmation
                     // link. It is unique because it uses the email of the user as body
 
-                    newuser.confirmationToken = jwt.sign({email: newuser.email}, config.confirmSecret);
+                    newUser.confirmationToken = jwt.sign({email: newUser.email}, config.confirmSecret);
 
-                    User.create(newuser, function (err, status) {
+                    User.create(newUser, function (err, status) {
                         if (err) {
                             // Internal Server Error, user could not be saved to db
                             console.log(err);
-                            res.status(500).send({message: "internal server error"});
+                            res.sendStatus(500);
                         } else {
                             // user was created in database
                             //send confirmation email
@@ -64,10 +71,10 @@ exports.signup = (req, res) => {
                                     message: "user could not be created"
                                 });
                             } else {
-                                res.status(201).send({message: "user created"});
+                                res.sendStatus(201);
 
                                 //send confirmation email to user with generated confirmationToken
-                                mail.sendConfirmationEmail(newuser);
+                                mail.sendConfirmationEmail(newUser);
                             }
                         }
                     });
@@ -81,14 +88,14 @@ exports.login = (req, res) => {
     const password = req.body.password;
     const emailOrUsername = req.body.emailOrUsername;
 
-    if ((!emailOrUsername && !password) || password.length < 5) {
-        res.status(400).send({message: "bad request"});
+    if (isParamMissing([password, emailOrUsername]) || password.length < 5) {
+        res.sendStatus(400);
     } else {
         //check if available --> Get user/email from database
         User.getUserByUsernameOrEmail(emailOrUsername, (result) => {
             if (result == null) {
                 //no user found (HTTP CODE: 401 - UNAUTHORIZED)
-                res.status(401).send({message: "Login failed"});
+                res.sendStatus(401);
             } else {
                 // user found
                 //compare password to database hash
@@ -101,7 +108,7 @@ exports.login = (req, res) => {
                     res.status(200).send({token: accessToken});
                 } else {
                     //passwords do not match (HTTP CODE: 401 - UNAUTHORIZED)
-                    res.status(401).send({message: "Login failed"});
+                    res.sendStatus(401);
                 }
             }
         });
@@ -113,7 +120,7 @@ exports.login = (req, res) => {
 exports.verifyEmail = (req, res) => {
     const token = req.params.hash;
 
-    if (!token) {
+    if (isParamMissing([token])) {
         res.sendStatus(400);
     } else {
         User.verifyToken(token);

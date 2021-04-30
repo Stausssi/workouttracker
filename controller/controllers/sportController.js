@@ -1,4 +1,4 @@
-const { request } = require('express');
+const {request} = require('express');
 const Sport = require("../../model/models/sportModel");
 
 exports.getAll = (req, res) => {

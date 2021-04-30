@@ -4,7 +4,7 @@ export const Footer = () =>
             <p>
                 Informationen für <a href="/#">Homepage</a>. The source code is licensed
                 <a href="http://opensource.org/licenses/mit-license.php"> MIT</a>. Für weitere
-                Informationen, bitte kontaktieren Sie den Admin.
+                Informationen, bitte kontaktieren Sie den Admin. Use <a href="https://icons8.com/"> Icons8</a> Icons.
             </p>
         </div>
     </footer>
