@@ -4,7 +4,6 @@ const Event = function (event) {    //event constructor
     this.title = event.title;
     this.start = event.start;
     this.end = event.end;
-    this.allDay = event.allDay;
     this.user = event.user;
 }
 

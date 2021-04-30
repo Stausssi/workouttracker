@@ -17,7 +17,6 @@ interface State {
   title: string;
   startDate: Date;
   endDate: Date;
-  allDay: boolean;
   date: Date;
   activityEvents: any[];
   notifyMessage: string;
@@ -29,7 +28,6 @@ const initialState = {
   title: "",
   startDate: new Date(),
   endDate: new Date(),
-  allDay: false,
   activityEvents: [],
   date: new Date(),
   notifyMessage: "",
@@ -37,10 +35,13 @@ const initialState = {
 };
 
 export default class FullCalendar extends React.Component<Props, State> {
+  private readonly abortController: AbortController;
+
   calendar: Calendar | undefined;
   constructor(props: any) {
     super(props);
-    this.state = initialState; //init state
+    this.state = initialState; //init state  
+    this.abortController = new AbortController();
   }
 
   action = () => {
@@ -52,12 +53,6 @@ export default class FullCalendar extends React.Component<Props, State> {
       this.setState(initialState); // reset state on close
     }
   };
-
-  initsources() {
-    console.log("hi");
-    console.log(this.calendar?.getEventSources());
-    var test = this.calendar?.getEventSourceById("1")?.id;
-  }
 
   componentDidMount() {
     // init calendar and render events on mount
@@ -72,7 +67,6 @@ export default class FullCalendar extends React.Component<Props, State> {
       this.calendar.destroy();
     }
     const canvas = document.getElementById("calendarFull") as HTMLCanvasElement; //get Canvas Element where Calendar will be displayed
-    console.log(this.calendar?.getEventSources());
     this.calendar = new Calendar(canvas, {
       //configure calendar
       initialView: "dayGridMonth", //set initial view (Month view)
@@ -102,10 +96,6 @@ export default class FullCalendar extends React.Component<Props, State> {
       height: "600px", //set height for table
       selectable: true, //enable selection of dates
       select: (info) => this.create(info), //Open create function on select date range
-      eventClick: (info) => {
-        console.log("Event: " + info.el);
-        console.log("Event: " + info.event.groupId);
-      },
       eventDidMount: (element) => {
         // add delete button to events
         var deleteButton = document.createElement("button");
@@ -130,7 +120,6 @@ export default class FullCalendar extends React.Component<Props, State> {
         title: this.state.title,
         start: this.state.startDate,
         end: this.state.endDate,
-        allDay: 1, //this.state.allDay
       };
       this.setEvents(event);
     } else {
@@ -142,13 +131,13 @@ export default class FullCalendar extends React.Component<Props, State> {
   }
 
   getactivity() {
-    console.log(this.state.activityEvents);
     fetch(BACKEND_URL + "/events/getactivity", {
       method: "GET",
       headers: {
         Accept: "application/json",
         Authorization: SessionHandler.getAuthToken(),
       },
+      signal: this.abortController.signal
     }).then((response) => {
       if (response.ok) {
         let activityEvents: any[] = [];
@@ -164,7 +153,6 @@ export default class FullCalendar extends React.Component<Props, State> {
               title: item.title,
               start: item.startedAt,
               end: end,
-              allDay: 1,
               groupId: "activityEvents",
               color: "green",
             };
@@ -190,6 +178,7 @@ export default class FullCalendar extends React.Component<Props, State> {
         Accept: "application/json",
         Authorization: SessionHandler.getAuthToken(),
       },
+      signal: this.abortController.signal
     }).then((response) => {
       if (response.ok) {
         return response.json().then((response) => {
@@ -215,6 +204,7 @@ export default class FullCalendar extends React.Component<Props, State> {
         Authorization: SessionHandler.getAuthToken(),
       },
       body: JSON.stringify(data),
+      signal: this.abortController.signal,
     }).then((response) => {
       if (response.ok) {
         //if event was successfully added, display success message
@@ -246,6 +236,7 @@ export default class FullCalendar extends React.Component<Props, State> {
           Authorization: SessionHandler.getAuthToken(),
         },
         body: JSON.stringify({ id: element.event.id }),
+        signal: this.abortController.signal
       }).then((response) => {
         //Displays information message on console
         if (response.ok) {
@@ -265,6 +256,7 @@ export default class FullCalendar extends React.Component<Props, State> {
           Authorization: SessionHandler.getAuthToken(),
         },
         body: JSON.stringify({ id: element.event.id }),
+        signal: this.abortController.signal
       }).then((response) => {
         //Displays information message on console
         if (response.ok) {
@@ -344,7 +336,6 @@ export default class FullCalendar extends React.Component<Props, State> {
             </footer>
           </div>
         </div>
-        <button onClick={() => this.initsources()}>Button</button>
       </div>
     );
   }

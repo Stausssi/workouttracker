@@ -95,9 +95,11 @@ const initialState = {
 };
 
 export default class Graphs extends React.Component<Props, State> {
+  private readonly abortController: AbortController;
   constructor(props: Props) {
     super(props);
     this.state = initialState; //init state
+    this.abortController = new AbortController();
   }
 
   action = () => {
@@ -123,6 +125,7 @@ export default class Graphs extends React.Component<Props, State> {
         Accept: "application/json",
         Authorization: SessionHandler.getAuthToken(),
       },
+      signal: this.abortController.signal
     }).then((response) => {
       if (response.ok) {
         return response.json().then((response) => {
@@ -152,6 +155,7 @@ export default class Graphs extends React.Component<Props, State> {
         Accept: "application/json",
         Authorization: SessionHandler.getAuthToken(),
       },
+      signal: this.abortController.signal
     })
       .then((response) => {
         if (response.ok) {
@@ -213,6 +217,7 @@ export default class Graphs extends React.Component<Props, State> {
         Accept: "application/json",
         Authorization: SessionHandler.getAuthToken(),
       },
+      signal: this.abortController.signal
     }).then((response) => {
       if (response.ok) {
         return response.json().then((response) => {
@@ -392,6 +397,7 @@ export default class Graphs extends React.Component<Props, State> {
         Authorization: SessionHandler.getAuthToken(),
       },
       body: JSON.stringify(chart),
+      signal: this.abortController.signal
     }).then((response) => {
       if (response.ok) {
       } else {
@@ -416,6 +422,7 @@ export default class Graphs extends React.Component<Props, State> {
           Authorization: SessionHandler.getAuthToken(),
         },
         body: JSON.stringify({ chartid: id }),
+        signal: this.abortController.signal
       }).then((response) => {
         if (response.ok) {
           console.log("Delete request has been submitted successfully");

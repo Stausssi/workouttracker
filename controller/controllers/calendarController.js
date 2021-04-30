@@ -49,7 +49,6 @@ exports.create = (request, response) => {
       title: request.body.title,
       start: request.body.start,
       end: request.body.end,
-      allDay: request.body.allDay,
       user:username
     });
     // Save event in the database
