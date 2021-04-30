@@ -9,10 +9,11 @@ import SessionHandler from "../../utilities/SessionHandler";
 
 interface State {
     comments: any[],
+    numComments: number
     activity: number
 }
 
-export default class CommentContainer extends Component<{ activityNr: number }, State> {
+export default class CommentContainer extends Component<{ activity_id: number }, State> {
     private readonly commentRefreshInterval: any;
     private readonly abortController: AbortController;
 
@@ -21,19 +22,20 @@ export default class CommentContainer extends Component<{ activityNr: number }, 
 
         this.state = {
             comments: [],
-            activity: props.activityNr
+            numComments: 5,
+            activity: props.activity_id
         };
 
         this.abortController = new AbortController();
 
-        this.refreshComment();
+        this.refreshComments();
 
         this.commentRefreshInterval = setInterval(() => {  //set interval
-            this.refreshComment();
+            this.refreshComments();
         }, 15000);
 
         this.handleChange = this.handleChange.bind(this);
-        this.addComment = this.addComment.bind(this);
+        this.loadMoreComments = this.loadMoreComments.bind(this);
     }
 
     handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -47,17 +49,8 @@ export default class CommentContainer extends Component<{ activityNr: number }, 
         } as unknown as Pick<State, keyof State>);
     }
 
-    //Add comment
-    addComment(comment: any) {
-        const id = Math.floor(Math.random() * 10000) + 1;
-        const newComment = {id, ...comment};
-        // console.log(newComment);
-        const comments = this.state.comments;
-        this.setState({comments: [...comments, newComment]});
-    }
-
-    //refresh comment
-    refreshComment() {
+    //refresh comments
+    refreshComments() {
         fetch(BACKEND_URL + "interaction/commentIsNew?activity=" + this.state.activity, {//get as default
             headers: {
                 Accept: 'application/json',
@@ -83,14 +76,39 @@ export default class CommentContainer extends Component<{ activityNr: number }, 
         });
     }
 
+    loadMoreComments() {
+        this.setState({numComments: this.state.numComments + 5})
+    }
+
     renderComments() {
-        if (this.state.comments.length > 0) {
-            let comments: JSX.Element[] = [];
-            for (let key in this.state.comments) {
-                let comment = this.state.comments[key];
-                comments.push(<Comment key={comment.id} comment={comment}/>)
+        let lengthAll = this.state.comments.length;
+        if (lengthAll > 0) {
+            let fieldsHTML: JSX.Element[] = []
+            let lengthRendered = this.state.numComments;
+
+            // Display a load more button if not every comment is visible
+            if (lengthAll > lengthRendered) {
+                fieldsHTML.push(
+                    <button
+                        className="button"
+                        key={"loadMore_" + this.props.activity_id}
+                        onClick={this.loadMoreComments}
+                    >
+                        Load older comments
+                    </button>);
             }
-            return comments;
+
+            let numFirst = lengthAll - lengthRendered;
+            for (let i = numFirst; i < lengthAll; i++) {
+                let comment = this.state.comments[i];
+                if (comment) {
+                    let prevComment = this.state.comments[i - 1];
+                    let prevName = prevComment && i !== numFirst ? prevComment.name : "";
+                    fieldsHTML.push(<Comment key={comment.id} comment={comment} newUser={comment.name !== prevName}/>)
+                }
+            }
+
+            return fieldsHTML;
         } else {
             return <p className="tag is-info">No Comments here yet. Be the first!</p>
         }

@@ -352,7 +352,7 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
                 {this.state.showComments ?
                     <>
                         <div className="card-content">
-                            <CommentContainer activityNr={this.props.activity_id} ref={this.commentContainerChild}/>
+                            <CommentContainer activity_id={this.props.activity_id} ref={this.commentContainerChild}/>
                         </div>
                         <footer className="card-footer">
                             <div className="card-footer-item">
