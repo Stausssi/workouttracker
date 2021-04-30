@@ -352,7 +352,7 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
                 {this.state.showComments ?
                     <>
                         <div className="card-content">
-                            <CommentContainer activityNr={this.props.activity_id} ref={this.commentContainerChild} />
+                            <CommentContainer activityNr={this.props.activity_id} ref={this.commentContainerChild}/>
                         </div>
                         <footer className="card-footer">
                             <div className="card-footer-item">
@@ -370,16 +370,21 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
                                                 if (event.keyCode === 13) this.handleCommentSubmit(event);
                                             }}
                                         />
-                                        <p className={`help is-light ${
-                                            this.state.commentText.length > 450 ? "is-danger" : "is-success"}`}>
-                                            {500 - this.state.commentText.length} chars remaining!
-                                        </p>
+                                        {
+                                            this.state.commentText.length > 0 ?
+                                                <p className={`help is-light ${
+                                                    this.state.commentText.length === 500 ? "is-danger" :
+                                                        this.state.commentText.length >= 450 ? "is-warning" : "is-success"}`}>
+                                                    {500 - this.state.commentText.length} chars remaining!
+                                                </p> :
+                                                <></>
+                                        }
                                     </div>
                                     <div className="control">
                                         <button
                                             className="button is-primary"
                                             disabled={this.state.commentText.length === 0}
-                                            onClick={this.handleCommentSubmit} >
+                                            onClick={this.handleCommentSubmit}>
                                             Send
                                         </button>
                                     </div>
