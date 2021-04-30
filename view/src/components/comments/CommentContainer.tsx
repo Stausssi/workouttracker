@@ -121,7 +121,6 @@ export default class CommentContainer extends Component<{ activity_id: number },
     }
 
     render() {
-        // TODO: display as infinite scroll component with "load more" button on top
         return (
             <div className="container">
                 {this.renderComments()}

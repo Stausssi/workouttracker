@@ -59,7 +59,8 @@ export interface activityData {
 }
 
 interface ActivityProps {
-    postData: postData
+    postData: postData,
+    ownFeed: boolean
 }
 
 interface ActivityState {
@@ -195,7 +196,7 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
                             <p className="subtitle is-6">
                                 <time
                                     dateTime="2016-1-1">{new Date(props.addedAt).toLocaleString().slice(0, 16)}</time>
-                                - {props.username}
+                                {this.props.ownFeed ? "" : " - " + props.username}
                             </p>
                         </div>
                         <div className="field has-addons">
@@ -263,12 +264,10 @@ class ActivityTable extends React.Component<TableProps, {}> {
             <>
                 <table className="table is-narrow">
                     <thead>
-                    <tr>
-                        {this.renderTableHeaders(this.props.activityData)}</tr>
+                    <tr>{this.renderTableHeaders(this.props.activityData)}</tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        {this.renderTableContents(this.props.activityData)}</tr>
+                    <tr>{this.renderTableContents(this.props.activityData)}</tr>
                     </tbody>
                 </table>
             </>
