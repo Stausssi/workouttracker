@@ -34,39 +34,17 @@ export default class App extends Component<Props, State> {
             </Route>
             <Route exact path="/dev" component={Homepage} />
 
-            <ProtectedRoute
-              exact
-              path="/login"
-              component={LoginContainer}
-              AuthenticationFunction={SessionHandler.isNotLoggedIn}
-              redirectPath={"/"}
-            />
-            <ProtectedRoute
-              exact
-              path="/sign-up"
-              component={LoginContainer}
-              AuthenticationFunction={SessionHandler.isNotLoggedIn}
-              redirectPath={"/"}
-            />
-            <ProtectedRoute
-              exact
-              path="/verify"
-              component={Verify}
-              AuthenticationFunction={SessionHandler.isNotLoggedIn}
-              redirectPath={"/"}
-            />
-            <ProtectedRoute
-              exact
-              path="/successful-signup"
-              component={SuccessfulSignup}
-              AuthenticationFunction={SessionHandler.isNotLoggedIn}
-              redirectPath={"/"}
-            />
-          </div>
-        </div>
-      </BrowserRouter>
-    );
-  }
+
+                        <ProtectedRoute exact path="/login" component={LoginContainer} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                        <ProtectedRoute exact path="/sign-up" component={LoginContainer} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                        <ProtectedRoute exact path="/verify" component={Verify} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                        <ProtectedRoute exact path="/successful-signup" component={SuccessfulSignup} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+
+                    </div>
+                </div>
+            </BrowserRouter>
+        );
+    }
 }
 
 export const BACKEND_URL = "http://localhost:9000/backend/";

@@ -13,7 +13,7 @@ exports.add = (req, res) => {
         // Dynamically create keys and values to insert into the database
         for (let key in activity) {
             if (activity.hasOwnProperty(key)) {
-                valueKeys +=  mysql.escapeId(key) + ", ";
+                valueKeys += mysql.escapeId(key) + ", ";
                 values += mysql.escape(activity[key], true) + ", ";
             }
         }

@@ -18,6 +18,7 @@ interface State {
 }
 
 class SearchBar extends React.Component<Props, State> {
+    private readonly abortController: AbortController;
     private searchDelay: any;
 
     constructor(props: Props) {
@@ -27,6 +28,8 @@ class SearchBar extends React.Component<Props, State> {
             searchResults: <></>,
             displayLoading: false
         }
+
+        this.abortController = new AbortController();
 
         this.updateSearch = this.updateSearch.bind(this);
     }
@@ -56,7 +59,8 @@ class SearchBar extends React.Component<Props, State> {
             headers: {
                 Accepts: "application/json",
                 Authorization: SessionHandler.getAuthToken()
-            }
+            },
+            signal: this.abortController.signal
         }).then((response) => {
             if (response.ok) {
                 return response.json().then((response) => {
@@ -84,7 +88,17 @@ class SearchBar extends React.Component<Props, State> {
             } else {
                 console.log(response);
             }
+        }).catch((error: any) => {
+            if (error.name !== "AbortError") {
+                console.log("Fetch failed:", error);
+            }
         });
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.searchDelay);
+
+        this.abortController.abort();
     }
 
     render() {
@@ -98,7 +112,7 @@ class SearchBar extends React.Component<Props, State> {
                                 type="search"
                                 value={this.state.searchQuery}
                                 placeholder="Search for other users"
-                                maxLength={20}
+                                maxLength={30}
                                 onChange={this.updateSearch}/>
                             <span className="icon is-small is-right">
                                 <FontAwesomeIcon icon={faSearch}/>

@@ -1,7 +1,7 @@
 import {faPlusCircle, faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
-import AddActivity from "./AddActivity";
+import ActivityForm from "./ActivityForm";
 import {BACKEND_URL} from "../../App";
 import SessionHandler from "../../utilities/SessionHandler";
 
@@ -13,7 +13,9 @@ interface State {
     sports: { [name: string]: number }
 }
 
-export default class Modal extends React.Component<Props, State> {
+export default class ActivityModal extends React.Component<Props, State> {
+    private readonly abortController: AbortController;
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -21,6 +23,8 @@ export default class Modal extends React.Component<Props, State> {
             active: false,
             sports: {}
         };
+
+        this.abortController = new AbortController();
     }
 
     componentDidMount() {
@@ -28,6 +32,10 @@ export default class Modal extends React.Component<Props, State> {
         if (submit) {
             submit.setAttribute("disabled", "");
         }
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     toggleActive() {
@@ -41,7 +49,8 @@ export default class Modal extends React.Component<Props, State> {
                 headers: {
                     Accepts: "application/json",
                     Authorization: SessionHandler.getAuthToken()
-                }
+                },
+                signal: this.abortController.signal
             }).then((response) => {
                 if (response.ok) {
                     return response.json().then((response) => {
@@ -52,6 +61,10 @@ export default class Modal extends React.Component<Props, State> {
                         console.log("Sport Fetch failed:", response);
                         this.setState({sports: {}});
                     });
+                }
+            }).catch((error: any) => {
+                if (error.name !== "AbortError") {
+                    console.log("Fetch failed:", error);
                 }
             });
         } else {
@@ -73,7 +86,7 @@ export default class Modal extends React.Component<Props, State> {
 
                         <section className="modal-card-body">
                             <div className="content">
-                                <AddActivity sports={this.state.sports}/>
+                                <ActivityForm sports={this.state.sports}/>
                             </div>
                         </section>
 
