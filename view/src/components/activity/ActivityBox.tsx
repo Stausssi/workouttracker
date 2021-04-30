@@ -143,7 +143,6 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
     }
 
     thumbIsPressed(event: any) {
-        // TODO: As put
         fetch(BACKEND_URL + 'interaction/thumbsUp', {
             method: 'PUT',
             headers: {
@@ -307,13 +306,6 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
     handleCommentSubmit(event: any) {
         let commentText = this.state.commentText;
         if (commentText.length > 0) {
-            // Add comment to comment container to display it instantly
-            this.commentContainerChild.current?.addComment({
-                text: commentText,
-                name: SessionHandler.getUsername(),
-                timestamp: new Date().toISOString().slice(0, 19).replace("T", " ")
-            });
-
             // insert in backend
             fetch(BACKEND_URL + 'interaction/addComment', {
                 method: 'POST',
@@ -331,6 +323,9 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
                     this.setState({
                         commentText: ""
                     })
+
+                    // Trigger refreshComment in CommentContainer
+                    this.commentContainerChild.current?.refreshComments();
                 }
             });
         }
@@ -375,15 +370,20 @@ class ActivityComments extends React.Component<CommentProps, CommentState> {
                                                 if (event.keyCode === 13) this.handleCommentSubmit(event);
                                             }}
                                         />
+                                        <p className={`help is-light ${
+                                            this.state.commentText.length > 450 ? "is-danger" : "is-success"}`}>
+                                            {500 - this.state.commentText.length} chars remaining!
+                                        </p>
                                     </div>
                                     <div className="control">
                                         <button
                                             className="button is-primary"
                                             disabled={this.state.commentText.length === 0}
-                                            onClick={this.handleCommentSubmit}>
+                                            onClick={this.handleCommentSubmit} >
                                             Send
                                         </button>
                                     </div>
+
                                 </div>
                             </div>
                         </footer>
