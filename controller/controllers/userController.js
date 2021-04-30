@@ -156,6 +156,7 @@ exports.search = (req, res) => {
     }
 }
 
+// Follow a specific user
 exports.follow = (req, res) => {
     let username = req.username;
     let followed = req.body.followed;
@@ -167,6 +168,7 @@ exports.follow = (req, res) => {
     }
 }
 
+// Unfollow a specific user
 exports.unfollow = (req, res) => {
     let username = req.username;
     let unfollowed = req.body.unfollowed;
@@ -178,6 +180,7 @@ exports.unfollow = (req, res) => {
     }
 }
 
+// Block a specific user
 exports.block = (req, res) => {
     // First unfollow and then block the user
     let user = req.username;
@@ -205,6 +208,7 @@ exports.block = (req, res) => {
     }
 }
 
+// Unblock a specific user
 exports.unblock = (req, res) => {
     let user = req.username;
     let unblocked = req.body.unblocked;
@@ -216,6 +220,7 @@ exports.unblock = (req, res) => {
     }
 }
 
+// Get the relationship (following and blocked) of two users
 exports.getRelationship = (req, res) => {
     let follower = req.username;
     let followed = req.query.user;
