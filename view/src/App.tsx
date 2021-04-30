@@ -10,7 +10,9 @@ import LoginContainer from "./pages/LoginContainer";
 import ProtectedRoute from "./utilities/Routing";
 import Verify from "./components/login/Verify";
 import SuccessfulSignup from "./components/login/SuccessfulSignUp";
+
 import Profile from "./pages/Profil";
+
 
 interface Props {}
 
@@ -34,11 +36,12 @@ export default class App extends Component<Props, State> {
                             {SessionHandler.isLoggedIn() ? <Homepage /> : <LoginContainer />}
                         </Route>
 
-
                         <ProtectedRoute exact path="/login" component={LoginContainer} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
                         <ProtectedRoute exact path="/sign-up" component={LoginContainer} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
                         <ProtectedRoute exact path="/verify" component={Verify} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
                         <ProtectedRoute exact path="/successful-signup" component={SuccessfulSignup} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+
+                        <ProtectedRoute exact path="/profile" component={Profile} AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={null}/>
 
                     </div>
                 </div>
