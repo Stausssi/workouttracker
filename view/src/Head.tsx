@@ -2,7 +2,7 @@ import SearchBar from './components/search/SearchBar';
 import Logo from './img/WorkoutLogo.png'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faHome, faSignInAlt, faUser} from '@fortawesome/free-solid-svg-icons';
-import Modal from './components/activity/Modal';
+import ActivityModal from './components/activity/ActivityModal';
 import { Link } from "react-router-dom";
 import SessionHandler from "./utilities/SessionHandler";
 
@@ -34,7 +34,7 @@ export const Head = () =>
                         <div>Profile</div>
                     </a>
                     <div className="navbar-item">
-                        <Modal> </Modal>
+                        <ActivityModal> </ActivityModal>
                     </div>
                     <span className="navbar-item">
                         <Link className="button is-primary is-inverted" to={'/login'} onClick={() => SessionHandler.logOut()}>

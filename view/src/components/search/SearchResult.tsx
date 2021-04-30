@@ -18,6 +18,8 @@ interface State {
 }
 
 export default class SearchResult extends React.Component<Props, State> {
+    private readonly abortController: AbortController;
+
     constructor(props: Props) {
         super(props);
 
@@ -28,13 +30,16 @@ export default class SearchResult extends React.Component<Props, State> {
             disableButton: SessionHandler.getUsername() === this.props.username
         }
 
+        this.abortController = new AbortController();
+
         // Check whether the user is already following or blocked
         fetch(BACKEND_URL + "users/getRelationship?user=" + this.props.username, {
             method: "GET",
             headers: {
                 Accept: "application/json",
                 Authorization: SessionHandler.getAuthToken()
-            }
+            },
+            signal: this.abortController.signal
         }).then((response) => {
             if (response.ok) {
                 return response.json().then((response) => {
@@ -48,6 +53,10 @@ export default class SearchResult extends React.Component<Props, State> {
                         disableButton: this.state.disableButton || isBlocked,
                     });
                 });
+            }
+        }).catch((error: any) => {
+            if (error.name !== "AbortError") {
+                console.log("Fetch failed:", error);
             }
         });
 
@@ -76,7 +85,8 @@ export default class SearchResult extends React.Component<Props, State> {
                 },
                 body: JSON.stringify({
                     followed: this.props.username
-                })
+                }),
+                signal: this.abortController.signal
             }).then((response) => {
                 this.setState({
                     isFollowing: response.ok,
@@ -86,6 +96,10 @@ export default class SearchResult extends React.Component<Props, State> {
 
                 if (response.ok) {
                     SessionHandler.setRefreshFeed(true, false);
+                }
+            }).catch((error: any) => {
+                if (error.name !== "AbortError") {
+                    console.log("Fetch failed:", error);
                 }
             });
         }
@@ -102,7 +116,8 @@ export default class SearchResult extends React.Component<Props, State> {
                 },
                 body: JSON.stringify({
                     unfollowed: this.props.username
-                })
+                }),
+                signal: this.abortController.signal
             }).then((response) => {
                 this.setState({
                     isFollowing: !response.ok,
@@ -112,6 +127,10 @@ export default class SearchResult extends React.Component<Props, State> {
 
                 if (response.ok) {
                     SessionHandler.setRefreshFeed(true, false);
+                }
+            }).catch((error: any) => {
+                if (error.name !== "AbortError") {
+                    console.log("Fetch failed:", error);
                 }
             });
         }
@@ -127,6 +146,10 @@ export default class SearchResult extends React.Component<Props, State> {
                 buttonClass: (following ? (mouseOver ? "is-danger" : "is-success") : this.state.buttonClass)
             });
         }
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     render() {

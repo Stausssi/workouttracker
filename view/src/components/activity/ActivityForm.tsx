@@ -145,7 +145,8 @@ const inputFields: inputConfig[] = [
 ];
 const NUM_FIELDS = inputFields.length - 1;
 
-export default class AddActivity extends Component<Props, State> {
+export default class ActivityForm extends Component<Props, State> {
+    private readonly abortController: AbortController;
     mandatoryParams: boolean[] = [];
     optParams: boolean[] = [];
 
@@ -153,6 +154,8 @@ export default class AddActivity extends Component<Props, State> {
         super(props);
         // Use Object.assign to copy the defaultState and prevent changes to default values
         this.state = Object.assign({}, defaultState);
+
+        this.abortController = new AbortController();
 
         // bind this to event handlers
         this.handleChange = this.handleChange.bind(this);
@@ -232,13 +235,13 @@ export default class AddActivity extends Component<Props, State> {
 
                 // Round to the last 2 decimal places
                 let rounded = Math.round((this.state[param] * multiplyWith) * 100) / 100;
-                this.setState({[param]: rounded})
+                this.setState({[param]: isNaN(rounded) ? 0 : rounded})
             }
         }
 
         // Update state
         isNaN(value) ?
-            this.setState({[name]: value}) :
+            this.setState({[name]: value === "NaN" ? 0 : value}) :
             this.setState({[name]: Number(value)});
     }
 
@@ -294,7 +297,8 @@ export default class AddActivity extends Component<Props, State> {
                     'Content-Type': 'application/json',
                     Authorization: SessionHandler.getAuthToken()
                 },
-                body: JSON.stringify(bodyContent)
+                body: JSON.stringify(bodyContent),
+                signal: this.abortController.signal
             }).then((response) => {
                 if (response.ok) {
                     this.setState({
@@ -318,6 +322,10 @@ export default class AddActivity extends Component<Props, State> {
                             });
                     });
                 }
+            }).catch((error: any) => {
+                if (error.name !== "AbortError") {
+                    console.log("Fetch failed:", error);
+                }
             });
         }
     }
@@ -332,25 +340,29 @@ export default class AddActivity extends Component<Props, State> {
 
     render() {
         return (
-            <>
-                <GoogleFit/>
-                <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
-                    <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
+            <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
+                <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
 
-                    <label className="label">Sport</label>
-                    <div className={`select is-fullwidth ${this.state.sportClass}`}>
-                        <select name="sport" onChange={this.handleChange} value={this.state.sport}>
-                            {
-                                this.state.notifyMessage !== notifyMessages["fetchFailed"][0] ?
-                                    this.createSportSelect() :
-                                    <option key="-1" value="-1">Something went wrong!</option>
-                            }
-                        </select>
-                    </div>
+                <label className="label">Sport</label>
+                <div className={`select is-fullwidth ${this.state.sportClass}`}>
+                    <select name="sport" onChange={this.handleChange} value={this.state.sport}>
+                        {
+                            this.state.notifyMessage !== notifyMessages["fetchFailed"][0] ?
+                                this.createSportSelect() :
+                                <option key="-1" value="-1">Something went wrong!</option>
+                        }
+                    </select>
+                </div>
 
-                    {this.createFormFields()}
-                </form>
-            </>
+                {
+                    this.state.sportClass === "is-success" ?
+                        this.createFormFields() :
+                        <>
+                            <div className="divider">Import</div>
+                            <GoogleFit/>
+                        </>
+                }
+            </form>
         );
     }
 
