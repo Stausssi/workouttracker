@@ -7,6 +7,10 @@ import CommentContainer from "../comments/CommentContainer";
 import SessionHandler from "../../utilities/SessionHandler";
 import {BACKEND_URL} from "../../App";
 
+function fillZeros(num: number) {
+    return num < 10 ? "0" + num : num;
+}
+
 const activityInfo = {
     distance: { // db unit: Meters
         title: 'Distance',
@@ -21,12 +25,18 @@ const activityInfo = {
     duration: { //db unit: seconds
         title: 'Duration',
         format: (DurationInSeconds: number) => {
-            const date = new Date(DurationInSeconds * 1000);
+            const DurInM = Math.round(DurationInSeconds / 60);
 
-            if (DurationInSeconds > 3600) {
-                return (date.toISOString().substr(11, 5) + ' h');
+            if (DurInM < 60) {
+                return fillZeros(DurInM) + ":" + fillZeros(DurationInSeconds%60) + " min";
             } else {
-                return (date.toISOString().substr(14, 5) + ' m');
+                let DurInH = Math.round(DurInM / 60);
+                if (DurInH < 24) {
+                    return fillZeros(DurInH) + ":" + fillZeros(DurInM%60) + " hours";
+                } else {
+                    let diffInD = Math.round(DurInH / 24);
+                    return diffInD + " days " + (DurInH%24 === 0 ? "" : DurInH%24 + " hours");
+                }
             }
         }
     },
@@ -45,7 +55,11 @@ const activityInfo = {
     altitudeDifference: {
         title: 'Altitude',
         format: (meters: number) => {
-            return (meters + " m");
+            if (meters < 1000) {
+                return (meters + " m");
+            } else {
+                return ((meters / 1000).toFixed(1) + " km");
+            }
         }
     }
 }
