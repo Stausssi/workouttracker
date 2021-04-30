@@ -98,10 +98,12 @@ export default class CommentContainer extends Component<{ activity_id: number },
                     </button>);
             }
 
+            // Render the X most recent comments
             let numFirst = lengthAll - lengthRendered;
             for (let i = numFirst; i < lengthAll; i++) {
                 let comment = this.state.comments[i];
                 if (comment) {
+                    // Also check whether the previous comment was made by the same user
                     let prevComment = this.state.comments[i - 1];
                     let prevName = prevComment && i !== numFirst ? prevComment.name : "";
                     fieldsHTML.push(<Comment key={comment.id} comment={comment} newUser={comment.name !== prevName}/>)
@@ -115,6 +117,7 @@ export default class CommentContainer extends Component<{ activity_id: number },
     }
 
     componentWillUnmount() {
+        // Clear interval and cancel ongoing fetch requests
         clearInterval(this.commentRefreshInterval);
 
         this.abortController.abort();
