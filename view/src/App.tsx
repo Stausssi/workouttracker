@@ -33,6 +33,7 @@ export default class App extends Component<Props, State> {
                             {SessionHandler.isLoggedIn() ? <Homepage /> : <LoginContainer />}
                         </Route>
 
+
                         <ProtectedRoute exact path="/login" component={LoginContainer} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
                         <ProtectedRoute exact path="/sign-up" component={LoginContainer} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
                         <ProtectedRoute exact path="/verify" component={Verify} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
