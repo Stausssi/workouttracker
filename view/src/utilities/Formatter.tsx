@@ -7,7 +7,7 @@ export class Formatter {
     /*
      * Format a date into on of the following
      * - 'Just now': Comment posted less than a minute ago
-     * - 'x minute(s) ago': Comment posted x minute(s) ago, same for hour(s) and day(s)
+     * - 'x minute(s) ago': Same for hour(s) and day(s)
      * - 'DD.MM.YYYY': Longer than 2 weeks ago
      */
     static formatCommentDate(timestamp: Date) {
@@ -32,12 +32,28 @@ export class Formatter {
                     formattedTime = diffInD + " day" + (diffInD === 1 ? "" : "s");
                 } else {
                     // Return date representation
-                    return Formatter.fillZeros(timestamp.getDay()) + "." + Formatter.fillZeros(timestamp.getMonth()) + "." + timestamp.getUTCFullYear();
+                    return Formatter.formatDate(timestamp);
                 }
             }
         }
 
         return formattedTime + " ago";
+    }
+
+    // Format a date into DD.MM.YYYY
+    static formatDate(date: Date) {
+        // getMonth is zero-based
+        return Formatter.fillZeros(date.getDate()) + "." + Formatter.fillZeros(date.getMonth() + 1) + "." + date.getUTCFullYear();
+    }
+
+    // Format a date into HH:MM
+    static formatTime(date: Date) {
+        return Formatter.fillZeros(date.getHours()) + ":" + Formatter.fillZeros(date.getMinutes());
+    }
+
+    // Format a date into DD.MM.YYYY, HH:MM
+    static formatDateTime(date: Date) {
+        return Formatter.formatDate(date) + ", " + Formatter.formatTime(date);
     }
 
     // Create a m or km string depending on the size of the number
@@ -49,6 +65,12 @@ export class Formatter {
         }
     }
 
+    /*
+     * Format activity duration into on of the following:
+     * - 'MM:SS'
+     * - 'HH:MM'
+     * - 'x days (y hours)'
+     */
     static format_ActivityDuration(durationInS: number) {
         const DurInM = Math.round(durationInS / 60);
 
@@ -65,10 +87,12 @@ export class Formatter {
         }
     }
 
+    // Add unit to a given pace
     static format_pace(kmPerHour: number) {
         return (kmPerHour).toFixed(1) + " km/h";
     }
 
+    // Add unit to the heart rate
     static format_heartRate(heartRate: number) {
         return heartRate + " bpm";
     }

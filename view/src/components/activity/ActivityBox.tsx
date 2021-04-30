@@ -178,8 +178,7 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
                         <div className="media-content has-text-left	pl-2">
                             <p className="title is-4">{props.sport}</p>
                             <p className="subtitle is-6">
-                                <time
-                                    dateTime="2016-1-1">{new Date(props.addedAt).toLocaleString().slice(0, 16)}</time>
+                                <time>{Formatter.formatDateTime(new Date(Date.parse(String(props.addedAt))))}</time>
                                 {this.props.ownFeed ? "" : " - " + props.username}
                             </p>
                         </div>
