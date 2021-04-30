@@ -175,7 +175,7 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
 
     componentWillUnmount() {
         // Dont refresh thumbs
-        clearTimeout(this.thumbsRefreshInterval);
+        clearInterval(this.thumbsRefreshInterval);
 
         // Abort all running requests
         this.abortController.abort();

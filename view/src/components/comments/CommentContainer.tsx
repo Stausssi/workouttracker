@@ -115,7 +115,7 @@ export default class CommentContainer extends Component<{ activity_id: number },
     }
 
     componentWillUnmount() {
-        clearTimeout(this.commentRefreshInterval);
+        clearInterval(this.commentRefreshInterval);
 
         this.abortController.abort();
     }

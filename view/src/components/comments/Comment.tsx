@@ -49,7 +49,6 @@ const Comment = (props: Props) => {
                             :
                             <></>
                     }
-
                     {props.comment.text}
                     <br/>
                     <p className="is-size-7">{formatTime(props.comment.timestamp)}</p>

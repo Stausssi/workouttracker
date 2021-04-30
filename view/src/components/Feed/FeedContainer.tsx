@@ -37,7 +37,13 @@ export default class FeedContainer extends React.Component<Props, State> {
                         <label htmlFor="feedSwitch" className="is-unselectable">Friends Feed</label>
                     </div>
                 </div>
-                <div>{this.state.switch ? <Feed key={"Feed1"} ownFeed={false}/> : <Feed key={"Feed2"} ownFeed={true}/>}</div>
+                <div>
+                    {
+                        this.state.switch ?
+                            <Feed key={"Feed1"} ownFeed={false}/> :
+                            <Feed key={"Feed2"} ownFeed={true}/>
+                    }
+                </div>
             </section>
         )
     }

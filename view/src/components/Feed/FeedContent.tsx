@@ -30,6 +30,7 @@ interface FeedProps {
 // ------------------------------------------------------------------------------------------------------------------
 
 export class Feed extends React.Component<FeedProps, FeedState> {
+    private readonly abortController: AbortController;
     private readonly refreshInterval;
 
     constructor(props: FeedProps) {
@@ -39,6 +40,8 @@ export class Feed extends React.Component<FeedProps, FeedState> {
             loaded: false,
             hasMore: true
         }
+
+        this.abortController = new AbortController();
 
         this.refreshInterval = setInterval(() => {
             if(SessionHandler.getRefreshFeed(props.ownFeed)){
@@ -59,6 +62,8 @@ export class Feed extends React.Component<FeedProps, FeedState> {
 
     componentWillUnmount() {
         clearInterval(this.refreshInterval);
+
+        this.abortController.abort();
     }
 
     getFeed() {
@@ -69,7 +74,8 @@ export class Feed extends React.Component<FeedProps, FeedState> {
             headers: {
                 Accepts: "application/json",
                 Authorization: SessionHandler.getAuthToken()
-            }
+            },
+            signal: this.abortController.signal
         }).then((response) => {
             if (response.ok) {
                 return response.json().then(response => {
@@ -79,6 +85,10 @@ export class Feed extends React.Component<FeedProps, FeedState> {
                         hasMore: activities.length > 0
                     });
                 });
+            }
+        }).catch((error: any) => {
+            if (error.name !== "AbortError") {
+                console.log("Fetch failed:", error);
             }
         });
     }
