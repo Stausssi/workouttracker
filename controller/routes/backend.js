@@ -37,6 +37,7 @@ router.get('/events/get', authenticateJWT,event.findAll);
 router.get('/events/getactivity', authenticateJWT,event.findActivityEvents); 
 router.post('/events/add', authenticateJWT,event.create); 
 router.delete('/events/remove', authenticateJWT,event.remove);  
+router.delete('/activity/remove', authenticateJWT,event.removeactivity);  
 
 /* charts routes */
 router.get('/charts/get',authenticateJWT, chart.findAll); 

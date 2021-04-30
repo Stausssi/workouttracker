@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import SessionHandler from "../SessionHandler";
 import moment from "moment";
+import NotificationBox from "./NotificationBox";
 
 interface Props {}
 
@@ -18,8 +19,9 @@ interface State {
   endDate: Date;
   allDay: boolean;
   date: Date;
-  eventsarray: any[];
   activityEvents: any[];
+  notifyMessage: string;
+  notifyType: string;
 }
 
 const initialState = {
@@ -28,9 +30,10 @@ const initialState = {
   startDate: new Date(),
   endDate: new Date(),
   allDay: false,
-  eventsarray: [],
   activityEvents: [],
   date: new Date(),
+  notifyMessage: "",
+  notifyType: "",
 };
 
 export default class FullCalendar extends React.Component<Props, State> {
@@ -50,6 +53,12 @@ export default class FullCalendar extends React.Component<Props, State> {
     }
   };
 
+  initsources() {
+    console.log("hi");
+    console.log(this.calendar?.getEventSources());
+    var test = this.calendar?.getEventSourceById("1")?.id;
+  }
+
   componentDidMount() {
     // init calendar and render events on mount
     this.initCalendar();
@@ -63,7 +72,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       this.calendar.destroy();
     }
     const canvas = document.getElementById("calendarFull") as HTMLCanvasElement; //get Canvas Element where Calendar will be displayed
-
+    console.log(this.calendar?.getEventSources());
     this.calendar = new Calendar(canvas, {
       //configure calendar
       initialView: "dayGridMonth", //set initial view (Month view)
@@ -88,11 +97,15 @@ export default class FullCalendar extends React.Component<Props, State> {
         minute: "2-digit",
         hour12: false,
       },
+      defaultAllDay: true,
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin], //add plugins to fullcalendar
-      events: this.state.eventsarray, //eventsList
       height: "600px", //set height for table
       selectable: true, //enable selection of dates
       select: (info) => this.create(info), //Open create function on select date range
+      eventClick: (info) => {
+        console.log("Event: " + info.el);
+        console.log("Event: " + info.event.groupId);
+      },
       eventDidMount: (element) => {
         // add delete button to events
         var deleteButton = document.createElement("button");
@@ -121,11 +134,14 @@ export default class FullCalendar extends React.Component<Props, State> {
       };
       this.setEvents(event);
     } else {
-      console.error("Title can not be empty");
+      this.setState({
+        notifyMessage: "Title can not be empty",
+        notifyType: "is-danger",
+      });
     }
   }
 
-  test() {
+  getactivity() {
     console.log(this.state.activityEvents);
     fetch(BACKEND_URL + "/events/getactivity", {
       method: "GET",
@@ -137,14 +153,11 @@ export default class FullCalendar extends React.Component<Props, State> {
       if (response.ok) {
         let activityEvents: any[] = [];
         return response.json().then((response) => {
-          //this.setState({ eventsarray: JSON.parse(response.body) });
-          console.log(JSON.parse(response.body));
           let posts = JSON.parse(response.body);
           posts.map((item: any) => {
             var end;
-            //console.log(item.duration)
             end = moment(item.startedAt)
-              .add("seconds", item.duration)
+              .add(item.duration, "seconds")
               .format("YYYY-MM-DD HH:mm:ss");
             const event = {
               id: item.activity_id,
@@ -152,13 +165,13 @@ export default class FullCalendar extends React.Component<Props, State> {
               start: item.startedAt,
               end: end,
               allDay: 1,
+              groupId: "activityEvents",
+              color: "green",
             };
-            console.log(event);
             activityEvents.push(event);
             return event;
           });
-          this.setState({ activityEvents: activityEvents });
-          this.calendar?.addEventSource(this.state.activityEvents); //add new events
+          this.calendar?.addEventSource(activityEvents); //add new events
         });
       } else {
         return response.json().then((response) => {
@@ -180,14 +193,13 @@ export default class FullCalendar extends React.Component<Props, State> {
     }).then((response) => {
       if (response.ok) {
         return response.json().then((response) => {
-          this.setState({ eventsarray: JSON.parse(response.body) });
           this.calendar?.removeAllEventSources(); //remove old events
-          this.calendar?.addEventSource(this.state.eventsarray); //add new events
+          this.calendar?.addEventSource(JSON.parse(response.body)); //add new events
+          this.getactivity(); //get vents fom activity
         });
       } else {
         return response.json().then((response) => {
           console.error("Fetch has failed:", response);
-          this.setState({ eventsarray: [] }); //Clear array on error
         });
       }
     });
@@ -222,24 +234,46 @@ export default class FullCalendar extends React.Component<Props, State> {
   }
 
   removeEvent(element: any) {
-    element.event.remove(); //remove on frontend
-    fetch(BACKEND_URL + "events/remove", {
-      //remove an event from DB
-      method: "DELETE",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        Authorization: SessionHandler.getAuthToken(),
-      },
-      body: JSON.stringify({ id: element.event.id }),
-    }).then((response) => {
-      //Displays information message on console
-      if (response.ok) {
-        console.log("Delete request has been submitted successfully");
-      } else {
-        console.log("Delete request has failed");
-      }
-    });
+    if (element.event.groupId === "activityEvents") {
+      console.log("hallo");
+      element.event.remove(); //remove on frontend
+      fetch(BACKEND_URL + "activity/remove", {
+        //remove an activity from DB
+        method: "DELETE",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          Authorization: SessionHandler.getAuthToken(),
+        },
+        body: JSON.stringify({ id: element.event.id }),
+      }).then((response) => {
+        //Displays information message on console
+        if (response.ok) {
+          console.log("Delete request has been submitted successfully");
+        } else {
+          console.log("Delete request has failed");
+        }
+      });
+    } else {
+      element.event.remove(); //remove on frontend
+      fetch(BACKEND_URL + "events/remove", {
+        //remove an event from DB
+        method: "DELETE",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          Authorization: SessionHandler.getAuthToken(),
+        },
+        body: JSON.stringify({ id: element.event.id }),
+      }).then((response) => {
+        //Displays information message on console
+        if (response.ok) {
+          console.log("Delete request has been submitted successfully");
+        } else {
+          console.log("Delete request has failed");
+        }
+      });
+    }
   }
 
   handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -272,6 +306,11 @@ export default class FullCalendar extends React.Component<Props, State> {
             <section className="modal-card-body">
               <div className="content">
                 <div className="control">
+                  <NotificationBox
+                    message={this.state.notifyMessage}
+                    type={this.state.notifyType}
+                    hasDelete={false}
+                  />
                   <label className="label">Event Name</label>
                   <>
                     <input
@@ -305,9 +344,7 @@ export default class FullCalendar extends React.Component<Props, State> {
             </footer>
           </div>
         </div>
-        <button className="button is-success" onClick={() => this.test()}>
-          Add activity
-        </button>
+        <button onClick={() => this.initsources()}>Button</button>
       </div>
     );
   }

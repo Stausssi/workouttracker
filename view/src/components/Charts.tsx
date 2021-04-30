@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import SessionHandler from "../SessionHandler";
 import { BACKEND_URL } from "../App";
 import "bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css";
+import NotificationBox from "./NotificationBox";
 
 interface Props {}
 
@@ -22,6 +23,8 @@ interface State {
   array: any;
   sports: string[];
   switchfunc: boolean;
+  notifyMessage:string;
+  notifyType:string;
 }
 
 const colors = [
@@ -67,13 +70,12 @@ const types = [
 const allcategories = [
   "distance",
   "duration",
-  "effort",
   "altitudeDifferences",
   "averageHeartRate",
   "pace",
 ];
 
-const categories = ["distance", "duration", "effort", "altitudeDifferences"];
+const categories = ["distance", "duration", "altitudeDifferences"];
 
 const averagecategories = ["averageHeartRate", "pace"];
 
@@ -88,6 +90,8 @@ const initialState = {
   sports: [],
   switchfunc: false,
   year: new Date(),
+  notifyMessage:'',
+  notifyType:''
 };
 
 export default class Graphs extends React.Component<Props, State> {
@@ -132,7 +136,7 @@ export default class Graphs extends React.Component<Props, State> {
         });
       } else {
         return response.json().then((response) => {
-          console.log("Sport Fetch failed:", response);
+          console.error("Sport Fetch failed:", response);
           this.setState({ sports: [] });
         });
       }
@@ -154,7 +158,7 @@ export default class Graphs extends React.Component<Props, State> {
           return response.json();
         } else {
           return response.json().then((response) => {
-            console.log("Failed to get charts: ", response); //error message in console on error
+            console.error("Failed to get charts: ", response); //error message in console on error
           });
         }
       })
@@ -368,15 +372,13 @@ export default class Graphs extends React.Component<Props, State> {
         params.append("year", chart.year.toString());
         const url = BACKEND_URL + "charts/dataset?";
         this.getdatasets(url, params, chart); //Display chart with data on frontend
-        this.action();
+        //this.action();
         this.setcharts(chart); //Add new chart to DB
       } else {
-        console.error(
-          "Title was already given. Please choose an other title for your chart"
-        );
+        this.setState({notifyMessage:"Title was already given. Please choose an other title for your chart",notifyType:'is-danger'})
       }
     } else {
-      console.error("Configurtion values are missing");
+      this.setState({notifyMessage:"Configurtion values are missing",notifyType:'is-danger'})
     }
   }
 
@@ -537,7 +539,7 @@ export default class Graphs extends React.Component<Props, State> {
   handleCategories() {
     //update categories on siwth buttons
     let newcategories = categories;
-    if (this.state.switchfunc === true) {
+    if (this.state.switchfunc === false) {
       newcategories = newcategories.concat(averagecategories);
     }
     return this.renderOptions(newcategories);
@@ -574,6 +576,7 @@ export default class Graphs extends React.Component<Props, State> {
             <section className="modal-card-body">
               <div className="content">
                 <div className="control">
+                <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
                   <label className="label">Chart Name</label>
                   <input
                     className="input"

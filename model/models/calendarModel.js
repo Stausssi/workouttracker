@@ -19,8 +19,8 @@ Event.getAll = (user,response) => { //sql query to get all events which match wi
         });
 }
 
-Event.getActivityEvents = (response) => {
-    sql.query("SELECT activity_id ,sport as title, startedAt,duration  FROM activity;",  //Where user = ?
+Event.getActivityEvents = (user,response) => { //sql query to get all actvities as events
+    sql.query("SELECT activity_id ,sport as title, startedAt,duration  FROM activity where user = ?",[user],  
         function (error, result) {
             if (error) {
                 response(error, null)
@@ -45,6 +45,18 @@ Event.create = (newEvent, result) => {  //sql query to insert event into DB
 
 Event.remove = (id, username, result) => {  //remove event 
     sql.query("DELETE FROM events WHERE id = ? AND user = ?", [id,username], (error, res) => {
+        if (error) {
+            console.log("error: ", error);
+            result(error, null);
+        }
+        else {
+            result(null, true);
+        }
+    });
+};
+
+Event.removeactivity = (id, username, result) => {  //remove activity  
+    sql.query("DELETE FROM activity WHERE activity_id = ? AND user = ?", [id,username], (error, res) => {
         if (error) {
             console.log("error: ", error);
             result(error, null);

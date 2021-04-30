@@ -26,7 +26,7 @@ exports.findActivityEvents = (request, response) => {
     request.sendStatus(400)
   }
   else {
-    Event.getActivityEvents((error, data) => {
+    Event.getActivityEvents(username,(error, data) => {
       if (error) {
         console.log(error);
         response.sendStatus(500)
@@ -72,6 +72,25 @@ exports.remove = (request, response) => {
   }
   else {
     Event.remove(eventid,username, (error, data) => {
+      if (error || !data) {
+        response.sendStatus(500)
+      } else {
+        response.sendStatus(200)
+      }
+    })
+
+  }
+};
+
+//remove event from DB
+exports.removeactivity = (request, response) => {
+  const eventid = request.body.id //id of event, to identify dataset which will be deleted
+  let username = request.username;
+  if (!request.body || isParamMissing([username,eventid])) {
+    response.sendStatus(400)
+  }
+  else {
+    Event.removeactivity(eventid,username, (error, data) => {
       if (error || !data) {
         response.sendStatus(500)
       } else {
