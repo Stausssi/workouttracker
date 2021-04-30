@@ -295,7 +295,7 @@ export default class AddActivity extends Component<Props, State> {
                         notifyMessage: notifyMessages["success"][0],
                         notifyType: notifyMessages["success"][1]
                     });
-
+                    SessionHandler.setRefreshFeed(true);
                     // Disable submit button and reset form
                     this.allowSubmit(false);
                     this.resetState(RESET_TYPES.ACTIVITY);

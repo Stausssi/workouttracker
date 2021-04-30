@@ -40,5 +40,3 @@ export default class FeedContainer extends React.Component<Props, State> {
         )
     }
 }
-
-

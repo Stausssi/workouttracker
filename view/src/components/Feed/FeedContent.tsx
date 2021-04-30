@@ -40,6 +40,9 @@ interface ActivityTableProps {
 // ------------------------------------------------------------------------------------------------------------------
 
 export class Feed extends React.Component<FeedProps, FeedState> {
+
+    private readonly refreshInterval;
+
     constructor(props: FeedProps) {
         super(props);
         this.state = {
@@ -47,6 +50,13 @@ export class Feed extends React.Component<FeedProps, FeedState> {
             loaded: false,
             hasMore: true
         }
+
+        this.refreshInterval = setInterval(() => {
+            if(SessionHandler.getRefreshFeed()){
+                SessionHandler.setRefreshFeed(false);
+                this.refresh();
+            }
+        }, 1000);
 
         // bind function scopes
         this.getFeed = this.getFeed.bind(this);
@@ -82,9 +92,10 @@ export class Feed extends React.Component<FeedProps, FeedState> {
 
     refresh() {
         //reset postData and
-        this.setState({postData: []});
-        // load new activities
-        this.getFeed()
+        this.setState({postData: []}, () => {
+            // load new activities
+            this.getFeed()
+        });
     }
 
     render() {

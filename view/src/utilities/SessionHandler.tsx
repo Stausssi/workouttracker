@@ -24,4 +24,12 @@ export default class SessionHandler {
         // Redirect
         window.location.href = FRONTEND_URL;
     }
+
+    static getRefreshFeed() {
+        return Boolean(Number(sessionStorage.getItem("refreshFeed")));
+    }
+
+    static setRefreshFeed(newActivity:boolean){
+        sessionStorage.setItem("refreshFeed", String(Number(newActivity)));
+    }
 }
