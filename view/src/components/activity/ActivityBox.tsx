@@ -2,7 +2,7 @@ import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown, faAngleUp, faThumbsUp} from "@fortawesome/free-solid-svg-icons";
 
-import {postData} from "../Feed/FriendsAndOwnFeed";
+import {postData} from "../Feed/FeedContent";
 import CommentContainer from "../comments/CommentContainer";
 import SessionHandler from "../../utilities/SessionHandler";
 import {BACKEND_URL} from "../../App";

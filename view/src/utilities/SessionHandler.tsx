@@ -29,11 +29,13 @@ export default class SessionHandler {
         window.location.href = FRONTEND_URL;
     }
 
-    static getRefreshFeed() {
-        return Boolean(Number(sessionStorage.getItem("refreshFeed")));
+    static getRefreshFeed(isOwnFeed: boolean=true) {
+        let key = "refresh" + (isOwnFeed ? "Own" : "Friends") + "Feed";
+        return Boolean(Number(sessionStorage.getItem(key)));
     }
 
-    static setRefreshFeed(newActivity:boolean){
-        sessionStorage.setItem("refreshFeed", String(Number(newActivity)));
+    static setRefreshFeed(refresh: boolean, isOwnFeed: boolean=true){
+        let key = "refresh" + (isOwnFeed ? "Own" : "Friends") + "Feed";
+        sessionStorage.setItem(key, String(Number(refresh)));
     }
 }

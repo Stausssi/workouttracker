@@ -83,6 +83,10 @@ export default class SearchResult extends React.Component<Props, State> {
                     icon: response.ok ? faUserMinus : faExclamationTriangle,
                     buttonClass: "is-danger"
                 });
+
+                if (response.ok) {
+                    SessionHandler.setRefreshFeed(true, false);
+                }
             });
         }
     }
@@ -105,6 +109,10 @@ export default class SearchResult extends React.Component<Props, State> {
                     icon: response.ok ? faUserPlus : faExclamationTriangle,
                     buttonClass: response.ok ? "is-success" : "is-danger"
                 });
+
+                if (response.ok) {
+                    SessionHandler.setRefreshFeed(true, false);
+                }
             });
         }
     }

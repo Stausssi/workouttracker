@@ -2,17 +2,18 @@ import React from "react";
 import {BACKEND_URL} from "../../App";
 import SessionHandler from "../../utilities/SessionHandler";
 import InfiniteScroll from "react-infinite-scroll-component";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSync} from "@fortawesome/free-solid-svg-icons";
 
 import {ActivityBox, activityData} from "../activity/ActivityBox";
 
 
-export type postData = {
+export interface postData {
     activity_id: number,
-    likes: number
-    activityData: activityData
-    username: string
-    sport: string
+    likes: number,
+    activityData: activityData,
+    username: string,
+    sport: string,
     addedAt: Date
 }
 
@@ -40,8 +41,8 @@ export class Feed extends React.Component<FeedProps, FeedState> {
         }
 
         this.refreshInterval = setInterval(() => {
-            if(SessionHandler.getRefreshFeed()){
-                SessionHandler.setRefreshFeed(false);
+            if(SessionHandler.getRefreshFeed(props.ownFeed)){
+                SessionHandler.setRefreshFeed(false, props.ownFeed);
                 this.refresh();
             }
         }, 1000);
@@ -54,6 +55,10 @@ export class Feed extends React.Component<FeedProps, FeedState> {
     componentDidMount() {
         this.getFeed();
         this.setState({loaded: true});
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.refreshInterval);
     }
 
     getFeed() {

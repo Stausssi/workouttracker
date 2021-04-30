@@ -333,23 +333,23 @@ export default class AddActivity extends Component<Props, State> {
     render() {
         return (
             <>
-            <GoogleFit />
-            <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
-                <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
+                <GoogleFit/>
+                <form onSubmit={this.handleSubmit} onReset={this.handleReset}>
+                    <NotificationBox message={this.state.notifyMessage} type={this.state.notifyType} hasDelete={false}/>
 
-                <label className="label">Sport</label>
-                <div className={`select is-fullwidth ${this.state.sportClass}`}>
-                    <select name="sport" onChange={this.handleChange} value={this.state.sport}>
-                        {
-                            this.state.notifyMessage !== notifyMessages["fetchFailed"][0] ?
-                                this.createSportSelect() :
-                                <option key="-1" value="-1">Something went wrong!</option>
-                        }
-                    </select>
-                </div>
+                    <label className="label">Sport</label>
+                    <div className={`select is-fullwidth ${this.state.sportClass}`}>
+                        <select name="sport" onChange={this.handleChange} value={this.state.sport}>
+                            {
+                                this.state.notifyMessage !== notifyMessages["fetchFailed"][0] ?
+                                    this.createSportSelect() :
+                                    <option key="-1" value="-1">Something went wrong!</option>
+                            }
+                        </select>
+                    </div>
 
-                {this.createFormFields()}
-            </form>
+                    {this.createFormFields()}
+                </form>
             </>
         );
     }
