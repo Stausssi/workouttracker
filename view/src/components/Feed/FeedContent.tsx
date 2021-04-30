@@ -4,6 +4,7 @@ import SessionHandler from "../../utilities/SessionHandler";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown} from "@fortawesome/free-solid-svg-icons";
 import InfiniteScroll from "react-infinite-scroll-component";
+import {faSync} from "@fortawesome/free-solid-svg-icons";
 
 // ------------------------------------------------------------------------------------------------------------------
 
@@ -103,30 +104,37 @@ export class Feed extends React.Component<FeedProps, FeedState> {
             <>
                 <div className="pr-4 pl-4 pt-1 pb-1">
                     {this.state.loaded ?
-                        <InfiniteScroll
-                            dataLength={this.state.postData.length}
-                            next={this.getFeed}
-                            hasMore={this.state.hasMore}
-                            loader={
-                                <div className="box">
-                                    <div className="control is-loading">
-                                        <input className="input is-static" type="text" readOnly={true}
-                                               placeholder="Loading ... "/>
+                        <div>
+                            {!this.props.ownFeed ?
+                                <button className="button mb-3 mr-5 is-success" onClick={this.refresh}>
+                                    <FontAwesomeIcon icon={faSync}/>
+                                </button> : ""
+                            }
+                            <InfiniteScroll
+                                dataLength={this.state.postData.length}
+                                next={this.getFeed}
+                                hasMore={this.state.hasMore}
+                                loader={
+                                    <div className="box">
+                                        <div className="control is-loading">
+                                            <input className="input is-static" type="text" readOnly={true}
+                                                   placeholder="Loading ... "/>
+                                        </div>
                                     </div>
-                                </div>
-                            }
-                            endMessage={
-                                <p className="tag is-info is-light is-inverted mb-5">No new activities found</p>
-                            }
-                            scrollThreshold={0.9}
-                            scrollableTarget="col-1"
-                        >
+                                }
+                                endMessage={
+                                    <p className="tag is-info is-light is-inverted mb-5">No new activities found</p>
+                                }
+                                scrollThreshold={0.9}
+                                scrollableTarget="col-1"
+                            >
 
-                            {this.state.postData.map((activity: postData, index: number) => (
-                                <div className="mb-5" key={index}><ActivityBox ownFeed={this.props.ownFeed} postData={activity}/></div>))
-                            }
+                                {this.state.postData.map((activity: postData, index: number) => (
+                                    <div className="mb-5" key={index}><ActivityBox ownFeed={this.props.ownFeed} postData={activity}/></div>))
+                                }
 
-                        </InfiniteScroll>
+                            </InfiniteScroll>
+                        </div>
                         : <h1>Not loaded</h1>
                     }
                 </div>
