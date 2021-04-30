@@ -43,9 +43,9 @@ export class Formatter {
     // Create a m or km string depending on the size of the number
     static format_MeterKilometer(numberInM: number) {
         if (numberInM < 1000) {
-            return (numberInM + " m");
+            return numberInM + " m";
         } else {
-            return ((numberInM / 1000).toFixed(1) + " km");
+            return (numberInM / 1000).toFixed(1) + " km";
         }
     }
 
@@ -66,10 +66,10 @@ export class Formatter {
     }
 
     static format_pace(kmPerHour: number) {
-        return ((kmPerHour).toFixed(1) + " km/h");
+        return (kmPerHour).toFixed(1) + " km/h";
     }
 
     static format_heartRate(heartRate: number) {
-        return (heartRate + " bpm");
+        return heartRate + " bpm";
     }
 }
