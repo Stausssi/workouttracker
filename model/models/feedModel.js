@@ -60,7 +60,7 @@ Feed.getFollowingFeed = (user, start, amount, result) => {
     //get Feed for users that "user" is following, just like in getOwnFeed() and append the number of likes for each post
     sql.query('SELECT * FROM ' +
         '(SELECT * FROM activity WHERE user in ' +
-        '(SELECT followed FROM following WHERE follower=?) ' +
+        '(SELECT followed FROM following WHERE follower=? AND blocked=0) ' +
         'ORDER BY addedAt DESC LIMIT ?, ?) activities ' +
         'LEFT OUTER JOIN ' +
         '(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsUp GROUP BY activity_id) likecount ' +

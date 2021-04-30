@@ -4,6 +4,7 @@ import SessionHandler from "../../utilities/SessionHandler";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSync} from "@fortawesome/free-solid-svg-icons";
+import FadeIn from 'react-fade-in';
 
 import {ActivityBox, activityData} from "../activity/ActivityBox";
 
@@ -20,7 +21,8 @@ export interface postData {
 interface FeedState {
     postData: postData[] | [],
     loaded: boolean,
-    hasMore: boolean
+    hasMore: boolean,
+    refreshAnimation: boolean
 }
 
 interface FeedProps {
@@ -38,7 +40,8 @@ export class Feed extends React.Component<FeedProps, FeedState> {
         this.state = {
             postData: [],
             loaded: false,
-            hasMore: true
+            hasMore: true,
+            refreshAnimation:true
         }
 
         this.abortController = new AbortController();
@@ -95,9 +98,10 @@ export class Feed extends React.Component<FeedProps, FeedState> {
 
     refresh() {
         //reset postData and
-        this.setState({postData: []}, () => {
+        this.setState({postData: [], refreshAnimation:true}, () => {
             // load new activities
             this.getFeed()
+            this.setState({refreshAnimation:false});
         });
     }
 
@@ -131,9 +135,11 @@ export class Feed extends React.Component<FeedProps, FeedState> {
                                 scrollableTarget="col-1"
                             >
 
+                                <FadeIn delay={50} transitionDuration={300} key={"fadeIn" + this.state.refreshAnimation}>
                                 {this.state.postData.map((activity: postData, index: number) => (
                                     <div className="mb-5" key={index}><ActivityBox ownFeed={this.props.ownFeed} postData={activity}/></div>))
                                 }
+                                </FadeIn>
 
                             </InfiniteScroll>
                         </div>

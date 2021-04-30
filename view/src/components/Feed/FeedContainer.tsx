@@ -27,6 +27,14 @@ export default class FeedContainer extends React.Component<Props, State> {
     }
 
     render() {
+        const transitionOptions = {
+            transitionName: "fade",
+            transitionEnterTimeout: 200,
+            transitionLeaveTimeout: 200
+        }
+
+        let feed = this.state.switch ? <Feed key={"Feed1"} ownFeed={false}/> : <Feed key={"Feed2"} ownFeed={true}/>;
+
         return (
             <section>
                 <div className="is-centered">
@@ -37,13 +45,7 @@ export default class FeedContainer extends React.Component<Props, State> {
                         <label htmlFor="feedSwitch" className="is-unselectable">Friends Feed</label>
                     </div>
                 </div>
-                <div>
-                    {
-                        this.state.switch ?
-                            <Feed key={"Feed1"} ownFeed={false}/> :
-                            <Feed key={"Feed2"} ownFeed={true}/>
-                    }
-                </div>
+                {feed}
             </section>
         )
     }
