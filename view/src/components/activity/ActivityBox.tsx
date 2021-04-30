@@ -6,61 +6,29 @@ import {postData} from "../Feed/FeedContent";
 import CommentContainer from "../comments/CommentContainer";
 import SessionHandler from "../../utilities/SessionHandler";
 import {BACKEND_URL} from "../../App";
+import {Formatter} from "../../utilities/Formatter";
 
-function fillZeros(num: number) {
-    return num < 10 ? "0" + num : num;
-}
-
+// Define title and formatting function for every data entry
 const activityInfo = {
     distance: { // db unit: Meters
         title: 'Distance',
-        format: (DistanceInMeters: number) => {
-            if (DistanceInMeters < 1000) {
-                return (DistanceInMeters + " m");
-            } else {
-                return ((DistanceInMeters / 1000).toFixed(1) + " km");
-            }
-        }
+        format: (distanceInMeters: number) => Formatter.format_MeterKilometer(distanceInMeters)
     },
     duration: { //db unit: seconds
         title: 'Duration',
-        format: (DurationInSeconds: number) => {
-            const DurInM = Math.round(DurationInSeconds / 60);
-
-            if (DurInM < 60) {
-                return fillZeros(DurInM) + ":" + fillZeros(DurationInSeconds%60) + " min";
-            } else {
-                let DurInH = Math.round(DurInM / 60);
-                if (DurInH < 24) {
-                    return fillZeros(DurInH) + ":" + fillZeros(DurInM%60) + " hours";
-                } else {
-                    let diffInD = Math.round(DurInH / 24);
-                    return diffInD + " days " + (DurInH%24 === 0 ? "" : DurInH%24 + " hours");
-                }
-            }
-        }
+        format: (durationInSeconds: number) => Formatter.format_ActivityDuration(durationInSeconds)
     },
-    pace: { // db unit: m/s * 3,6 = km/h
+    pace: {
         title: 'Speed',
-        format: (metersPerSecond: number) => {
-            return ((metersPerSecond * 3.6).toFixed(1) + " km/h");
-        }
+        format: (kmPerHour: number) => Formatter.format_pace(kmPerHour)
     },
     averageHeartRate: {
-        title: 'Average heartrate',
-        format: (heartrate: number) => {
-            return (heartrate + " bpm");
-        }
+        title: 'Average heart rate',
+        format: (heartRate: number) => Formatter.format_heartRate(heartRate)
     },
     altitudeDifference: {
         title: 'Altitude',
-        format: (meters: number) => {
-            if (meters < 1000) {
-                return (meters + " m");
-            } else {
-                return ((meters / 1000).toFixed(1) + " km");
-            }
-        }
+        format: (meters: number) => Formatter.format_MeterKilometer(meters)
     }
 }
 
@@ -173,12 +141,14 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
             if (response.ok) {
                 let likedBefore = this.state.showThumbsUp;
 
+                // In-/decrement local counter depending on whether the activity was liked before
                 this.setState({
                     showThumbsUp: !likedBefore,
                     thumbsUpCounter: (likedBefore ? this.state.thumbsUpCounter - 1 : this.state.thumbsUpCounter + 1)
                 });
             } else {
-                console.log(response);
+                // Log reponse otherwise
+                response.text().then((response) => console.log(response));
             }
         }).catch((error: any) => {
             if (error.name !== "AbortError") {

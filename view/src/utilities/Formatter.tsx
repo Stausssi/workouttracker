@@ -39,4 +39,37 @@ export class Formatter {
 
         return formattedTime + " ago";
     }
+
+    // Create a m or km string depending on the size of the number
+    static format_MeterKilometer(numberInM: number) {
+        if (numberInM < 1000) {
+            return (numberInM + " m");
+        } else {
+            return ((numberInM / 1000).toFixed(1) + " km");
+        }
+    }
+
+    static format_ActivityDuration(durationInS: number) {
+        const DurInM = Math.round(durationInS / 60);
+
+        if (DurInM < 60) {
+            return Formatter.fillZeros(DurInM) + ":" + Formatter.fillZeros(durationInS % 60) + " min";
+        } else {
+            let DurInH = Math.round(DurInM / 60);
+            if (DurInH < 24) {
+                return Formatter.fillZeros(DurInH) + ":" + Formatter.fillZeros(DurInM % 60) + " hours";
+            } else {
+                let diffInD = Math.round(DurInH / 24);
+                return diffInD + " days " + (DurInH % 24 === 0 ? "" : DurInH % 24 + " hours");
+            }
+        }
+    }
+
+    static format_pace(kmPerHour: number) {
+        return ((kmPerHour).toFixed(1) + " km/h");
+    }
+
+    static format_heartRate(heartRate: number) {
+        return (heartRate + " bpm");
+    }
 }
