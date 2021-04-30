@@ -2,7 +2,6 @@ import React from "react";
 import Chart from "chart.js/auto";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
-import NotificationBox from "./NotificationBox";
 import DatePicker from "react-datepicker";
 import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
@@ -23,8 +22,6 @@ interface State {
   array: any;
   sports: string[];
   switchfunc: boolean;
-  informtext: string;
-  informtype: string;
 }
 
 const colors = [
@@ -81,8 +78,6 @@ const initialState = {
   array: "",
   sports: [],
   switchfunc: false,
-  informtext: "",
-  informtype: "",
   year: new Date(),
 };
 
@@ -248,8 +243,9 @@ export default class Graphs extends React.Component<Props, State> {
     if (!chartnode && !buttonnode) {
       // create new unique div and new unique button for each new chart
       var canvas = document.createElement("canvas"); //Canvas, where chart will be displayed
-      canvas.id = "chartID_" + chart.name; // use chart title to create id for div
-      canvas.className = chart.name;
+      canvas.id = "chartID_" + chart.name; // use chart title to create id for div 
+      canvas.height=500                               //set chart height to 500px
+      canvas.style.width ='100%';                     //set chart canvas to full width
       var button = document.createElement("button"); //Button, to delete chart
       button.id = chart.name; //Set button ID to chart title
       button.className = "button is-danger";
@@ -261,10 +257,7 @@ export default class Graphs extends React.Component<Props, State> {
       parent?.appendChild(button);
       this.addcharts(canvas, chart, data);
     } else {
-      this.setState({
-        informtext: "Element could not be added",
-        informtype: "is-danger",
-      });
+        console.error("Element could not be added")
     }
   }
 
@@ -301,6 +294,8 @@ export default class Graphs extends React.Component<Props, State> {
     new Chart(canvas, {
       //Create chart
       options: {
+        responsive: false,            //set chart static height
+        maintainAspectRatio: false,   //disable maintening ratio of chart when resizing
         scales: {
           x: {
             display: display, //enable/disable axis dependind on chart type
@@ -328,6 +323,7 @@ export default class Graphs extends React.Component<Props, State> {
           },
         },
       },
+      height:"600px",
       type: chart.type, //Define chart type
       data: {
         labels: labels,
@@ -690,11 +686,6 @@ export default class Graphs extends React.Component<Props, State> {
                 <span className="m-2">Cancel</span>
               </button>
             </footer>
-            <NotificationBox
-              message={this.state.informtext}
-              type={this.state.informtype}
-              hasDelete={false}
-            />
           </div>
         </div>
       </div>
