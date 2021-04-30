@@ -64,6 +64,15 @@ const types = [
   "pie",
 ];
 
+const allcategories = [
+  "distance",
+  "duration",
+  "effort",
+  "altitudeDifferences",
+  "averageHeartRate",
+  "pace",
+];
+
 const categories = ["distance", "duration", "effort", "altitudeDifferences"];
 
 const averagecategories = ["averageHeartRate", "pace"];
@@ -150,7 +159,6 @@ export default class Graphs extends React.Component<Props, State> {
         }
       })
       .then((data) => {
-        console.log(JSON.parse(data.body));
         this.setState({ array: JSON.parse(data.body) }); //add charts to array
         this.loopOverData(); //get data for each chart
       })
@@ -185,33 +193,12 @@ export default class Graphs extends React.Component<Props, State> {
         type: this.state.array[i].type,
         category: this.state.array[i].category,
         fill: this.state.array[i].fill,
-        param_sport: this.state.array[i].sport,
+        param_sport: this.state.array[i].param_sport,
         year: this.state.array[i].year,
         sqlfunc: this.state.array[i].sqlfunc,
       };
       this.getdatasets(url, params, chart); //fetch values from DB
     }
-  }
-
-  test() {
-    fetch(BACKEND_URL + "charts/dataset?category=pace&sqlfunc=sum&year=2021", {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: SessionHandler.getAuthToken(),
-      },
-    }).then((response) => {
-      if (response.ok) {
-        return response.json().then((response) => {
-          var data = JSON.parse(response.body);
-          console.log(data);
-        });
-      } else {
-        return response.json().then((response) => {
-          console.error("Fetch has failed:", response);
-        });
-      }
-    });
   }
 
   getdatasets(url: string, params: any, chart: any) {
@@ -226,7 +213,6 @@ export default class Graphs extends React.Component<Props, State> {
       if (response.ok) {
         return response.json().then((response) => {
           var data = JSON.parse(response.body);
-          console.log(data);
           this.addElement(chart, data); //create chart with data on frontend
         });
       } else {
@@ -243,9 +229,9 @@ export default class Graphs extends React.Component<Props, State> {
     if (!chartnode && !buttonnode) {
       // create new unique div and new unique button for each new chart
       var canvas = document.createElement("canvas"); //Canvas, where chart will be displayed
-      canvas.id = "chartID_" + chart.name; // use chart title to create id for div 
-      canvas.height=500                               //set chart height to 500px
-      canvas.style.width ='100%';                     //set chart canvas to full width
+      canvas.id = "chartID_" + chart.name; // use chart title to create id for div
+      canvas.height = 500; //set chart height to 500px
+      canvas.style.width = "100%"; //set chart canvas to full width
       var button = document.createElement("button"); //Button, to delete chart
       button.id = chart.name; //Set button ID to chart title
       button.className = "button is-danger";
@@ -257,7 +243,7 @@ export default class Graphs extends React.Component<Props, State> {
       parent?.appendChild(button);
       this.addcharts(canvas, chart, data);
     } else {
-        console.error("Element could not be added")
+      console.error("Element could not be added");
     }
   }
 
@@ -281,7 +267,12 @@ export default class Graphs extends React.Component<Props, State> {
 
     let dataarray: any[] = new Array(labels.length);
     let ylab = this.yLab(chart.category); //get unit of measurement for chart
-    let subtitle = this.subtitle(chart.category, ylab, chart.year); //create subtitle to add information for displayed chart
+    let subtitle = this.subtitle(
+      chart.category,
+      ylab,
+      chart.year,
+      chart.param_sport
+    ); //create subtitle to add information for displayed chart
     dataarray.fill(0, 0, labels.length); //init  charts values
     for (let i = 0; i < data.length; i++) {
       //Assign value to labels. Set value position depending on label position
@@ -294,8 +285,8 @@ export default class Graphs extends React.Component<Props, State> {
     new Chart(canvas, {
       //Create chart
       options: {
-        responsive: false,            //set chart static height
-        maintainAspectRatio: false,   //disable maintening ratio of chart when resizing
+        responsive: false, //set chart static height
+        maintainAspectRatio: false, //disable maintening ratio of chart when resizing
         scales: {
           x: {
             display: display, //enable/disable axis dependind on chart type
@@ -323,7 +314,7 @@ export default class Graphs extends React.Component<Props, State> {
           },
         },
       },
-      height:"600px",
+      height: "600px",
       type: chart.type, //Define chart type
       data: {
         labels: labels,
@@ -402,7 +393,7 @@ export default class Graphs extends React.Component<Props, State> {
     }).then((response) => {
       if (response.ok) {
       } else {
-        console.log(response); //view response in console
+        console.error("An error occured: " + response); //view response in console
       }
     });
   }
@@ -448,7 +439,7 @@ export default class Graphs extends React.Component<Props, State> {
   yLab(category: string) {
     //get unit of measurement depending on category
     var ylab = "";
-    if (categories.includes(category)) {
+    if (allcategories.includes(category)) {
       switch (category) {
         case "distance":
         case "altitudeDifference":
@@ -471,8 +462,13 @@ export default class Graphs extends React.Component<Props, State> {
     return ylab;
   }
 
-  subtitle(category: string, ylab: string, year: number) {
-    var subtitle = `${category} in ${ylab} per month for ${year}`; //create subtitle for chart
+  subtitle(category: string, ylab: string, year: number, sport: string) {
+    let subtitle;
+    if (sport && sport !== "") {
+      subtitle = `${category} in ${ylab} per month for ${year} and for ${sport}`; //create subtitle for chart with defined chart
+    } else {
+      subtitle = `${category} in ${ylab} per month for ${year} and for all sports`; //create subtitle for chart without defined chart
+    }
     return subtitle;
   }
 
@@ -541,7 +537,7 @@ export default class Graphs extends React.Component<Props, State> {
   handleCategories() {
     //update categories on siwth buttons
     let newcategories = categories;
-    if (this.state.switchfunc === false) {
+    if (this.state.switchfunc === true) {
       newcategories = newcategories.concat(averagecategories);
     }
     return this.renderOptions(newcategories);
@@ -554,13 +550,7 @@ export default class Graphs extends React.Component<Props, State> {
         <div className="divider">Chart</div>
         <div className="controls">
           <button className="button is-success" onClick={() => this.action()}>
-            Open Modal
-          </button>
-          <button className="button" onClick={() => this.getcharts()}>
-            get combine
-          </button>
-          <button className="button" onClick={() => this.test()}>
-            Test Api
+            Add Chart
           </button>
         </div>
         <div id="charts" />
@@ -594,7 +584,18 @@ export default class Graphs extends React.Component<Props, State> {
                     value={this.state.title}
                     onChange={(title) => this.handleOnChange(title)}
                   />
-                  <div className="columns is-centered m-2">
+                  <label className="label">Chart Type</label>
+                  <div className="select is-fullwidth mb-5">
+                    <select
+                      className="type"
+                      name="type"
+                      id="type"
+                      onChange={(type) => this.handleOnChange(type)}
+                    >
+                      {this.renderOptions(types)}
+                    </select>
+                  </div>
+                  <div className="columns is-centered">
                     <div className="column is-one-quarter">
                       <label className="label">Chart function</label>
                     </div>
@@ -618,17 +619,6 @@ export default class Graphs extends React.Component<Props, State> {
                         </label>
                       </div>
                     </div>
-                  </div>
-                  <label className="label">Chart Type</label>
-                  <div className="select is-fullwidth mb-5">
-                    <select
-                      className="type"
-                      name="type"
-                      id="type"
-                      onChange={(type) => this.handleOnChange(type)}
-                    >
-                      {this.renderOptions(types)}
-                    </select>
                   </div>
                   <label className="label">Filter for category</label>
                   <div className="select is-fullwidth">

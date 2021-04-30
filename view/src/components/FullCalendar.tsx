@@ -112,13 +112,17 @@ export default class FullCalendar extends React.Component<Props, State> {
 
   createEvent() {
     //create event
-    const event = {
-      title: this.state.title,
-      start: this.state.startDate,
-      end: this.state.endDate,
-      allDay: 1, //this.state.allDay
-    };
-    this.setEvents(event);
+    if (this.state.title && this.state.title !== "") {
+      const event = {
+        title: this.state.title,
+        start: this.state.startDate,
+        end: this.state.endDate,
+        allDay: 1, //this.state.allDay
+      };
+      this.setEvents(event);
+    } else {
+      console.error("Title can not be empty");
+    }
   }
 
   test() {
@@ -177,7 +181,6 @@ export default class FullCalendar extends React.Component<Props, State> {
       if (response.ok) {
         return response.json().then((response) => {
           this.setState({ eventsarray: JSON.parse(response.body) });
-          console.log(this.state.eventsarray);
           this.calendar?.removeAllEventSources(); //remove old events
           this.calendar?.addEventSource(this.state.eventsarray); //add new events
         });
@@ -203,7 +206,7 @@ export default class FullCalendar extends React.Component<Props, State> {
     }).then((response) => {
       if (response.ok) {
         //if event was successfully added, display success message
-          console.log("Event was successfully added to Database")
+        console.log("Event was successfully added to Database");
       } else {
         //if error on add event, display error message
         return response.json().then((response) => {

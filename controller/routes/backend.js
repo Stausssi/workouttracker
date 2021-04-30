@@ -44,8 +44,4 @@ router.get('/charts/dataset',authenticateJWT, chart.getdataset);
 router.post('/charts/add',authenticateJWT, chart.create); 
 router.delete('/charts/remove',authenticateJWT, chart.remove);
 
-router.get('/testConnection', function (req, res, next) {
-    res.send('Connection to the backend established!');
-})
-
 module.exports = router;
