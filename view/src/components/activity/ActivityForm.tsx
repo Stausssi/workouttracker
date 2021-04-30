@@ -20,6 +20,7 @@ interface State {
     [key: string]: any
 }
 
+// Create default state values
 const defaultActivityState = {
     sport: 0,
     sportClass: "",
@@ -57,6 +58,7 @@ enum RESET_TYPES {
     NOTIFICATION
 }
 
+// Create error messages
 const tryAgainLater = "Please try again later and contact an administrator.";
 const notifyMessages: { [ident: string]: [message: string, type: string] } = {
     "fetchFailed":
@@ -83,6 +85,7 @@ interface inputConfig {
     multiplier?: selectOptions
 }
 
+// Configure every possible sport param
 const inputFields: inputConfig[] = [
     {
         identifier: "distance",
@@ -157,14 +160,14 @@ export default class ActivityForm extends Component<Props, State> {
 
         this.abortController = new AbortController();
 
-        // bind this to event handlers
+        // bind 'this' to event handlers
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleReset = this.handleReset.bind(this);
     }
 
     componentDidMount() {
-        // Find submit button of the Modal
+        // Find submit button of the ActivityModal
         let submit = document.getElementById("submit-activity");
         if (submit) {
             this.setState({submitButton: submit});
@@ -203,7 +206,7 @@ export default class ActivityForm extends Component<Props, State> {
             return;
         }
 
-        // Retrieve params
+        // Retrieve predefined params
         let inputParams = null;
         for (let index in inputFields) {
             let inputIndex = inputFields[index];
@@ -218,9 +221,11 @@ export default class ActivityForm extends Component<Props, State> {
             let valid = this.isValid(value, inputParams.validValues, name === "sport", this.state[name + "Mul"]);
             let icon = inputParams.hasIcon;
 
+            // Set CSS class depending on validity
             this.setState({[name + "Class"]: (valid ? "is-success" : "")});
 
             if (icon) {
+                // Set icon depending on validity
                 this.setState({
                     [name + "Icon"]: (valid ? faCheck : faTimes),
                     [name + "IconClass"]: (valid ? "has-text-success" : "")
@@ -235,6 +240,8 @@ export default class ActivityForm extends Component<Props, State> {
 
                 // Round to the last 2 decimal places
                 let rounded = Math.round((this.state[param] * multiplyWith) * 100) / 100;
+
+                // Catch possible NaNs
                 this.setState({[param]: isNaN(rounded) ? 0 : rounded})
             }
         }
@@ -282,12 +289,12 @@ export default class ActivityForm extends Component<Props, State> {
                 bodyContent["pace"] = bodyContent["distance"] / bodyContent["duration"] * 3.6;
             }
 
-            // Check if date is valid, else use max valid date
-            bodyContent.startedAt =
-                (this.state.date < this.getMaxValidDate() ?
-                        this.state.date :
-                        this.getMaxValidDate()
-                ).toISOString().slice(0, 19).replace("T", " ");
+            // Check if picked date is valid, else use max valid date
+            bodyContent["startedAt"] = (
+                this.state.date < this.getMaxValidDate() ?
+                    this.state.date :
+                    this.getMaxValidDate()
+            ).toISOString().slice(0, 19).replace("T", " ");
 
             // Send post request
             fetch(BACKEND_URL + "activity/add", {
@@ -305,26 +312,29 @@ export default class ActivityForm extends Component<Props, State> {
                         notifyMessage: notifyMessages["success"][0],
                         notifyType: notifyMessages["success"][1]
                     });
+
+                    // Trigger feed refresh
                     SessionHandler.setRefreshFeed(true);
+
                     // Disable submit button and reset form
                     this.allowSubmit(false);
                     this.resetState(RESET_TYPES.ACTIVITY);
                 } else {
-                    return response.json().then((response) => {
-                        response.errno === 1 ?
-                            this.setState({
-                                notifyMessage: notifyMessages["unknownUser"][0],
-                                notifyType: notifyMessages["unknownUser"][1]
-                            }) :
-                            this.setState({
-                                notifyMessage: notifyMessages["error"][0],
-                                notifyType: notifyMessages["error"][1]
-                            });
+                    // Get response as text
+                    response.text().then((response) => {
+                        try {
+                            // Try parsing received string to json
+                            let responseJson = JSON.parse(response);
+                            this.handleError(responseJson.message, responseJson.errno === 1)
+                        } catch (e) {
+                            this.handleError("Invalid JSON response");
+                        }
                     });
                 }
             }).catch((error: any) => {
+                // Don't react to 'AbortError's
                 if (error.name !== "AbortError") {
-                    console.log("Fetch failed:", error);
+                    this.handleError(error)
                 }
             });
         }
@@ -333,9 +343,15 @@ export default class ActivityForm extends Component<Props, State> {
     handleReset(event: any) {
         event.preventDefault();
 
+        // Reset form and NotificationBox
         this.resetState(RESET_TYPES.NOTIFICATION);
         this.resetState(RESET_TYPES.ACTIVITY);
         this.allowSubmit(false);
+    }
+
+    handleError(error: any, knownError?: boolean) {
+        console.log("Error after adding activity to database: ", error);
+        this.notifyError(knownError ? "unknownUser" : "error");
     }
 
     render() {
@@ -347,6 +363,7 @@ export default class ActivityForm extends Component<Props, State> {
                 <div className={`select is-fullwidth ${this.state.sportClass}`}>
                     <select name="sport" onChange={this.handleChange} value={this.state.sport}>
                         {
+                            // Create sport select if sport fetch was successful
                             this.state.notifyMessage !== notifyMessages["fetchFailed"][0] ?
                                 this.createSportSelect() :
                                 <option key="-1" value="-1">Something went wrong!</option>
@@ -355,6 +372,7 @@ export default class ActivityForm extends Component<Props, State> {
                 </div>
 
                 {
+                    // Create input forms or display GoogleFit-import
                     this.state.sportClass === "is-success" ?
                         this.createFormFields() :
                         <>
@@ -366,6 +384,7 @@ export default class ActivityForm extends Component<Props, State> {
         );
     }
 
+    // Create a select option for every sport
     createSportSelect() {
         let sports = [];
         sports.push(<option value="0" key="0"/>);
@@ -397,6 +416,7 @@ export default class ActivityForm extends Component<Props, State> {
             // Pace doesn't have an input field
             if (identifier !== "pace") {
                 return (
+                    // Conditional rendering depending on multiplier
                     params.multiplier ?
                         <div key={"inputField_" + identifier} className="field">
                             <label className="label">{params.inputLabel}</label>
@@ -477,7 +497,6 @@ export default class ActivityForm extends Component<Props, State> {
             for (let i = 0; i < NUM_FIELDS - mandatory.length; i++) {
                 mandatory.push(false);
             }
-
             for (let i = 0; i < NUM_FIELDS - optional.length; i++) {
                 optional.push(false);
             }
@@ -486,6 +505,7 @@ export default class ActivityForm extends Component<Props, State> {
             mandatory = mandatory.reverse();
             optional = optional.reverse();
 
+            // Create input fields depending on specified params
             let fieldsHTML = [<div className="divider" key={"input_divider_man"}>Mandatory</div>];
             for (let index in mandatory) {
                 if (mandatory[index]) {
@@ -500,7 +520,6 @@ export default class ActivityForm extends Component<Props, State> {
 
             // Only display optional params if there are any
             fieldsHTML.push(<div className="divider" key={"input_divider_opt"}>Optional</div>);
-
             for (let index in optional) {
                 if (optional[index]) {
                     fieldsHTML.push(createInputField(inputFields[index]));
@@ -540,12 +559,15 @@ export default class ActivityForm extends Component<Props, State> {
 
             return fieldsHTML;
         }
+        // Display an information for the user
         return <p className="tag is-info mt-4" key={"inputField_sportInfo"}>Please select a sport</p>;
     }
 
     validateInput(returnValue?: boolean) {
+        // Check whether a sport was selected
         let valid = this.isValid(this.state.sport, inputFields[NUM_FIELDS].validValues, true);
 
+        // Check whether the value is in the valid range for every mandatory param
         for (let index in this.mandatoryParams) {
             if (this.mandatoryParams[index]) {
                 let inputParams = inputFields[index];
@@ -554,10 +576,12 @@ export default class ActivityForm extends Component<Props, State> {
             }
         }
 
+        // En-/disable submit button if existing
         if (this.state.submitButton) {
             this.allowSubmit(valid);
         }
 
+        // Return if needed
         if (returnValue) {
             return valid;
         }
@@ -589,7 +613,15 @@ export default class ActivityForm extends Component<Props, State> {
         this.setState(defaultStates[type]);
     }
 
+    // Get the maximum valid date depending on the duration of the activity
     getMaxValidDate() {
         return new Date(Date.now() - this.state.duration * this.state.durationMul * 1000);
+    }
+
+    notifyError(type: "error" | "unknownUser") {
+        this.setState({
+            notifyMessage: notifyMessages[type][0],
+            notifyType: notifyMessages[type][1]
+        });
     }
 }

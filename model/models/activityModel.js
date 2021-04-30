@@ -1,8 +1,6 @@
 const sql = require("../createConnection");
 
-const Activity = function (activity) {
-    this.sport = activity.sport;
-}
+const Activity = function() {};
 
 Activity.add = (activity, isAdded) => {
     sql.query(`INSERT INTO activity (${activity.valueKeys}) VALUES (${activity.values});`, function (error, result) {
