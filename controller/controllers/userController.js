@@ -162,8 +162,9 @@ exports.updateInformation = (req, res) => {
                         res.status(200).send(resMessage);
                     }
                 });
+            } else {
+                res.status(200).send(resMessage);
             }
-            res.status(200).send(resMessage);
         }
     });
 }
