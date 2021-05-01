@@ -1,7 +1,7 @@
-import { Redirect, Route, RouteProps } from 'react-router';
+import {Redirect, Route, RouteProps} from 'react-router';
 
 export type ProtectedRouteProps = {
-    AuthenticationFunction():Boolean;
+    AuthenticationFunction(): Boolean;
     /*
     /Specify a bool function that determines the rendered result.
     /True: Return a Route with the specified props
@@ -18,9 +18,9 @@ export default function ProtectedRoute({AuthenticationFunction, redirectPath, ..
     / This component can be used to protect a route, based on a given "AuthenticationFunction" a Route with a given component is rendered
     / or the user is redirected
      */
-    if(AuthenticationFunction()) {
+    if (AuthenticationFunction()) {
         return <Route {...routeProps} />;
     } else {
-        return <Redirect to={{ pathname: redirectPath }} />;
+        return <Redirect to={{pathname: redirectPath}}/>;
     }
 };

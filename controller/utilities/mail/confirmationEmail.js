@@ -10,18 +10,18 @@ exports.sendConfirmationEmail = (user) => {
         to: user.email,
         subject: 'Registration Confirmation',
         html: config.emailContent(user)
-      };
-      
+    };
+
     transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: config.auth
     });
-      
-    transporter.sendMail(mailOptions, function(error, info){
+
+    transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-          console.log(error);
+            console.log(error);
         } else {
-          console.log('Email sent: ' + info.response);
+            console.log('Email sent: ' + info.response);
         }
     });
 }

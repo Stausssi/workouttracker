@@ -29,7 +29,7 @@ export default class Login extends Component<{}, State> {
 
         this.setState({
             [name]: value
-        }as Pick<State, keyof State>);
+        } as Pick<State, keyof State>);
     }
 
     handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
@@ -44,7 +44,7 @@ export default class Login extends Component<{}, State> {
 
             //sends User credentials to API
 
-            fetch( BACKEND_URL + 'login', {
+            fetch(BACKEND_URL + 'login', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -88,7 +88,7 @@ export default class Login extends Component<{}, State> {
     //return rendered component
     render() {
         return (
-            <section className="section" >
+            <section className="section">
                 <div className="columns is-centered">
                     <div className="column is-5-tablet is-4-desktop is-3-widescreen">
                         <form className="box ">
@@ -106,7 +106,8 @@ export default class Login extends Component<{}, State> {
                             <div className="field">
                                 <label className="label">Password</label>
                                 <div className="control">
-                                    <input type="password" name="password" className="input" placeholder="Enter password"
+                                    <input type="password" name="password" className="input"
+                                           placeholder="Enter password"
                                            value={this.state.password} onChange={this.handleChange}/>
                                 </div>
                             </div>

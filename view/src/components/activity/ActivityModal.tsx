@@ -5,7 +5,8 @@ import ActivityForm from "./ActivityForm";
 import {BACKEND_URL} from "../../App";
 import SessionHandler from "../../utilities/SessionHandler";
 
-interface Props {}
+interface Props {
+}
 
 interface State {
     showPopup: boolean

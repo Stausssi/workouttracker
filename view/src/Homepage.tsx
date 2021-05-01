@@ -10,13 +10,13 @@ class Homepage extends React.Component<any, any> {
         super(props);
         this.state = {};
     }
+
     render() {
         return (
-
             <section className='main'>
-                <Head />
-                <Body />
-                <Foot />
+                <Head/>
+                <Body/>
+                <Foot/>
             </section>
         )
     }

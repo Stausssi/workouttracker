@@ -4,12 +4,11 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import {BACKEND_URL, FRONTEND_URL} from "../../App";
 
-function validateEmail(email: string)
-{
+function validateEmail(email: string) {
     return /^[^@]+@\w+(\.\w+)+\w$/.test(email);
 }
 
-function validatePassword(password: string){
+function validatePassword(password: string) {
     // regex for: min 8 letter password, with at least a symbol, upper and lower case letters and a number
     return /^(?=.*\d)(?=.*[!@#$%^&_*-])(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(password);
 }
@@ -27,7 +26,7 @@ interface State {
     dateChange: Boolean
 }
 
-export default class SignUp extends Component<{},State> {
+export default class SignUp extends Component<{}, State> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -61,7 +60,7 @@ export default class SignUp extends Component<{},State> {
     }
 
     handleDateChange(date: Date) {
-        this.setState({date:date, dateChange:true});
+        this.setState({date: date, dateChange: true});
     }
 
     handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
@@ -76,13 +75,13 @@ export default class SignUp extends Component<{},State> {
 
         if (!(email === '' || pw1 === '' || pw2 === '' || firstname === '' || lastname === '' || username === '' || weight === 0 || !this.state.dateChange)) {
             //all inputs must be filled
-            if(firstname.length <= 30 && lastname.length <= 30) {
+            if (firstname.length <= 30 && lastname.length <= 30) {
                 //firstname/Lastname max 30 characters
-                if(username.length <= 20) {
+                if (username.length <= 20) {
                     //username max 20 characters
-                    if(validateEmail(email)) {
+                    if (validateEmail(email)) {
                         //email must have correct form
-                        if(weight >= 10 && weight <= 250) {
+                        if (weight >= 10 && weight <= 250) {
                             if (pw1 === pw2) {
                                 //the passwords must be equal
                                 if (validatePassword(pw1)) {
@@ -133,7 +132,7 @@ export default class SignUp extends Component<{},State> {
                         } else {
                             this.setState({errorMessage: 'Please enter a real weight!'});
                         }
-                    }else {
+                    } else {
                         this.setState({errorMessage: 'Please enter a correct email!'});
                     }
                 } else {
@@ -149,103 +148,110 @@ export default class SignUp extends Component<{},State> {
 
     render() {
         return (
-            <section className="section" >
-                        <div className="columns is-centered">
-                            <div className="column is-5-tablet is-4-desktop is-3-widescreen">
-                                <form className="box">
-                                    <h3 className="title">Register</h3>
+            <section className="section">
+                <div className="columns is-centered">
+                    <div className="column is-5-tablet is-4-desktop is-3-widescreen">
+                        <form className="box">
+                            <h3 className="title">Register</h3>
 
-                                    <div className="field is-horizontal">
-                                        <div className="field-label is-normal">
-                                            <label className="label">Name</label>
-                                        </div>
-                                        <div className="field-body">
-                                            <div className="field">
-                                                <input autoFocus name="firstname" type="text" className="input" placeholder="First name"
-                                                       value={this.state.firstname} onChange={this.handleChange}/>
-                                            </div>
-                                            <div className="field">
-                                                <input name="lastname" type="text" className="input" placeholder="Last name"
-                                                       value={this.state.lastname} onChange={this.handleChange}/>
-                                            </div>
-                                        </div>
+                            <div className="field is-horizontal">
+                                <div className="field-label is-normal">
+                                    <label className="label">Name</label>
+                                </div>
+                                <div className="field-body">
+                                    <div className="field">
+                                        <input autoFocus name="firstname" type="text" className="input"
+                                               placeholder="First name"
+                                               value={this.state.firstname} onChange={this.handleChange}/>
                                     </div>
-
-                                    <div className="field is-horizontal">
-                                        <div className="field-label is-normal">
-                                            <label className="label">Username</label>
-                                        </div>
-                                        <div className="field-body">
-                                            <div className="field">
-                                                <input name="username" type="text" className="input" placeholder="Enter username"
-                                                       value={this.state.username} onChange={this.handleChange}/>
-                                            </div>
-                                        </div>
+                                    <div className="field">
+                                        <input name="lastname" type="text" className="input" placeholder="Last name"
+                                               value={this.state.lastname} onChange={this.handleChange}/>
                                     </div>
-
-                                    <div className="field is-horizontal">
-                                        <div className="field-label is-normal">
-                                            <label className="label">Email</label>
-                                        </div>
-                                        <div className="field-body">
-                                            <div className="field">
-                                                <input name="email" type="email" className="input has-icons-left" placeholder="Enter email"
-                                                       value={this.state.email} onChange={this.handleChange}/>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr/>
-
-                                    <div className="field is-horizontal">
-                                        <div className="field-label is-normal">
-                                            <label className="label">Date of Birth</label>
-                                        </div>
-                                        <div className="field-body">
-                                            <div className="field">
-                                                <DatePicker selected={this.state.date} onChange={this.handleDateChange} dateFormat="dd.MM.yyyy"/>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="field is-horizontal">
-                                        <div className="field-label is-normal">
-                                            <label className="label">Weigth (kg)</label>
-                                        </div>
-                                        <div className="field-body">
-                                            <div className="field">
-                                                <input name="weight" type="number" className="input" placeholder="Enter weight" min="10" max="200"
-                                                       value={this.state.weight} onChange={this.handleChange}/>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr/>
-
-                                    <div className="field is-horizontal">
-                                        <div className="field-label is-normal">
-                                            <label className="label">Password</label>
-                                        </div>
-                                        <div className="field-body">
-                                            <div className="field">
-                                                <input name="password1" type="password" className="input" placeholder="Enter password"
-                                                       value={this.state.password1} onChange={this.handleChange}/>
-                                            </div>
-                                            <div className="field">
-                                                <input name="password2" type="password" className="input" placeholder="Confirm password"
-                                                       value={this.state.password2} onChange={this.handleChange}/>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <br/>
-
-                                    <NotificationBox message={this.state.errorMessage} type={"is-danger"} hasDelete={false}/>
-
-                                    <button className="button is-primary" onClick={this.handleSubmit}>Register</button>
-                                </form>
+                                </div>
                             </div>
-                        </div>
+
+                            <div className="field is-horizontal">
+                                <div className="field-label is-normal">
+                                    <label className="label">Username</label>
+                                </div>
+                                <div className="field-body">
+                                    <div className="field">
+                                        <input name="username" type="text" className="input"
+                                               placeholder="Enter username"
+                                               value={this.state.username} onChange={this.handleChange}/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="field is-horizontal">
+                                <div className="field-label is-normal">
+                                    <label className="label">Email</label>
+                                </div>
+                                <div className="field-body">
+                                    <div className="field">
+                                        <input name="email" type="email" className="input has-icons-left"
+                                               placeholder="Enter email"
+                                               value={this.state.email} onChange={this.handleChange}/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr/>
+
+                            <div className="field is-horizontal">
+                                <div className="field-label is-normal">
+                                    <label className="label">Date of Birth</label>
+                                </div>
+                                <div className="field-body">
+                                    <div className="field">
+                                        <DatePicker selected={this.state.date} onChange={this.handleDateChange}
+                                                    dateFormat="dd.MM.yyyy"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="field is-horizontal">
+                                <div className="field-label is-normal">
+                                    <label className="label">Weigth (kg)</label>
+                                </div>
+                                <div className="field-body">
+                                    <div className="field">
+                                        <input name="weight" type="number" className="input" placeholder="Enter weight"
+                                               min="10" max="200"
+                                               value={this.state.weight} onChange={this.handleChange}/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr/>
+
+                            <div className="field is-horizontal">
+                                <div className="field-label is-normal">
+                                    <label className="label">Password</label>
+                                </div>
+                                <div className="field-body">
+                                    <div className="field">
+                                        <input name="password1" type="password" className="input"
+                                               placeholder="Enter password"
+                                               value={this.state.password1} onChange={this.handleChange}/>
+                                    </div>
+                                    <div className="field">
+                                        <input name="password2" type="password" className="input"
+                                               placeholder="Confirm password"
+                                               value={this.state.password2} onChange={this.handleChange}/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br/>
+
+                            <NotificationBox message={this.state.errorMessage} type={"is-danger"} hasDelete={false}/>
+
+                            <button className="button is-primary" onClick={this.handleSubmit}>Register</button>
+                        </form>
+                    </div>
+                </div>
             </section>
         );
     }

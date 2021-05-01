@@ -41,13 +41,13 @@ export class Feed extends React.Component<FeedProps, FeedState> {
             postData: [],
             loaded: false,
             hasMore: true,
-            refreshAnimation:true
+            refreshAnimation: true
         }
 
         this.abortController = new AbortController();
 
         this.refreshInterval = setInterval(() => {
-            if(SessionHandler.getRefreshFeed(props.ownFeed)){
+            if (SessionHandler.getRefreshFeed(props.ownFeed)) {
                 SessionHandler.setRefreshFeed(false, props.ownFeed);
                 this.refresh();
             }
@@ -98,10 +98,10 @@ export class Feed extends React.Component<FeedProps, FeedState> {
 
     refresh() {
         //reset postData and
-        this.setState({postData: [], refreshAnimation:true}, () => {
+        this.setState({postData: [], refreshAnimation: true}, () => {
             // load new activities
             this.getFeed()
-            this.setState({refreshAnimation:false});
+            this.setState({refreshAnimation: false});
         });
     }
 
@@ -136,9 +136,10 @@ export class Feed extends React.Component<FeedProps, FeedState> {
                             >
 
                                 <FadeIn transitionDuration={300} key={"fadeIn" + this.state.refreshAnimation}>
-                                {this.state.postData.map((activity: postData, index: number) => (
-                                    <div className="mb-5" key={index}><ActivityBox ownFeed={this.props.ownFeed} postData={activity}/></div>))
-                                }
+                                    {this.state.postData.map((activity: postData, index: number) => (
+                                        <div className="mb-5" key={index}><ActivityBox ownFeed={this.props.ownFeed}
+                                                                                       postData={activity}/></div>))
+                                    }
                                 </FadeIn>
 
                             </InfiniteScroll>

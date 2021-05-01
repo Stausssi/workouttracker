@@ -7,7 +7,8 @@ interface Props {
     hasDelete: boolean
 }
 
-interface State {}
+interface State {
+}
 
 // TODO: Add delete button functionality
 export default class NotificationBox extends Component<Props, State> {
@@ -24,7 +25,7 @@ export default class NotificationBox extends Component<Props, State> {
         } else {
             return (
                 <div className={`notification ${this.props.type}`}>
-                    {(this.props.hasDelete ? <button type="button" className="delete" /> : "")}
+                    {(this.props.hasDelete ? <button type="button" className="delete"/> : "")}
                     {parse(this.props.message)}
                 </div>
             );

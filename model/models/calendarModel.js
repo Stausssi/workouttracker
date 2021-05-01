@@ -7,8 +7,8 @@ const Event = function (event) {    //event constructor
     this.user = event.user;
 }
 
-Event.getAll = (user,response) => { //sql query to get all events which match with current user. Response with values on success
-    sql.query("SELECT * FROM events where user = ?",[user],  
+Event.getAll = (user, response) => { //sql query to get all events which match with current user. Response with values on success
+    sql.query("SELECT * FROM events where user = ?", [user],
         function (error, result) {
             if (error) {
                 response(error, null)
@@ -18,8 +18,8 @@ Event.getAll = (user,response) => { //sql query to get all events which match wi
         });
 }
 
-Event.getActivityEvents = (user,response) => { //sql query to get all actvities as events
-    sql.query("SELECT activity_id ,sport as title, startedAt,duration  FROM activity where user = ?",[user],  
+Event.getActivityEvents = (user, response) => { //sql query to get all actvities as events
+    sql.query("SELECT activity_id ,sport as title, startedAt,duration  FROM activity where user = ?", [user],
         function (error, result) {
             if (error) {
                 response(error, null)
@@ -35,32 +35,29 @@ Event.create = (newEvent, result) => {  //sql query to insert event into DB
         if (error) {
             console.log("error: ", error);
             result(newEvent, false);
-        }
-        else {
+        } else {
             result(null, true);
         }
     });
 };
 
 Event.remove = (id, username, result) => {  //remove event 
-    sql.query("DELETE FROM events WHERE id = ? AND user = ?", [id,username], (error, res) => {
+    sql.query("DELETE FROM events WHERE id = ? AND user = ?", [id, username], (error, res) => {
         if (error) {
             console.log("error: ", error);
             result(error, null);
-        }
-        else {
+        } else {
             result(null, true);
         }
     });
 };
 
 Event.removeactivity = (id, username, result) => {  //remove activity  
-    sql.query("DELETE FROM activity WHERE activity_id = ? AND user = ?", [id,username], (error, res) => {
+    sql.query("DELETE FROM activity WHERE activity_id = ? AND user = ?", [id, username], (error, res) => {
         if (error) {
             console.log("error: ", error);
             result(error, null);
-        }
-        else {
+        } else {
             result(null, true);
         }
     });

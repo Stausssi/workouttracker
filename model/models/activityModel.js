@@ -1,9 +1,11 @@
 const sql = require("../createConnection");
 
-const Activity = function() {};
+const Activity = function () {
+};
 
 Activity.add = (activity, isAdded) => {
-    sql.query(`INSERT INTO activity (${activity.valueKeys}) VALUES (${activity.values});`, function (error, result) {
+    sql.query(`INSERT INTO activity (${activity.valueKeys})
+               VALUES (${activity.values});`, function (error, result) {
         if (error) {
             isAdded(error, false);
         } else {
@@ -11,5 +13,3 @@ Activity.add = (activity, isAdded) => {
         }
     });
 }
-
-module.exports = Activity;

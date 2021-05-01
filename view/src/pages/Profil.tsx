@@ -13,12 +13,13 @@ class Profil extends React.Component<any, any> {
             text: '',
         };
     }
+
     render() {
         return (
             <section className='main'>
-                <Head></Head>
-                <Profile></Profile>
-                <Foot></Foot>
+                <Head/>
+                <Profile/>
+                <Foot/>
             </section>
         )
     }

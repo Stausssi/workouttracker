@@ -1,13 +1,13 @@
 const sql = require("../createConnection");
 
-const Sport = function(sport) {
+const Sport = function (sport) {
     this.name = sport.name;
 }
 
 Sport.getAll = (setSports) => {
     sql.query("SELECT * FROM sport;",
         function (error, result) {
-            if(error) {
+            if (error) {
                 setSports(error, null);
             } else {
                 // Convert into useable dict
