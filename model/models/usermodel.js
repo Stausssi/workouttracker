@@ -183,13 +183,24 @@ User.unblock = (username, unblocked, success) => {
 
 // Get the relationship of two given users
 User.getRelationship = (follower, followed, relationship) => {
+    // Determine whether the follower is blocked by followed
     sql.query("SELECT blocked FROM following WHERE follower = ? AND followed = ?",
         [follower, followed],
-        function (error, result) {
-            if (result.length > 0) {
-                relationship(error, true, Boolean(result[0].blocked));
+        function (error, result1) {
+            if (error) {
+                relationship(error, false, false, false, false);
             } else {
-                relationship(error, false, false);
+                // Determine whether the followed is blocked by the follower
+                sql.query("SELECT blocked FROM following WHERE followed = ? AND follower = ?", [follower, followed],
+                    function (error, result2) {
+                        let isFollowing = result1.length > 0;
+                        let isFollowed = result2.length > 0;
+                        let isBlocked = isFollowing ? Boolean(result1[0].blocked) : false;
+                        let hasBlocked = isFollowed ? Boolean(result2[0].blocked) : false;
+
+                        relationship(error, isFollowing, isFollowed, isBlocked, hasBlocked);
+                    }
+                );
             }
         }
     );

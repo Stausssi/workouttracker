@@ -237,7 +237,7 @@ exports.block = (req, res) => {
                 res.sendStatus(500);
             } else {
                 // Check whether the toBeBlocked user is already following the other user
-                User.getRelationship(toBeBlocked, user, (error, isFollowing, isBlocked) => {
+                User.getRelationship(toBeBlocked, user, (error, isFollowing, isFollowed, isBlocked) => {
                     if (error) {
                         console.log(error);
                         res.sendStatus(500);
@@ -274,14 +274,16 @@ exports.getRelationship = (req, res) => {
     if (isParamMissing([follower, followed])) {
         res.sendStatus(400);
     } else {
-        User.getRelationship(follower, followed, (error, isFollowing, isBlocked) => {
+        User.getRelationship(follower, followed, (error, isFollowing, isFollowed, isBlocked, hasBlocked) => {
             if (error) {
                 console.log(error);
                 res.sendStatus(500);
             } else {
                 res.status(200).send({
                     following: isFollowing,
-                    blocked: isBlocked
+                    followed: isFollowed,
+                    blocked: isBlocked,
+                    hasBlocked: hasBlocked
                 });
             }
         });
