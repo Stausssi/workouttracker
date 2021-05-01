@@ -174,6 +174,10 @@ export default class ActivityForm extends Component<Props, State> {
         }
     }
 
+    componentWillUnmount() {
+        this.abortController.abort()
+    }
+
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
         // Check for prop changes
         if (prevProps.sports !== this.props.sports) {
