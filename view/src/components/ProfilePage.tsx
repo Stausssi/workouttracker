@@ -33,7 +33,7 @@ interface State {
 
 }
 
-export default class ProfileSite  extends Component<{}, State> {
+export default class ProfilePage extends Component<{}, State> {
     constructor(props: any) {
         super(props);
         var username = "undefined Username";

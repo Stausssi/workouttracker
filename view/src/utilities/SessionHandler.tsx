@@ -19,9 +19,23 @@ export default class SessionHandler {
         });
     }
 
+    static getUsername() {
+        return sessionStorage.getItem("username");
+    }
+
     static logOut() {
         sessionStorage.clear();
         // Redirect
         window.location.href = FRONTEND_URL;
+    }
+
+    static getRefreshFeed(isOwnFeed: boolean=true) {
+        let key = "refresh" + (isOwnFeed ? "Own" : "Friends") + "Feed";
+        return Boolean(Number(sessionStorage.getItem(key)));
+    }
+
+    static setRefreshFeed(refresh: boolean, isOwnFeed: boolean=true){
+        let key = "refresh" + (isOwnFeed ? "Own" : "Friends") + "Feed";
+        sessionStorage.setItem(key, String(Number(refresh)));
     }
 }

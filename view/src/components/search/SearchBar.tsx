@@ -1,8 +1,12 @@
-import {faSearch} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSearch} from "@fortawesome/free-solid-svg-icons";
+import onClickOutside from "react-onclickoutside";
+
 import SearchResult from "./SearchResult";
 import {BACKEND_URL} from "../../App";
+import SessionHandler from "../../utilities/SessionHandler";
+import NotificationBox from "../NotificationBox";
 
 interface Props {
 }
@@ -13,7 +17,8 @@ interface State {
     displayLoading: boolean
 }
 
-export default class SearchBar extends React.Component<Props, State> {
+class SearchBar extends React.Component<Props, State> {
+    private readonly abortController: AbortController;
     private searchDelay: any;
 
     constructor(props: Props) {
@@ -23,6 +28,8 @@ export default class SearchBar extends React.Component<Props, State> {
             searchResults: <></>,
             displayLoading: false
         }
+
+        this.abortController = new AbortController();
 
         this.updateSearch = this.updateSearch.bind(this);
     }
@@ -35,7 +42,6 @@ export default class SearchBar extends React.Component<Props, State> {
                 searchResults: <></>,
                 displayLoading: true
             }, () => {
-                // TODO: Input filtering
                 clearTimeout(this.searchDelay);
 
                 if (value !== "") {
@@ -48,30 +54,51 @@ export default class SearchBar extends React.Component<Props, State> {
     }
 
     searchFor(query: string) {
-        console.log(`Searching for user ${query} in the database`);
-
-        this.setState({
-            displayLoading: false,
-            searchResults: <>
-                <SearchResult username="@username"/>
-                <SearchResult username="@extremlangerusername"/>
-                <SearchResult username="1"/>
-                <SearchResult username="@12345678901234567890"/>
-            </>
-        });
-
-        // TODO: auth
-        fetch(BACKEND_URL + "users/search?query=" + query).then((response) => {
+        fetch(BACKEND_URL + "users/search?query=" + query, {
+            method: "GET",
+            headers: {
+                Accepts: "application/json",
+                Authorization: SessionHandler.getAuthToken()
+            },
+            signal: this.abortController.signal
+        }).then((response) => {
             if (response.ok) {
                 return response.json().then((response) => {
-                    console.log("users received:", response);
+                    let foundUsers: any = <NotificationBox
+                        message={`User '${query}' could not be found!`}
+                        type={"is-danger is-light mx-2"}
+                        hasDelete={false}
+                    />
+
+                    if (response.userFound) {
+                        foundUsers = JSON.parse(response.users);
+                        for (let index in foundUsers) {
+                            if (foundUsers.hasOwnProperty(index)) {
+                                foundUsers[index] =
+                                    <SearchResult username={foundUsers[index]} key={"result_" + foundUsers[index]}/>
+                            }
+                        }
+                    }
+
+                    this.setState({
+                        displayLoading: false,
+                        searchResults: foundUsers
+                    });
                 });
             } else {
                 console.log(response);
             }
+        }).catch((error: any) => {
+            if (error.name !== "AbortError") {
+                console.log("Fetch failed:", error);
+            }
         });
+    }
 
+    componentWillUnmount() {
+        clearTimeout(this.searchDelay);
 
+        this.abortController.abort();
     }
 
     render() {
@@ -85,7 +112,7 @@ export default class SearchBar extends React.Component<Props, State> {
                                 type="search"
                                 value={this.state.searchQuery}
                                 placeholder="Search for other users"
-                                maxLength={20}
+                                maxLength={30}
                                 onChange={this.updateSearch}/>
                             <span className="icon is-small is-right">
                                 <FontAwesomeIcon icon={faSearch}/>
@@ -95,24 +122,37 @@ export default class SearchBar extends React.Component<Props, State> {
                 </div>
                 <div className="dropdown-menu">
                     <div className="dropdown-content">
-                        {this.state.searchResults}
                         {this.state.displayLoading ?
-                            <>
-                                <div className="dropdown-item">
-                                    <div className="field">
-                                        <div className="control is-loading">
-                                            <input className="input is-static" type="text" placeholder="Searching..."
-                                                   readOnly={true}/>
-                                        </div>
+                            <div className="dropdown-item">
+                                <div className="field has-addons">
+                                    <div className="control">
+                                        <input className="input is-static"
+                                               type="text"
+                                               placeholder={"Searching..."}
+                                               readOnly={true}/>
+                                    </div>
+                                    <div className="control">
+                                        <button className="button is-loading is-white" disabled={true}/>
                                     </div>
                                 </div>
-                            </>
+                            </div>
                             :
-                            <></>
-                        }
+                            this.state.searchResults}
                     </div>
                 </div>
             </div>
         );
     }
+
+    handleClickOutside() {
+        if (this.state.searchQuery !== "") {
+            this.setState({
+                searchQuery: "",
+                searchResults: <></>,
+                displayLoading: false
+            });
+        }
+    }
 }
+
+export default onClickOutside(SearchBar);

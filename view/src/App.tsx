@@ -12,6 +12,7 @@ import Verify from "./components/login/Verify";
 import SuccessfulSignup from "./components/login/SuccessfulSignUp";
 
 import Profile from "./pages/Profil";
+import Users from "./pages/UserPage";
 
 
 interface Props {}
@@ -41,7 +42,9 @@ export default class App extends Component<Props, State> {
                         <ProtectedRoute exact path="/verify" component={Verify} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
                         <ProtectedRoute exact path="/successful-signup" component={SuccessfulSignup} AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
 
-                        <ProtectedRoute exact path="/profile" component={Profile} AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={null}/>
+                        <ProtectedRoute exact path="/profile" component={Profile} AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
+
+                        <ProtectedRoute exact path="/users/:username" component={Users} AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
 
                     </div>
                 </div>

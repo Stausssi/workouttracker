@@ -38,8 +38,10 @@ export default class FollowUserSite extends Component<{username: string}, State>
             headers:{
               Accept: 'application/json',
               'Content-Type': 'application/json',
-              Authorization: SessionHandler.getAuthToken() 
+              'Cache-Control': 'no-cache',
+              Authorization: SessionHandler.getAuthToken()
             },
+            //Cache-Control: max-age=3600,
       }).then((response) => {
         if (response.status !== 200) {
           console.log('Looks like there was a problem. Status Code: ' +
@@ -61,9 +63,9 @@ export default class FollowUserSite extends Component<{username: string}, State>
    
     render(){
         return (
-            <div className="section">
-                <div className="container">
-                        <p className="is-size-4">This is the Site From {this.state.username},<br/> here you can see some account informations</p>
+            <div className="section has-background-black-ter">
+                    <div className="section container box">
+                        <p className="is-size-4">This is the page from {this.state.username},<br/> here you can see some general information</p>
                         <div className='field'>
                             <label className="label">Firstname</label>
                             <p>{this.state.firstname}</p>
