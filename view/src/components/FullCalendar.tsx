@@ -47,7 +47,7 @@ export default class FullCalendar extends React.Component<Props, State> {
   action = () => {
     //open and close modal
     let active = !this.state.active;
-    if (active === true) {
+    if (active) {
       this.setState(() => ({ active: active }));
     } else {
       this.setState(initialState); // reset state on close
@@ -98,7 +98,7 @@ export default class FullCalendar extends React.Component<Props, State> {
       select: (info) => this.create(info), //Open create function on select date range
       eventDidMount: (element) => {
         // add delete button to events
-        var deleteButton = document.createElement("button");
+        let deleteButton = document.createElement("button");
         deleteButton.onclick = () => this.removeEvent(element); //remove event
         deleteButton.className = "delete";
         element.el.append(deleteButton);
@@ -144,8 +144,7 @@ export default class FullCalendar extends React.Component<Props, State> {
         return response.json().then((response) => {
           let posts = JSON.parse(response.body);
           posts.map((item: any) => {
-            var end;
-            end = moment(item.startedAt)
+            let end = moment(item.startedAt)
               .add(item.duration, "seconds")
               .format("YYYY-MM-DD HH:mm:ss");
             const event = {
@@ -283,9 +282,9 @@ export default class FullCalendar extends React.Component<Props, State> {
     const active = this.state.active ? "is-active" : ""; //if active is true: show modal. Else hide it
     return (
       <div className="container">
-        <div id="calendarFull"></div>
+        <div id="calendarFull"/>
         <div className={`modal ${active}`} id="CalendarModal">
-          <div className="modal-background"></div>
+          <div className="modal-background"/>
           <div className="modal-card">
             <header className="modal-card-head">
               <p className="modal-card-title">Create Event</p>
@@ -293,7 +292,7 @@ export default class FullCalendar extends React.Component<Props, State> {
                 className="delete"
                 aria-label="close"
                 onClick={() => this.action()}
-              ></button>
+              />
             </header>
             <section className="modal-card-body">
               <div className="content">
@@ -307,7 +306,7 @@ export default class FullCalendar extends React.Component<Props, State> {
                   <>
                     <input
                       className="input"
-                      id="eventtitle"
+                      id="eventTitle"
                       name="title"
                       type="text"
                       placeholder="Event title"

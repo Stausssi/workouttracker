@@ -105,7 +105,7 @@ export default class Graphs extends React.Component<Props, State> {
   action = () => {
     //open and close modal
     let active = !this.state.active;
-    if (active === true) {
+    if (active) {
       this.fetchsports(); //fetch sports from DB when modal opens
       this.setState(() => ({ active: active }));
     } else {
@@ -133,7 +133,10 @@ export default class Graphs extends React.Component<Props, State> {
           let sports = [];
           sports.push("");
           for (let key in data) {
-            sports.push(key);
+            if(data.hasOwnProperty(key))
+            {
+              sports.push(key);
+            }
           }
           this.setState({ sports: sports });
         });
@@ -176,7 +179,7 @@ export default class Graphs extends React.Component<Props, State> {
   loopOverData() {
     for (let i = 0; i < this.state.array.length; i++) {
       //loop over each chart
-      var year, sport, category, sqlfunc;
+      let year, sport, category, sqlfunc;
       const params = new URLSearchParams(); //create query params for request
       if (this.state.array[i].category) {
         category = this.state.array[i].category;
@@ -221,7 +224,7 @@ export default class Graphs extends React.Component<Props, State> {
     }).then((response) => {
       if (response.ok) {
         return response.json().then((response) => {
-          var data = JSON.parse(response.body);
+          let data = JSON.parse(response.body);
           this.addElement(chart, data); //create chart with data on frontend
         });
       } else {
@@ -233,21 +236,21 @@ export default class Graphs extends React.Component<Props, State> {
   }
 
   addElement(chart: any, data: any) {
-    var buttonnode = document.getElementById(chart.name); //check if ID already exists (should be unique)
-    var chartnode = document.getElementById("chart_ID" + chart.name);
+    let buttonnode = document.getElementById(chart.name); //check if ID already exists (should be unique)
+    let chartnode = document.getElementById("chart_ID" + chart.name);
     if (!chartnode && !buttonnode) {
       // create new unique div and new unique button for each new chart
-      var canvas = document.createElement("canvas"); //Canvas, where chart will be displayed
+      let canvas = document.createElement("canvas"); //Canvas, where chart will be displayed
       canvas.id = "chartID_" + chart.name; // use chart title to create id for div
       canvas.height = 500; //set chart height to 500px
       canvas.style.width = "100%"; //set chart canvas to full width
-      var button = document.createElement("button"); //Button, to delete chart
+      let button = document.createElement("button"); //Button, to delete chart
       button.id = chart.name; //Set button ID to chart title
       button.className = "button is-danger";
       button.innerHTML = "Delete " + canvas.id;
-      button.onclick = (event: any) => this.removeChart(event.target.id); //add delete fnction to function
+      button.onclick = (event: any) => this.removeChart(event.target.id); //add delete function to function
       // add created elements to DOM
-      var parent = document.getElementById("charts"); //append every charts to parent div
+      let parent = document.getElementById("charts"); //append every charts to parent div
       parent?.appendChild(canvas);
       parent?.appendChild(button);
       this.addcharts(canvas, chart, data);
@@ -259,20 +262,16 @@ export default class Graphs extends React.Component<Props, State> {
   addcharts(canvas: HTMLCanvasElement, chart: any, data: any) {
     let display = true;
     if (
-      //disable xaxis and yaxis for doughut, polarArea, radar, pie
+      //disable x-axis and yaxis for doughnut, polarArea, radar, pie
       chart.type === "pie" ||
-      chart.type === "doughut" ||
+      chart.type === "doughnut" ||
       chart.type === "polarArea" ||
       chart.type === "radar"
     ) {
       display = false;
     }
-    if (chart.fill === 1) {
-      //Set fill value to ture or false
-      chart.fill = true;
-    } else {
-      chart.fill = false;
-    }
+    //Set fill value to true or false
+    chart.fill = chart.fill === 1;
 
     let dataarray: any[] = new Array(labels.length);
     let ylab = this.yLab(chart.category); //get unit of measurement for chart
@@ -295,10 +294,10 @@ export default class Graphs extends React.Component<Props, State> {
       //Create chart
       options: {
         responsive: false, //set chart static height
-        maintainAspectRatio: false, //disable maintening ratio of chart when resizing
+        maintainAspectRatio: false, //disable maintaining ratio of chart when resizing
         scales: {
           x: {
-            display: display, //enable/disable axis dependind on chart type
+            display: display, //enable/disable axis depending on chart type
             title: {
               text: "Month",
               display: display,
@@ -354,13 +353,13 @@ export default class Graphs extends React.Component<Props, State> {
         )
       ) {
         let sqlfunc;
-        if (this.state.switchfunc === true) {
+        if (this.state.switchfunc) {
           //Set sql function depending on switch button value
           sqlfunc = "sum";
         } else {
           sqlfunc = "avg";
         }
-        var year = this.state.year.getFullYear(); //filter date on year
+        let year = this.state.year.getFullYear(); //filter date on year
         const chart = {
           //build chart
           name: this.state.title,
@@ -383,7 +382,7 @@ export default class Graphs extends React.Component<Props, State> {
         this.setState({notifyMessage:"Title was already given. Please choose an other title for your chart",notifyType:'is-danger'})
       }
     } else {
-      this.setState({notifyMessage:"Configurtion values are missing",notifyType:'is-danger'})
+      this.setState({notifyMessage:"Configuration values are missing",notifyType:'is-danger'})
     }
   }
 
@@ -401,16 +400,15 @@ export default class Graphs extends React.Component<Props, State> {
     }).then((response) => {
       if (response.ok) {
       } else {
-        console.error("An error occured: " + response); //view response in console
+        console.error("An error occurred: " + response); //view response in console
       }
     });
   }
 
   removeChart(id: string) {
     //remove chart
-    var chart = null;
     const chartID = "chartID_" + id;
-    chart = Chart.getChart(chartID); //get chart object
+    let chart = Chart.getChart(chartID); //get chart object
     if (chart) {
       chart.destroy(); //Destroy chart object on frontend
       this.removeElement(id); //remove element created with chart
@@ -435,10 +433,10 @@ export default class Graphs extends React.Component<Props, State> {
 
   removeElement(name: string) {
     //remove chart elements
-    var canvas = document.getElementById(
+    let canvas = document.getElementById(
       "chartID_" + name
     ) as HTMLCanvasElement;
-    var button = document.getElementById(name) as HTMLButtonElement;
+    let button = document.getElementById(name) as HTMLButtonElement;
     if (canvas.parentNode && button.parentNode) {
       canvas.parentNode.removeChild(canvas); //remove canvas element
       button.parentNode.removeChild(button); ////remove button element
@@ -447,7 +445,7 @@ export default class Graphs extends React.Component<Props, State> {
 
   yLab(category: string) {
     //get unit of measurement depending on category
-    var ylab = "";
+    let ylab = "";
     if (allcategories.includes(category)) {
       switch (category) {
         case "distance":
@@ -537,16 +535,16 @@ export default class Graphs extends React.Component<Props, State> {
     //update checkbox/ switch button on change
     const target = event.target;
     const name = target.name;
-    var check = target.checked;
+    let check = target.checked;
     this.setState(({
       [name]: check,
     } as unknown) as Pick<State, keyof State>);
   }
 
   handleCategories() {
-    //update categories on siwth buttons
+    //update categories on switch buttons
     let newcategories = categories;
-    if (this.state.switchfunc === false) {
+    if (!this.state.switchfunc) {
       newcategories = newcategories.concat(averagecategories);
     }
     return this.renderOptions(newcategories);
@@ -564,13 +562,13 @@ export default class Graphs extends React.Component<Props, State> {
         </div>
         <div id="charts" />
         <div className="chart-container">
-          <canvas id="myChart"></canvas>
+          <canvas id="myChart"/>
         </div>
         <div className="chart-container2">
-          <canvas id="myChart2"></canvas>
+          <canvas id="myChart2"/>
         </div>
         <div className={`modal ${active}`} id="ChartModal">
-          <div className="modal-background"></div>
+          <div className="modal-background"/>
           <div className="modal-card">
             <header className="modal-card-head">
               <p className="modal-card-title">Chart Modal</p>
@@ -578,7 +576,7 @@ export default class Graphs extends React.Component<Props, State> {
                 className="delete"
                 aria-label="close"
                 onClick={() => this.action()}
-              ></button>
+              />
             </header>
             <section className="modal-card-body">
               <div className="content">
@@ -587,7 +585,7 @@ export default class Graphs extends React.Component<Props, State> {
                   <label className="label">Chart Name</label>
                   <input
                     className="input"
-                    id="charttitle"
+                    id="chartTitle"
                     name="title"
                     type="text"
                     placeholder="Chart title"
@@ -641,7 +639,7 @@ export default class Graphs extends React.Component<Props, State> {
                       {this.handleCategories()}
                     </select>
                   </div>
-                  <div className="is-divider" data-content="Optional"></div>
+                  <div className="is-divider" data-content="Optional"/>
                   <label className="label">Filter for sport</label>
                   <div className="select is-fullwidth mb-5">
                     <select

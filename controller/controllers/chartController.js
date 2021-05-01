@@ -33,7 +33,7 @@ exports.getdataset = (request, response) => {
     sport = request.query.sport
     category = request.query.category
     year = request.query.year
-    if (sqlfunc === "sum") {    //get datasets with sql funcrtion sum 
+    if (sqlfunc === "sum") {    //get datasets with sql function sum
       Data.getamount(category, sport, year, username,(error, data) => {
         if (error) {
           console.log(error);
@@ -43,7 +43,7 @@ exports.getdataset = (request, response) => {
         }
       });
     }
-    else if (sqlfunc === "avg") { //get datasets with sql funcrtion avg 
+    else if (sqlfunc === "avg") { //get datasets with sql function avg
       Data.getaverage  (category, sport, year, username,(error, data) => {
         if (error) {
           console.log(error);
@@ -67,7 +67,7 @@ exports.create = (request, response) => {
   }
   else {
     let sport = null
-    if (request.body.param_sport && !request.body.param_sport === "") {
+    if (request.body.param_sport) {
       sport = request.body.param_sport
     }
     const chart = new Chart({   //chart constructor
