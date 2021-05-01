@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {BACKEND_URL, FRONTEND_URL} from "../App";
+import {BACKEND_URL} from "../App";
 import SessionHandler from "../utilities/SessionHandler";
 
 /*Here is the component of the Follow UserProfile Site.
@@ -34,7 +34,7 @@ export default class FollowUserSite extends Component<{ username: string }, Stat
     }
 
     getDefaultValues() {
-        fetch(BACKEND_URL + "profilesite/" + this.state.username, {//get as default
+        fetch(BACKEND_URL + "users/" + this.state.username, {//get as default
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
@@ -57,32 +57,32 @@ export default class FollowUserSite extends Component<{ username: string }, Stat
         });
     }
 
-
     render() {
         return (
             <div className="section has-background-black-ter">
-                    <div className="section container box">
-                        <p className="is-size-4">This is the page from {this.state.username},<br/> here you can see some general information</p>
-                        <div className='field'>
-                            <label className="label">Firstname</label>
-                            <p>{this.state.firstname}</p>
-                        </div>
-                        <div className='field'>
-                            <label className="label">Lastname</label>
-                            <p>{this.state.lastname}</p>
-                        </div>
-                        <div className='field'>
-                            <label className="label">Date of Birth</label>
-                            <p>{this.state.date.toISOString().slice(0, 10)}</p>
-                        </div>
-                        <div className='field'>
-                            <label className="label">Weight</label>
-                            <p>{this.state.weight}</p>
-                        </div>
-                        <div className='field'>
-                            <label className="label">e-mail</label>
-                            <p>{this.state.email}</p>
-                        </div>
+                <div className="section container box">
+                    <p className="is-size-4">This is the page from {this.state.username},<br/> here you can see some
+                        general information</p>
+                    <div className='field'>
+                        <label className="label">Firstname</label>
+                        <p>{this.state.firstname}</p>
+                    </div>
+                    <div className='field'>
+                        <label className="label">Lastname</label>
+                        <p>{this.state.lastname}</p>
+                    </div>
+                    <div className='field'>
+                        <label className="label">Date of Birth</label>
+                        <p>{this.state.date.toISOString().slice(0, 10)}</p>
+                    </div>
+                    <div className='field'>
+                        <label className="label">Weight</label>
+                        <p>{this.state.weight}</p>
+                    </div>
+                    <div className='field'>
+                        <label className="label">e-mail</label>
+                        <p>{this.state.email}</p>
+                    </div>
                 </div>
             </div>
         )

@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {BACKEND_URL, FRONTEND_URL} from "../App";
+import {BACKEND_URL} from "../App";
 import SessionHandler from "../utilities/SessionHandler";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -35,7 +35,7 @@ interface State {
 export default class ProfilePage extends Component<{}, State> {
     constructor(props: any) {
         super(props);
-        var username = "undefined Username";
+        let username = "undefined Username";
         if (SessionHandler.getUser()) {
             // @ts-ignore
             username = SessionHandler.getUser().username.toString();
@@ -67,7 +67,7 @@ export default class ProfilePage extends Component<{}, State> {
 
     //get placeholders by loading the Page
     getDefaultValues() {
-        fetch(BACKEND_URL + "profilesite/" + this.state.username, {//get as default
+        fetch(BACKEND_URL + "users/" + this.state.username, {//get as default
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ export default class ProfilePage extends Component<{}, State> {
     handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
         this.setState({errorMessage: ''});
-        var date = "";
+        let date = "";
         if (this.state.dateChange) {
             this.setState({dateChange: false});
 
@@ -113,16 +113,16 @@ export default class ProfilePage extends Component<{}, State> {
             const datePusOneDay = new Date(this.state.date.getTime() + 86400000);
             date = datePusOneDay.toISOString().slice(0, 10);
         }
-        var email = "";
+        let email = "";
         if (this.state.email) {
             if (validateEmail(this.state.email)) {
                 email = this.state.email;
                 this.setState({emailPlaceholder: this.state.email});
                 this.setState({email: ''});
-            } else this.setState({errorMessage: 'Pleace fill out a valid email'});
+            } else this.setState({errorMessage: 'Please fill out a valid email'});
         }
         //nice put req to parse the data in the DB
-        fetch(BACKEND_URL + 'profilesiteupdate', {
+        fetch(BACKEND_URL + 'users/update', {
             method: 'PUT',
             headers: {
                 Accept: 'application/json',

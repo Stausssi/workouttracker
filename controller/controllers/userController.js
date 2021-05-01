@@ -1,4 +1,3 @@
-const {request} = require('express');
 const User = require('../../model/models/userModel');
 const jwt = require("jsonwebtoken");
 const config = require("../utilities/mail/emailConfirmation.config");
@@ -7,7 +6,7 @@ const mail = require("../utilities/mail/confirmationEmail");
 const tokenGeneration = require("../utilities/authentication/AccessTokenSecret.config");
 const {isParamMissing, basicSuccessErrorHandling} = require("../utilities/misc");
 
-//creates a new user if the email/username doesn´t already exist
+//creates a new user if the email/username doesn't already exist
 exports.signup = (req, res) => {
     //validate request --> add more checks !!!!!!!!!!!!!!!!!!!!!!!!!!
     // console.log(req.body);
@@ -42,7 +41,7 @@ exports.signup = (req, res) => {
                 console.log(err);
                 res.sendStatus(500);
             } else {
-                // no error occured
+                // no error occurred
 
                 if (exists) {
                     res.status(200).send({
@@ -127,6 +126,48 @@ exports.verifyEmail = (req, res) => {
     }
 }
 
+//get data to profile with the username
+exports.getInformation = (req, res) => {
+    User.selectProfileData(req, function (error, profileData) {
+        if (error) {
+            console.log(error);
+            res.sendStatus(500);
+        } else {
+            res.status(200).send(profileData);
+        }
+    });
+}
+
+// update profile with new data
+exports.updateInformation = (req, res) => {
+    let newMail = false;
+    let confirmationToken = "";
+    if (req.body.email) {
+        newMail = true;
+        confirmationToken = jwt.sign({email: req.body.email}, config.confirmSecret);
+    }
+    User.updateProfileInDB(req, confirmationToken, function (error, resMessage) {
+        if (error) {
+            console.log(error);
+            res.sendStatus(500);
+        } else {
+            if (newMail) {
+                //select all data to send a new confirmation mail if the mail was changed
+                User.selectAllProfileDataForEmail(req.username, function (error, profileData) {
+                    if (error) {
+                        console.log(error);
+                        res.sendStatus(500);
+                    } else {
+                        mail.sendConfirmationEmail(profileData[0]);
+                        res.status(200).send(resMessage);
+                    }
+                });
+            }
+            res.status(200).send(resMessage);
+        }
+    });
+}
+
 // Search for a given user in the database
 exports.search = (req, res) => {
     const query = req.query.query;
@@ -200,7 +241,11 @@ exports.block = (req, res) => {
                         console.log(error);
                         res.sendStatus(500);
                     } else {
-                        User.block(user, toBeBlocked, isFollowing, (error) => basicSuccessErrorHandling(error, res, 204));
+                        if(!isBlocked) {
+                            User.block(user, toBeBlocked, isFollowing, (error) => basicSuccessErrorHandling(error, res, 204));
+                        } else {
+                            res.sendStatus(204);
+                        }
                     }
                 })
             }

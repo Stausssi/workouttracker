@@ -28,11 +28,11 @@ export const Head = () => (
                             </span>
                             <div>Home</div>
                         </Link>
-                        <Link className="navbar-item" to="/Profil">
+                        <Link className="navbar-item" to="/profile">
                             <span className="icon">
                                 <FontAwesomeIcon icon={faUser}/>
                             </span>
-                            <div>Profil</div>
+                            <div>Profile</div>
                         </Link>
                         <div className="navbar-item">
                             <ActivityModal/>

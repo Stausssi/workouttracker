@@ -1,5 +1,6 @@
 //get connection to database
 const sql = require('../createConnection');
+const mysql = require('mysql');
 
 //constructor for user model
 
@@ -82,6 +83,53 @@ User.getUserByUsernameOrEmail = (UsernameOrEmail, result) => {
             }
         }
     });
+}
+
+User.selectProfileData = (req, profileData) => {
+    sql.query("SELECT firstname, lastname, date, weight, email FROM user WHERE `username`=?;", [
+        req.params.user
+    ], function (error, rows, fields) {
+        if (error) {
+            profileData(error, "{}");
+        } else {
+            profileData(null, JSON.stringify(rows));
+        }
+    });
+}
+
+User.selectAllProfileDataForEmail = (username, profileData) => {
+    sql.query("SELECT firstname, lastname, username, email, confirmationToken FROM user WHERE `username`=?;", [
+        username
+    ], function (error, rows, fields) {
+        if (error) {
+            profileData(error, "{}");
+        } else {
+            profileData(null, rows);
+        }
+    });
+}
+
+User.updateProfileInDB = (req, confirmationToken, resMessage) => {
+    let sqlreq = "UPDATE user SET ";
+    if (req.body.firstname || req.body.lastname || req.body.date || req.body.weight || req.body.email) {
+        if (req.body.firstname) sqlreq += "firstname=" + mysql.escape(req.body.firstname, true) + ", ";
+        if (req.body.lastname) sqlreq += "lastname=" + mysql.escape(req.body.lastname, true) + ", ";
+        if (req.body.date) sqlreq += "date=" + mysql.escape(req.body.date, true) + ", ";       //date insted of age
+        if (req.body.weight) sqlreq += "weight=" + mysql.escape(req.body.weight, true) + ", ";
+        if (req.body.email) sqlreq += "email=" + mysql.escape(req.body.email, true) + ", emailVerify=false, confirmationToken='" + confirmationToken + "'";
+        sqlreq += "WHERE `username`=" + mysql.escape(req.username, true) + ";";
+        sqlreq = sqlreq.replace(", WHERE", " WHERE");
+
+        sql.query(sqlreq, function (error, rows, fields) {
+            if (error) {
+                resMessage(error, '');
+            } else {
+                resMessage(null, 'PUT resived!')
+            }
+        });
+    } else {
+        resMessage(null, 'PUT is empty!');
+    }
 }
 
 // Find a username containing a given term
