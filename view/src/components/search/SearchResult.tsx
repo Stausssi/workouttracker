@@ -42,10 +42,12 @@ export default class SearchResult extends React.Component<Props, State> {
             signal: this.abortController.signal
         }).then((response) => {
             if (response.ok) {
-                return response.json().then((response) => {
+                // Process response
+                response.json().then((response) => {
                     let isFollowing: boolean = response.following;
                     let isBlocked: boolean = response.blocked;
 
+                    // Set icon and class depending on relationship
                     this.setState({
                         isFollowing: isFollowing,
                         icon: (isBlocked ? faBan : (isFollowing ? faCheck : faUserPlus)),
@@ -68,6 +70,7 @@ export default class SearchResult extends React.Component<Props, State> {
     scrollInputContent(event: any) {
         const target = event.target;
 
+        // Scroll username if its larger than the displayable content
         target.scrollBy({
             left: (event.type === "mouseout" ? -target.scrollWidth : target.scrollWidth),
             behavior: "smooth"
@@ -75,6 +78,7 @@ export default class SearchResult extends React.Component<Props, State> {
     }
 
     followUser(event: any) {
+        // Only follow if button is not disabled
         if (!this.state.disableButton) {
             fetch(BACKEND_URL + "users/follow", {
                 method: "PUT",
@@ -94,6 +98,7 @@ export default class SearchResult extends React.Component<Props, State> {
                     buttonClass: "is-danger"
                 });
 
+                // Trigger friends feed response
                 if (response.ok) {
                     SessionHandler.setRefreshFeed(true, false);
                 }
@@ -125,6 +130,7 @@ export default class SearchResult extends React.Component<Props, State> {
                     buttonClass: response.ok ? "is-success" : "is-danger"
                 });
 
+                // Trigger friends feed response
                 if (response.ok) {
                     SessionHandler.setRefreshFeed(true, false);
                 }
@@ -138,6 +144,7 @@ export default class SearchResult extends React.Component<Props, State> {
 
     updateIcon(event: any) {
         if (!this.state.disableButton) {
+            // Display unfollow icon if user is following and mouse is hovering over the button
             let following: boolean = this.state.isFollowing;
             let mouseOver: boolean = event.type === "mouseenter";
 
@@ -149,6 +156,7 @@ export default class SearchResult extends React.Component<Props, State> {
     }
 
     componentWillUnmount() {
+        // Abort running requests
         this.abortController.abort();
     }
 

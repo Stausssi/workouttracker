@@ -135,7 +135,7 @@ export class Feed extends React.Component<FeedProps, FeedState> {
                                 scrollableTarget="col-1"
                             >
 
-                                <FadeIn delay={50} transitionDuration={300} key={"fadeIn" + this.state.refreshAnimation}>
+                                <FadeIn transitionDuration={300} key={"fadeIn" + this.state.refreshAnimation}>
                                 {this.state.postData.map((activity: postData, index: number) => (
                                     <div className="mb-5" key={index}><ActivityBox ownFeed={this.props.ownFeed} postData={activity}/></div>))
                                 }

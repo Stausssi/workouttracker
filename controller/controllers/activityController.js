@@ -23,26 +23,23 @@ exports.add = (req, res) => {
             values: values.substring(0, values.length - 2)
         };
 
+        // Insert new activity into database
         Activity.add(activity, function (error, isAdded) {
             if (error) {
                 console.log("Error when saving activity to database: ", error);
+
+                // Mysql error 1452 is 'invalid foreign key'
                 if (error.errno === 1452) {
                     res.status(500).send({
                         errno: 1,
                         message: "PKUser not found!"
                     });
                 } else {
-                    res.status(500).send({
-                        errno: 2,
-                        message: "Internal server error!"
-                    });
+                    // Send general error
+                    res.sendStatus(500);
                 }
             } else {
-                if (isAdded) {
-                    res.sendStatus(201);
-                } else {
-                    res.status(500).send({message: "Activity not added!"});
-                }
+                res.sendStatus(isAdded ? 201 : 500);
             }
         });
     }

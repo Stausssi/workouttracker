@@ -42,6 +42,7 @@ class SearchBar extends React.Component<Props, State> {
                 searchResults: <></>,
                 displayLoading: true
             }, () => {
+                // Only start searching for the term if it hasn't changed for a second and is not empty
                 clearTimeout(this.searchDelay);
 
                 if (value !== "") {
@@ -63,7 +64,8 @@ class SearchBar extends React.Component<Props, State> {
             signal: this.abortController.signal
         }).then((response) => {
             if (response.ok) {
-                return response.json().then((response) => {
+                response.json().then((response) => {
+                    // Display a NotificationBox if no users where found
                     let foundUsers: any = <NotificationBox
                         message={`User '${query}' could not be found!`}
                         type={"is-danger is-light mx-2"}
@@ -72,6 +74,8 @@ class SearchBar extends React.Component<Props, State> {
 
                     if (response.userFound) {
                         foundUsers = JSON.parse(response.users);
+
+                        // Create a SearchResult for every found user
                         for (let index in foundUsers) {
                             if (foundUsers.hasOwnProperty(index)) {
                                 foundUsers[index] =
@@ -86,7 +90,8 @@ class SearchBar extends React.Component<Props, State> {
                     });
                 });
             } else {
-                console.log(response);
+                // Log response
+                response.text().then((response) => console.log(response));
             }
         }).catch((error: any) => {
             if (error.name !== "AbortError") {
@@ -96,6 +101,7 @@ class SearchBar extends React.Component<Props, State> {
     }
 
     componentWillUnmount() {
+        // Remove running timeout and abort running requests to prevent a memory leak
         clearTimeout(this.searchDelay);
 
         this.abortController.abort();
@@ -145,6 +151,7 @@ class SearchBar extends React.Component<Props, State> {
     }
 
     handleClickOutside() {
+        // Reset searchQuery on click outside component
         if (this.state.searchQuery !== "") {
             this.setState({
                 searchQuery: "",
