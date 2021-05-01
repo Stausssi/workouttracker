@@ -1,6 +1,6 @@
 import React from 'react';
-import Head from '../Head';
-import Foot from '../Foot';
+import Head from '../components/Head';
+import Foot from '../components/Foot';
 import {BACKEND_URL} from "../App";
 import SessionHandler from "../utilities/SessionHandler";
 

@@ -1,10 +1,10 @@
-import SearchBar from "./components/search/SearchBar";
+import SearchBar from "./search/SearchBar";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faHome, faSignInAlt, faUser} from "@fortawesome/free-solid-svg-icons";
-import ActivityModal from "./components/activity/ActivityModal";
+import ActivityModal from "./activity/ActivityModal";
 import {Link} from "react-router-dom";
-import SessionHandler from "./utilities/SessionHandler";
-import NewLogo from "./img/TransarentLogo.png";
+import SessionHandler from "../utilities/SessionHandler";
+import NewLogo from "../img/TransarentLogo.png";
 
 //Head of React app. Used on every page. Integration of Modal to create Activity and Search
 
