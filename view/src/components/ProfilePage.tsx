@@ -67,7 +67,7 @@ export default class ProfilePage extends Component<{}, State> {
 
     //get placeholders by loading the Page
     getDefaultValues() {
-        fetch(BACKEND_URL + "users/" + this.state.username, {//get as default
+        fetch(BACKEND_URL + "users/get/" + this.state.username, {//get as default
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',

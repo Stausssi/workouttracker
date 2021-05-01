@@ -34,7 +34,7 @@ export default class FollowUserSite extends Component<{ username: string }, Stat
     }
 
     getDefaultValues() {
-        fetch(BACKEND_URL + "users/" + this.state.username, {//get as default
+        fetch(BACKEND_URL + "users/get/" + this.state.username, {//get as default
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',

@@ -185,9 +185,9 @@ export default class SearchResult extends React.Component<Props, State> {
                             onMouseDown={(e) => e.preventDefault()}
                             disabled={this.state.disableButton}
                         >
-                                <span className="icon is-small">
-                                    <FontAwesomeIcon icon={this.state.icon}/>
-                                </span>
+                            <span className="icon is-small">
+                                <FontAwesomeIcon icon={this.state.icon}/>
+                            </span>
                         </button>
                     </div>
                 </div>

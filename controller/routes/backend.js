@@ -24,7 +24,7 @@ router.get('/verify/:hash', function (req, res) {
     res.redirect('http://localhost:3000/verify');
 });
 
-router.get('/users/:user', authenticateJWT, users.getInformation);
+router.get('/users/get/:user', authenticateJWT, users.getInformation);
 router.put('/users/update', authenticateJWT, users.updateInformation);
 router.get('/users/search', authenticateJWT, users.search);
 router.put('/users/block', authenticateJWT, users.block);
