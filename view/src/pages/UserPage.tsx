@@ -61,6 +61,7 @@ class UserPage extends React.Component<any, State> {
                 'Content-Type': 'application/json',
                 Authorization: SessionHandler.getAuthToken()
             },
+            signal: this.abortController.signal
         }).then((response) => {
             if (response.ok) {
                 // Examine the text in the response
@@ -75,6 +76,11 @@ class UserPage extends React.Component<any, State> {
                 });
             } else {
                 console.log('Looks like there was a problem. Status Code: ', response.status);
+            }
+        }).catch((error: any) => {
+            // Don't react to 'AbortError's
+            if (error.name !== "AbortError") {
+                console.log(error);
             }
         });
 
