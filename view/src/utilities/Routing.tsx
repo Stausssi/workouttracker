@@ -7,7 +7,7 @@ export type ProtectedRouteProps = {
     /True: Return a Route with the specified props
     /False: Returns a redirect to "redirectPath"
      */
-    redirectPath: string;
+    redirectPath: string | null;
     /*
     /Redirect Path
      */
@@ -20,7 +20,8 @@ export default function ProtectedRoute({AuthenticationFunction, redirectPath, ..
      */
     if (AuthenticationFunction()) {
         return <Route {...routeProps} />;
-    } else {
+    } else if(redirectPath != null) {
         return <Redirect to={{pathname: redirectPath}}/>;
     }
+    return null;
 };

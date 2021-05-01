@@ -32,7 +32,7 @@ interface State {
 
 }
 
-export default class ProfileSite extends Component<{}, State> {
+export default class ProfilePage extends Component<{}, State> {
     constructor(props: any) {
         super(props);
         var username = "undefined Username";
@@ -159,7 +159,7 @@ export default class ProfileSite extends Component<{}, State> {
 
     render() {
         return (
-            <div className="section">
+            <div className="section has-background-black-ter">
                 <div className="container">
                     <form className='box'>
                         <p className="is-size-4">Hello {this.state.username},<br/> here you can change your account
