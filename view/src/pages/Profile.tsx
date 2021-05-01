@@ -4,7 +4,6 @@ import Foot from '../Foot';
 import ProfilePage from '../components/ProfilePage'
 
 //Profile page
-
 class Profile extends React.Component<any, any> {
     render() {
         return (

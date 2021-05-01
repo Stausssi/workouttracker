@@ -20,8 +20,8 @@ export default function ProtectedRoute({AuthenticationFunction, redirectPath, ..
      */
     if (AuthenticationFunction()) {
         return <Route {...routeProps} />;
-    } else if (redirectPath != null) {
-        return <Redirect to={{pathname: redirectPath}}/>;
+    } else if (redirectPath !== null) {
+        return <Redirect to={redirectPath}/>;
     }
     return null;
 };

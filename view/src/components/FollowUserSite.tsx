@@ -33,8 +33,15 @@ export default class FollowUserSite extends Component<{ username: string }, Stat
         this.getDefaultValues();
     }
 
+    componentDidUpdate(prevProps: Readonly<{ username: string }>, prevState: Readonly<State>, snapshot?: any) {
+        // Get new values if username changed
+        if (prevProps.username !== this.props.username) {
+            this.getDefaultValues();
+        }
+    }
+
     getDefaultValues() {
-        fetch(BACKEND_URL + "users/get/" + this.state.username, {//get as default
+        fetch(BACKEND_URL + "users/get/" + this.props.username, {//get as default
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
@@ -60,7 +67,7 @@ export default class FollowUserSite extends Component<{ username: string }, Stat
     render() {
         return (
             <div className="section has-background-black-ter">
-                <div className="section container box">
+                <div className="container box">
                     <p className="is-size-4">This is the page from {this.state.username},<br/> here you can see some
                         general information</p>
                     <div className='field'>

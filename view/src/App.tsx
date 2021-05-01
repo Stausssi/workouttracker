@@ -13,9 +13,7 @@ import SuccessfulSignup from "./components/login/SuccessfulSignUp";
 import Profile from "./pages/Profile";
 import Users from "./pages/UserPage";
 
-
 interface Props {
-
 }
 
 interface State {
@@ -32,12 +30,11 @@ export default class App extends Component<Props, State> {
 
         return (
             // This BrowserRouter handles the routing of the entire application
+            // TODO: Fix router refresh problem, see: https://stackoverflow.com/questions/44943920/react-router-stay-at-the-same-page-after-refresh
             <BrowserRouter>
                 <div className="App">
                     <div className="children">
-                        <Route exact path="/">
-                            {SessionHandler.isLoggedIn() ? <Homepage/> : <LoginContainer/>}
-                        </Route>
+                        <Route exact path="/" component={SessionHandler.isLoggedIn() ? Homepage : LoginContainer}/>
                         <Route exact path="/dev" component={Homepage}/>
                         <ProtectedRoute exact path="/login" component={LoginContainer}
                                         AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
