@@ -52,11 +52,11 @@ class User extends React.Component<any, State> {
                 // Examine the text in the response
                 response.json().then((data) => {
                     this.setState({
-                        firstname: data[0].firstname ? '' : this.state.firstname,
-                        lastname: data[0].lastname ? '' : this.state.lastname,
+                        firstname: data[0].firstname ? data[0].firstname : this.state.firstname,
+                        lastname: data[0].lastname ? data[0].lastname : this.state.lastname,
                         date: data[0].date ? new Date(data[0].date) : this.state.date,
-                        weight: data[0].weight ? '' : this.state.weight,
-                        email: data[0].email ? '' : this.state.email
+                        weight: data[0].weight ? data[0].weight : this.state.weight,
+                        email: data[0].email ? data[0].email : this.state.email
                     });
                 });
             } else {
