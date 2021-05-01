@@ -8,7 +8,7 @@ const User = function (user) {
     this.password = user.password;
     this.firstname = user.firstname;
     this.lastname = user.lastname;
-    this.age = user.age;
+    this.date = user.date;
     this.weight = user.weight;
     this.email = user.email;
     this.emailVerify = user.emailVerify;
@@ -17,7 +17,7 @@ const User = function (user) {
 
 //status is true if user was created and false if user was not created --> Status
 User.create = (newUser, status) => {
-    sql.query("INSERT INTO user SET ?", newUser, (error, result) => {
+    sql.query("INSERT INTO user SET ? ", newUser, (error, result) => {
         if (error) {
             console.log("error: ", error);
             status(error, false);
@@ -31,7 +31,6 @@ User.create = (newUser, status) => {
 //test, if username/email already exist in database
 //returns True if user exist and False if user doesn´t
 User.exists = (newUser, user_exists) => {
-
     console.log("New User: " + newUser.username + "|" + newUser.email);
     sql.query("SELECT * FROM user WHERE username = ? OR email = ?", [
         newUser.username,
@@ -85,6 +84,7 @@ User.getUserByUsernameOrEmail = (UsernameOrEmail, result) => {
     });
 }
 
+// Find a username containing a given term
 User.find = (user, foundUsers) => {
     sql.query("SELECT username FROM user WHERE LOCATE(?, username)>0 LIMIT 5;",
         [user],
@@ -92,6 +92,7 @@ User.find = (user, foundUsers) => {
     );
 }
 
+// Follow a user
 User.follow = (follower, followed, success) => {
     sql.query("INSERT INTO following VALUES (?, ?, false)",
         [follower, followed],
@@ -99,6 +100,7 @@ User.follow = (follower, followed, success) => {
     );
 }
 
+// Unfollow a user
 User.unfollow = (follower, followed, success) => {
     sql.query("DELETE FROM following WHERE follower = ? AND followed = ?",
         [follower, followed],
@@ -106,13 +108,16 @@ User.unfollow = (follower, followed, success) => {
     );
 }
 
+// Block a user
 User.block = (username, toBeBlocked, isFollowing, success) => {
+    // Update entry if blocked user is already following
     if (isFollowing) {
         sql.query("UPDATE following SET blocked = 1 WHERE follower = ? AND followed = ?",
             [toBeBlocked, username],
             (error) => success(error)
         );
     } else {
+        // Create a new entry in the database
         sql.query("INSERT INTO following VALUES (?, ?, true)",
             [toBeBlocked, username],
             (error) => success(error)
@@ -120,6 +125,7 @@ User.block = (username, toBeBlocked, isFollowing, success) => {
     }
 }
 
+// Unblock a user
 User.unblock = (username, unblocked, success) => {
     sql.query("UPDATE following SET blocked = 0 WHERE follower = ? AND followed = ?",
         [unblocked, username],
@@ -127,6 +133,7 @@ User.unblock = (username, unblocked, success) => {
     );
 }
 
+// Get the relationship of two given users
 User.getRelationship = (follower, followed, relationship) => {
     sql.query("SELECT blocked FROM following WHERE follower = ? AND followed = ?",
         [follower, followed],
