@@ -32,17 +32,18 @@ router.put('/users/follow', authenticateJWT, users.follow);
 router.put('/users/unfollow', authenticateJWT, users.unfollow);
 router.get('/users/getRelationship', authenticateJWT, users.getRelationship);
 
-router.get('/events/get', authenticateJWT,event.findAll); 
-router.get('/events/getactivity', authenticateJWT,event.findActivityEvents); 
-router.post('/events/add', authenticateJWT,event.create); 
-router.delete('/events/remove', authenticateJWT,event.remove);  
-router.delete('/activity/remove', authenticateJWT,event.removeactivity);  
+router.get('/events/get', authenticateJWT, event.findAll);
+router.get('/events/getactivity', authenticateJWT, event.findActivityEvents);
+router.post('/events/add', authenticateJWT, event.create);
+router.delete('/events/remove', authenticateJWT, event.remove);
+
 router.get('/profilesite/:user', authenticateJWT, profile.profilesite);
 router.put('/profilesiteupdate', authenticateJWT, profile.profileUpdate);
 
 router.get('/sports/fetch', authenticateJWT, sport.getAll);
 
 router.post('/activity/add', authenticateJWT, activity.add);
+router.delete('/activity/remove', authenticateJWT, event.removeactivity);
 router.get('/feed/:type/', authenticateJWT, feed.getFeed);
 
 router.post('/interaction/addComment', authenticateJWT, comment.addComment);
@@ -60,9 +61,9 @@ router.get('/testConnection', function (req, res, next) {
 })
 
 /* charts routes */
-router.get('/charts/get',authenticateJWT, chart.findAll); 
-router.get('/charts/dataset',authenticateJWT, chart.getdataset); 
-router.post('/charts/add',authenticateJWT, chart.create); 
-router.delete('/charts/remove',authenticateJWT, chart.remove);
+router.get('/charts/get', authenticateJWT, chart.findAll);
+router.get('/charts/dataset', authenticateJWT, chart.getdataset);
+router.post('/charts/add', authenticateJWT, chart.create);
+router.delete('/charts/remove', authenticateJWT, chart.remove);
 
 module.exports = router;

@@ -6,9 +6,9 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { BACKEND_URL } from "../App";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
-import SessionHandler from "../SessionHandler";
 import moment from "moment";
 import NotificationBox from "./NotificationBox";
+import SessionHandler from "../utilities/SessionHandler";
 
 interface Props {}
 

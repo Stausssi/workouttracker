@@ -5,7 +5,7 @@ import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import DatePicker from "react-datepicker";
 import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
-import SessionHandler from "../SessionHandler";
+import SessionHandler from "../utilities/SessionHandler";
 import { BACKEND_URL } from "../App";
 import "bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css";
 import NotificationBox from "./NotificationBox";
