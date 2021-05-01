@@ -15,7 +15,7 @@ interface State {
     relationship: any
 }
 
-class User extends React.Component<any, State> {
+class UserPage extends React.Component<any, State> {
     private readonly abortController: AbortController;
 
     constructor(props: any) {
@@ -203,5 +203,5 @@ class User extends React.Component<any, State> {
     }
 }
 
-export default User
+export default UserPage
 
