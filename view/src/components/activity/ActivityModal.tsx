@@ -118,5 +118,3 @@ export default class ActivityModal extends React.Component<Props, State> {
     }
 }
   
-  
-

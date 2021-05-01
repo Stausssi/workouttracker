@@ -3,6 +3,8 @@ import Head from '../Head';
 import Foot from '../Foot';
 import Profile from '../components/ProfileSite'
 
+//Profile page
+
 class Profil extends React.Component<any, any> {
     constructor(props: any) {
         super(props);

@@ -5,6 +5,8 @@ const router = express.Router();
 const users = require("../controllers/userController");
 const activity = require("../controllers/activityController");
 const sport = require("../controllers/sportController");
+const event = require("../controllers/calendarController");
+const chart = require("../controllers/chartController");
 const feed = require("../controllers/feedController");
 const comment = require("../controllers/interactionController");
 const profile = require("../controllers/profileController");
@@ -30,6 +32,11 @@ router.put('/users/follow', authenticateJWT, users.follow);
 router.put('/users/unfollow', authenticateJWT, users.unfollow);
 router.get('/users/getRelationship', authenticateJWT, users.getRelationship);
 
+router.get('/events/get', authenticateJWT,event.findAll); 
+router.get('/events/getactivity', authenticateJWT,event.findActivityEvents); 
+router.post('/events/add', authenticateJWT,event.create); 
+router.delete('/events/remove', authenticateJWT,event.remove);  
+router.delete('/activity/remove', authenticateJWT,event.removeactivity);  
 router.get('/profilesite/:user', authenticateJWT, profile.profilesite);
 router.put('/profilesiteupdate', authenticateJWT, profile.profileUpdate);
 
@@ -51,5 +58,11 @@ router.get('/googlefit/activity', googlefit.insertActivitysFromGoogle);
 router.get('/testConnection', function (req, res, next) {
     res.send('Connection to the backend established!');
 })
+
+/* charts routes */
+router.get('/charts/get',authenticateJWT, chart.findAll); 
+router.get('/charts/dataset',authenticateJWT, chart.getdataset); 
+router.post('/charts/add',authenticateJWT, chart.create); 
+router.delete('/charts/remove',authenticateJWT, chart.remove);
 
 module.exports = router;
