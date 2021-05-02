@@ -13,3 +13,5 @@ Activity.add = (activity, isAdded) => {
         }
     });
 }
+
+module.exports = Activity;
