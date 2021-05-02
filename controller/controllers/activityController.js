@@ -46,13 +46,13 @@ exports.add = (req, res) => {
 }
 
 
+//find activity which belonged to currently logged user
 exports.get = (request, response) => {
-    //find events which belonged to currently logged user
     let username = request.username;
-    if (isParamMissing([username])) { //return Bad Request if user is missing
+    if (isParamMissing([username])) { //return bad Request if user is missing
         request.sendStatus(400)
     } else {
-        Activity.getActivityEvents(username, (error, data) => {
+        Activity.get(username, (error, data) => {
             if (error) {
                 console.log(error);
                 response.sendStatus(500)

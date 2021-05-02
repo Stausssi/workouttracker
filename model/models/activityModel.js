@@ -14,7 +14,7 @@ Activity.add = (activity, isAdded) => {
     });
 }
 
-Activity.getActivityEvents = (user, response) => { 
+Activity.get = (user, response) => { 
     sql.query("SELECT activity_id ,sport as title, startedAt,duration FROM activity WHERE user = ?", [user],
         function (error, result) {
             if (error) {
