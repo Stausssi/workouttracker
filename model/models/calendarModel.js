@@ -1,13 +1,9 @@
 const sql = require("../createConnection");
 
-const Event = function (event) {    //event constructor
-    this.title = event.title;
-    this.start = event.start;
-    this.end = event.end;
-    this.user = event.user;
+const Event = function () {    
 }
 
-Event.getAll = (user, response) => { //sql query to get all events which match with current user. Response with values on success
+Event.get = (user, response) => { 
     sql.query("SELECT * FROM events where user = ?", [user],
         function (error, result) {
             if (error) {
@@ -18,8 +14,8 @@ Event.getAll = (user, response) => { //sql query to get all events which match w
         });
 }
 
-Event.getActivityEvents = (user, response) => { //sql query to get all actvities as events
-    sql.query("SELECT activity_id ,sport as title, startedAt,duration  FROM activity where user = ?", [user],
+Event.getActivityEvents = (user, response) => { 
+    sql.query("SELECT activity_id ,sport as title, startedAt,duration FROM activity WHERE user = ?", [user],
         function (error, result) {
             if (error) {
                 response(error, null)
@@ -30,7 +26,7 @@ Event.getActivityEvents = (user, response) => { //sql query to get all actvities
 }
 
 
-Event.create = (newEvent, result) => {  //sql query to insert event into DB
+Event.create = (newEvent, result) => {  
     sql.query("INSERT INTO events SET ?", [newEvent], (error, res) => {
         if (error) {
             console.log("error: ", error);
@@ -52,7 +48,7 @@ Event.remove = (id, username, result) => {  //remove event
     });
 };
 
-Event.removeactivity = (id, username, result) => {  //remove activity  
+Event.removeActivity = (id, username, result) => {  //remove activity
     sql.query("DELETE FROM activity WHERE activity_id = ? AND user = ?", [id, username], (error, res) => {
         if (error) {
             console.log("error: ", error);

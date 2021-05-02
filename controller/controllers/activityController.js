@@ -1,4 +1,5 @@
 const Activity = require("../../model/models/activityModel");
+const Event = require("../../model/models/calendarModel");
 const mysql = require("mysql");
 const {isParamMissing} = require("../utilities/misc");
 
@@ -44,3 +45,39 @@ exports.add = (req, res) => {
         });
     }
 }
+
+
+exports.get = (request, response) => {
+    //find events which belonged to currently logged user
+    let username = request.username;
+    if (isParamMissing([username])) { //return Bad Request if user is missing
+        request.sendStatus(400)
+    } else {
+        Activity.getActivityEvents(username, (error, data) => {
+            if (error) {
+                console.log(error);
+                response.sendStatus(500)
+            } else {
+                response.status(200).send({body: JSON.stringify(data)});  //return events if sql request has succeeded
+            }
+        });
+    }
+};
+
+//remove activity from DB
+exports.remove = (request, response) => {
+    const activityid = request.body.id //id of event, to identify dataset which will be deleted
+    let username = request.username;
+    if (!request.body || isParamMissing([username, eventid])) {
+        response.sendStatus(400)
+    } else {
+        Activity.remove(activityid, username, (error, data) => {
+            if (error || !data) {
+                response.sendStatus(500)
+            } else {
+                response.sendStatus(200)
+            }
+        })
+
+    }
+};

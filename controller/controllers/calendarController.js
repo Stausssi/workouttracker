@@ -1,13 +1,13 @@
 const Event = require("../../model/models/calendarModel");
 const {isParamMissing} = require("../utilities/misc");
 
-exports.findAll = (request, response) => {
+exports.get = (request, response) => {
     //find events which belonged to currently logged user
     let username = request.username;
     if (isParamMissing([username])) { //return Bad Request if user is missing
         request.sendStatus(400)
     } else {
-        Event.getAll(username, (error, data) => {
+        Event.get(username, (error, data) => {
             if (error) {
                 console.log(error);
                 response.sendStatus(500)
@@ -18,21 +18,6 @@ exports.findAll = (request, response) => {
     }
 };
 
-exports.findActivityEvents = (request, response) => {
-    let username = request.username;
-    if (isParamMissing([username])) {
-        request.sendStatus(400)
-    } else {
-        Event.getActivityEvents(username, (error, data) => {
-            if (error) {
-                console.log(error);
-                response.sendStatus(500)
-            } else {
-                response.status(200).send({body: JSON.stringify(data)});
-            }
-        });
-    }
-};
 
 //Create new event and add it to DB
 exports.create = (request, response) => {
@@ -60,12 +45,12 @@ exports.create = (request, response) => {
 
 //remove event from DB
 exports.remove = (request, response) => {
-    const eventid = request.body.id //id of event, to identify dataset which will be deleted
+    const eventId = request.body.id //id of event, to identify dataset which will be deleted
     let username = request.username;
-    if (!request.body || isParamMissing([username, eventid])) {
+    if (!request.body || isParamMissing([username, eventId])) {
         response.sendStatus(400)
     } else {
-        Event.remove(eventid, username, (error, data) => {
+        Event.remove(eventId, username, (error, data) => {
             if (error || !data) {
                 response.sendStatus(500)
             } else {
@@ -76,21 +61,4 @@ exports.remove = (request, response) => {
     }
 };
 
-//remove event from DB
-exports.removeactivity = (request, response) => {
-    const eventid = request.body.id //id of event, to identify dataset which will be deleted
-    let username = request.username;
-    if (!request.body || isParamMissing([username, eventid])) {
-        response.sendStatus(400)
-    } else {
-        Event.removeactivity(eventid, username, (error, data) => {
-            if (error || !data) {
-                response.sendStatus(500)
-            } else {
-                response.sendStatus(200)
-            }
-        })
-
-    }
-};
 

@@ -3,14 +3,14 @@ const Data = require("../../model/models/dataModel");
 const {isParamMissing} = require("../utilities/misc");
 
 //find charts which matched to currently logged user
-exports.findAll = (request, response) => {
+exports.get = (request, response) => {
     let username = request.username;
     if (isParamMissing([username])) {
         request.sendStatus(400)
     } else {
         Chart.getAll(username, (error, charts) => {
             if (error) {
-                console.log(error);
+                console.error(error);
                 response.sendStatus(500)
             } else {
                 response.status(200).send({body: JSON.stringify(charts)});
@@ -20,29 +20,28 @@ exports.findAll = (request, response) => {
 };
 
 //find datasets for chart
-exports.getdataset = (request, response) => {
+exports.getDataset = (request, response) => {
     let username = request.username;
     let sqlfunc = request.query.sqlfunc
     if (isParamMissing([username, sqlfunc])) {
         request.sendStatus(400)
     } else {
-        let year, sport, category = null
-        sport = request.query.sport
-        category = request.query.category
-        year = request.query.year
+        let sport = request.query.sport
+        let category = request.query.category
+        let year = request.query.year
         if (sqlfunc === "sum") {    //get datasets with sql function sum
-            Data.getamount(category, sport, year, username, (error, data) => {
+            Data.getAmount(category, sport, year, username, (error, data) => {
                 if (error) {
-                    console.log(error);
+                    console.error(error);
                     response.sendStatus(500)
                 } else {
                     response.status(200).send({body: JSON.stringify(data)});
                 }
             });
         } else if (sqlfunc === "avg") { //get datasets with sql function avg
-            Data.getaverage(category, sport, year, username, (error, data) => {
+            Data.getAverage(category, sport, year, username, (error, data) => {
                 if (error) {
-                    console.log(error);
+                    console.error(error);
                     response.sendStatus(500)
                 } else {
                     response.status(200).send({body: JSON.stringify(data)});
@@ -86,12 +85,12 @@ exports.create = (request, response) => {
 
 //remove chart with name of chart as id
 exports.remove = (request, response) => {
-    const chartid = request.body.chartid
+    const chartId = request.body.chartId
     let username = request.username;
-    if (!request.body || isParamMissing([username, chartid])) {
+    if (!request.body || isParamMissing([username, chartId])) {
         response.sendStatus(400)
     } else {
-        Chart.remove(chartid, username, (error, data) => {
+        Chart.remove(chartId, username, (error, data) => {
             if (error || !data) {
                 response.sendStatus(500)
             } else {
