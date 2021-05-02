@@ -160,7 +160,7 @@ User.unfollow = (follower, followed, success) => {
 User.block = (username, toBeBlocked, isFollowing, success) => {
     // Update entry if blocked user is already following
     if (isFollowing) {
-        sql.query("UPDATE following SET blocked = 1 WHERE follower = ? AND followed = ?",
+        sql.query("UPDATE following SET blocked = true WHERE follower = ? AND followed = ?",
             [toBeBlocked, username],
             (error) => success(error)
         );

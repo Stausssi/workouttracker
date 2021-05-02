@@ -224,31 +224,23 @@ exports.unfollow = (req, res) => {
 
 // Block a specific user
 exports.block = (req, res) => {
-    // First unfollow and then block the user
     let user = req.username;
     let toBeBlocked = req.body.toBeBlocked;
 
     if (isParamMissing([user, toBeBlocked])) {
         res.sendStatus(400);
     } else {
-        User.unfollow(user, toBeBlocked, (error) => {
+        // Check whether the toBeBlocked user is already following the other user
+        User.getRelationship(toBeBlocked, user, (error, isFollowing, isFollowed, isBlocked) => {
             if (error) {
                 console.log(error);
                 res.sendStatus(500);
             } else {
-                // Check whether the toBeBlocked user is already following the other user
-                User.getRelationship(toBeBlocked, user, (error, isFollowing, isFollowed, isBlocked) => {
-                    if (error) {
-                        console.log(error);
-                        res.sendStatus(500);
-                    } else {
-                        if(!isBlocked) {
-                            User.block(user, toBeBlocked, isFollowing, (error) => basicSuccessErrorHandling(error, res, 204));
-                        } else {
-                            res.sendStatus(204);
-                        }
-                    }
-                })
+                if (!isBlocked) {
+                    User.block(user, toBeBlocked, isFollowing, (error) => basicSuccessErrorHandling(error, res, 204));
+                } else {
+                    res.sendStatus(204);
+                }
             }
         });
     }
