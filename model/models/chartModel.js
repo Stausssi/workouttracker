@@ -45,5 +45,4 @@ Chart.remove = (name, user, result) => {     //remove chart depending on unique 
     });
 };
 
-
 module.exports = Chart;

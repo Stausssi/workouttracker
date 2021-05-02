@@ -27,5 +27,4 @@ Data.getaverage = (category, sports, year, user, response) => {
         });
 }
 
-
 module.exports = Data;

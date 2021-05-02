@@ -25,8 +25,7 @@ interface OwnState {
     weightPlaceholder: string;
     emailPlaceholder: string;
 
-    errorMessage: string,
-
+    errorMessage: string
 }
 
 //Profile page
