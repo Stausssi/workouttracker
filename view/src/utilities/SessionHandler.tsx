@@ -20,7 +20,7 @@ export default class SessionHandler {
     }
 
     static getUsername() {
-        return sessionStorage.getItem("username");
+        return sessionStorage.getItem("username") ? String(sessionStorage.getItem("username")) : "unknown user";
     }
 
     static logOut() {
