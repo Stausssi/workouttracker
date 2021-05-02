@@ -189,19 +189,25 @@ class UserPage extends React.Component<any, State> {
                             <p>{this.state.email}</p>
                         </div>
                     </div>
-                    <button
-                        className="button is-success"
-                        onClick={this.handleFollowClick}
-                        disabled={this.state.relationship.blocked}
-                    >
-                        {(this.state.relationship.following ? "Unf" : "F") + "ollow"}
-                    </button>
-                    <button
-                        className="button is-danger"
-                        onClick={this.handleBlockClick}
-                    >
-                        {(this.state.relationship.hasBlocked ? "Unb" : "B") + "lock"}
-                    </button>
+                    {
+                        this.state.username !== SessionHandler.getUsername() ?
+                            <>
+                                <button
+                                    className="button is-success"
+                                    onClick={this.handleFollowClick}
+                                    disabled={this.state.relationship.blocked}
+                                >
+                                    {(this.state.relationship.following ? "Unf" : "F") + "ollow"}
+                                </button>
+                                <button
+                                    className="button is-danger"
+                                    onClick={this.handleBlockClick}
+                                >
+                                    {(this.state.relationship.hasBlocked ? "Unb" : "B") + "lock"}
+                                </button>
+                            </> :
+                            <></>
+                    }
                 </div>
                 <Foot/>
             </section>
