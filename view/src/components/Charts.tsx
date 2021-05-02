@@ -160,11 +160,12 @@ export default class Graphs extends React.Component<Props, State> {
     }).then((response) => {
       if (response.ok) {
         return response.json().then((response) => {
-          this.setState({ array: JSON.parse(response.body) }, () => { 
-            if (display) {           //if displayed add data to charts and displayed it
+          this.setState({ array: JSON.parse(response.body) }, () => {
+            if (display) {
+              //if displayed add data to charts and displayed it
               this.loopOverData(); //get data for each chart
             }
-          }); 
+          });
         });
       } else {
         return response.json().then((response) => {
@@ -240,22 +241,26 @@ export default class Graphs extends React.Component<Props, State> {
   addElement(chart: any, data: any) {
     let buttonNode = document.getElementById(chart.name); //check if ID already exists (should be unique)
     let chartNode = document.getElementById("chart_ID" + chart.name);
-    if (!chartNode && !buttonNode) {
+    let chartBoxNode = document.getElementById("chartBox_ID" + chart.name);
+    if (!chartNode && !buttonNode && !chartBoxNode) {
       // create new unique div and new unique button for each new chart
+      let chartBox = document.createElement("div");  
+      chartBox.className = "box";
+      chartBox.id = "chartBoxID_" + chart.name; // ChartBox ID
       let canvas = document.createElement("canvas"); //Canvas, where chart will be displayed
-      canvas.className='box'
-      canvas.id = "chartID_" + chart.name; // use chart title to create id for div
       canvas.height = 500; //set chart height to 500px
+      canvas.id = "chartID_" + chart.name;          // Canvas ID
       canvas.style.width = "100%"; //set chart canvas to full width
       let button = document.createElement("button"); //Button, to delete chart
       button.id = chart.name; //Set button ID to chart title
-      button.className = "button is-danger";
+      button.className = "button is-danger m-1";
       button.innerHTML = "Delete " + canvas.id;
       button.onclick = (event: any) => this.removeChart(event.target.id); //add delete function to function
       // add created elements to DOM
       let parent = document.getElementById("charts"); //append every charts to parent div
-      parent?.appendChild(canvas);
-      parent?.appendChild(button);
+      parent?.appendChild(chartBox);
+      chartBox?.append(canvas)
+      chartBox?.appendChild(button);
       this.addCharts(canvas, chart, data);
     } else {
       console.error("Element could not be added");
@@ -275,7 +280,6 @@ export default class Graphs extends React.Component<Props, State> {
     }
     //Set fill value to true or false
     chart.fill = chart.fill === 1;
-
     let dataArray: any[] = new Array(labels.length);
     let yLab = this.yLab(chart.category); //get unit of measurement for chart
     let subtitle = this.subtitle(
@@ -325,7 +329,7 @@ export default class Graphs extends React.Component<Props, State> {
           },
         },
       },
-      height: "auto",
+      height: "500px",
       type: chart.type, //Define chart type
       data: {
         labels: labels,
@@ -375,7 +379,7 @@ export default class Graphs extends React.Component<Props, State> {
           sqlfunc: sqlfunc,
         };
         this.createRequest(chart);
-        //this.setCharts(chart); //Add new chart to DB
+        this.setCharts(chart); //Add new chart to DB
         this.action();
       } else {
         this.setState({
@@ -450,9 +454,11 @@ export default class Graphs extends React.Component<Props, State> {
       "chartID_" + name
     ) as HTMLCanvasElement;
     let button = document.getElementById(name) as HTMLButtonElement;
-    if (canvas.parentNode && button.parentNode) {
+    let box = document.getElementById("chartBoxID_"+name) as HTMLDivElement;
+    if (canvas.parentNode && button.parentNode && box.parentNode) {
       canvas.parentNode.removeChild(canvas); //remove canvas element
-      button.parentNode.removeChild(button); ////remove button element
+      button.parentNode.removeChild(button); //remove button element
+      box.parentNode.removeChild(box);      //remove box after children
     }
   }
 
@@ -573,7 +579,7 @@ export default class Graphs extends React.Component<Props, State> {
             Add Chart
           </button>
         </div>
-        <div id="charts" className='p-5'/>
+        <div id="charts" className="p-5" />
         <div className={`modal ${active}`} id="ChartModal">
           <div className="modal-background" />
           <div className="modal-card">
