@@ -85,7 +85,7 @@ export class Feed extends React.Component<FeedProps, FeedState> {
                     const activities = response["activities"];
                     this.setState({
                         postData: this.state.postData.concat(activities),
-                        hasMore: activities.length > 0
+                        hasMore: activities.length === 5
                     });
                 });
             }
