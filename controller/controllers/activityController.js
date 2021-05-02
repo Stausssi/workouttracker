@@ -1,5 +1,4 @@
 const Activity = require("../../model/models/activityModel");
-const Event = require("../../model/models/calendarModel");
 const mysql = require("mysql");
 const {isParamMissing} = require("../utilities/misc");
 

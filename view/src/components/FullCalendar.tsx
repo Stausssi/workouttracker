@@ -135,21 +135,6 @@ export default class FullCalendar extends React.Component<Props, State> {
     }
   }
 
-  test() {
-    fetch(BACKEND_URL + "activity/get", {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Authorization: SessionHandler.getAuthToken(),
-        },
-        signal: this.abortController.signal,
-      }).then((response) => {
-          return response.json().then((response)=>{
-              console.log(JSON.parse(response))
-          })
-    })
-  }
-
   getActivity() {
     fetch(BACKEND_URL + "activity/get", {
       method: "GET",
@@ -349,7 +334,6 @@ export default class FullCalendar extends React.Component<Props, State> {
             </footer>
           </div>
         </div>
-        <button onClick={()=>this.test()}>Test Activity Events</button>
       </div>
     );
   }

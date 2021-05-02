@@ -42,9 +42,6 @@ router.get('/charts/dataset', authenticateJWT, chart.getDataset);
 router.post('/charts/add', authenticateJWT, chart.create);
 router.delete('/charts/remove', authenticateJWT, chart.remove);
 
-router.get('/profilesite/:user', authenticateJWT, profile.profilesite);
-router.put('/profilesiteupdate', authenticateJWT, profile.profileUpdate);
-
 router.get('/sports/fetch', authenticateJWT, sport.getAll);
 
 router.get('/activity/get', authenticateJWT, activity.get);
