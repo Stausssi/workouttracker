@@ -243,6 +243,7 @@ export default class Graphs extends React.Component<Props, State> {
     if (!chartNode && !buttonNode) {
       // create new unique div and new unique button for each new chart
       let canvas = document.createElement("canvas"); //Canvas, where chart will be displayed
+      canvas.className='box'
       canvas.id = "chartID_" + chart.name; // use chart title to create id for div
       canvas.height = 500; //set chart height to 500px
       canvas.style.width = "100%"; //set chart canvas to full width
@@ -324,7 +325,7 @@ export default class Graphs extends React.Component<Props, State> {
           },
         },
       },
-      height: "600px",
+      height: "auto",
       type: chart.type, //Define chart type
       data: {
         labels: labels,
@@ -566,19 +567,13 @@ export default class Graphs extends React.Component<Props, State> {
     const active = this.state.active ? "is-active" : "";
     return (
       <div className="container">
-        <div className="divider">Chart</div>
+        <div className="divider">Charts</div>
         <div className="controls">
-          <button className="button is-success" onClick={() => this.action()}>
+          <button className="button is-primary" onClick={() => this.action()}>
             Add Chart
           </button>
         </div>
-        <div id="charts" />
-        <div className="chart-container">
-          <canvas id="myChart" />
-        </div>
-        <div className="chart-container2">
-          <canvas id="myChart2" />
-        </div>
+        <div id="charts" className='p-5'/>
         <div className={`modal ${active}`} id="ChartModal">
           <div className="modal-background" />
           <div className="modal-card">

@@ -98,7 +98,8 @@ export default class FullCalendar extends React.Component<Props, State> {
       },
       defaultAllDay: true,
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin], //add plugins to fullcalendar
-      height: "600px", //set height for table
+      //height: "600px", //set height for table
+      contentHeight:"auto",
       selectable: true, //enable selection of dates
       select: (info) => this.create(info), //Open create function on select date range
       eventDidMount: (element) => {
@@ -280,7 +281,7 @@ export default class FullCalendar extends React.Component<Props, State> {
   render() {
     const active = this.state.active ? "is-active" : ""; //if active is true: show modal. Else hide it
     return (
-      <div className="container">
+      <div className="box m-5">
         <div id="calendarFull" />
         <div className={`modal ${active}`} id="CalendarModal">
           <div className="modal-background" />
