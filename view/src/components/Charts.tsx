@@ -13,18 +13,18 @@ import NotificationBox from "./NotificationBox";
 interface Props {}
 
 interface State {
-    active: boolean;
-    title: string;
-    type: string;
-    category: string;
-    sport: string;
-    year: Date;
-    fill: boolean;
-    array: any;
-    sports: string[];
-    switchfunc: boolean;
-    notifyMessage: string;
-    notifyType: string;
+  active: boolean;
+  title: string;
+  type: string;
+  category: string;
+  sport: string;
+  year: Date;
+  fill: boolean;
+  array: any[];
+  sports: string[];
+  switchfunc: boolean;
+  notifyMessage: string;
+  notifyType: string;
 }
 
 const colors = [
@@ -57,25 +57,17 @@ const labels = [
   "Dec.",
 ];
 
-const types = [
-  "line",
-  "bar",
-  "horizontalBar",
-  "radar",
-  "polarArea",
-  "doughnut",
-  "pie",
-];
+const types = ["line", "bar", "radar", "polarArea", "doughnut", "pie"];
 
 const allCategories = [
   "distance",
   "duration",
-  "altitudeDifferences",
+  "altitudeDifference",
   "averageHeartRate",
   "pace",
 ];
 
-const categories = ["distance", "duration", "altitudeDifferences"];
+const categories = ["distance", "duration", "altitudeDifference"];
 
 const averageCategories = ["averageHeartRate", "pace"];
 
@@ -86,7 +78,7 @@ const initialState = {
   category: "distance",
   sport: "",
   fill: false,
-  array: "",
+  array: [],
   sports: [],
   switchfunc: false,
   year: new Date(),
@@ -96,10 +88,12 @@ const initialState = {
 
 export default class Graphs extends React.Component<Props, State> {
   private readonly abortController: AbortController;
+  charts: any[];
 
   constructor(props: Props) {
     super(props);
     this.state = initialState; //init state
+    this.charts = [];
     this.abortController = new AbortController();
   }
 
@@ -115,7 +109,11 @@ export default class Graphs extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    this.getCharts(); //get charts with data on mount
+    this.getCharts(true); //get charts with data on mount
+  }
+
+  componentWillUnmount() {
+    this.abortController.abort();
   }
 
   fetchSports() {
@@ -149,7 +147,7 @@ export default class Graphs extends React.Component<Props, State> {
     });
   }
 
-  getCharts() {
+  getCharts(display: boolean) {
     //get charts
     // Call the API
     fetch(BACKEND_URL + "charts/get", {
@@ -159,21 +157,21 @@ export default class Graphs extends React.Component<Props, State> {
         Authorization: SessionHandler.getAuthToken(),
       },
       signal: this.abortController.signal,
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          return response.json().then((response) => {
-            console.error("Failed to get charts: ", response); //error message in console on error
-          });
-        }
-      })
-      .then((data) => {
-        this.setState({ array: JSON.parse(data.body) }); //add charts to array
-        this.loopOverData(); //get data for each chart
-      })
-      .catch((error) => console.warn(error));
+    }).then((response) => {
+      if (response.ok) {
+        return response.json().then((response) => {
+          this.setState({ array: JSON.parse(response.body) }, () => { 
+            if (display) {           //if displayed add data to charts and displayed it
+              this.loopOverData(); //get data for each chart
+            }
+          }); 
+        });
+      } else {
+        return response.json().then((response) => {
+          console.error("Failed to get charts: ", response); //error message in console on error
+        });
+      }
+    });
   }
 
   loopOverData() {
@@ -351,6 +349,7 @@ export default class Graphs extends React.Component<Props, State> {
       this.state.year &&
       this.state.category
     ) {
+      this.getCharts(false);
       if (
         !this.state.array.find(
           (title: { name: string }) => title.name === this.state.title //Accepts request if title is unique
@@ -375,7 +374,7 @@ export default class Graphs extends React.Component<Props, State> {
           sqlfunc: sqlfunc,
         };
         this.createRequest(chart);
-        this.setCharts(chart); //Add new chart to DB
+        //this.setCharts(chart); //Add new chart to DB
         this.action();
       } else {
         this.setState({
@@ -435,7 +434,9 @@ export default class Graphs extends React.Component<Props, State> {
         body: JSON.stringify({ chartId: id }),
         signal: this.abortController.signal,
       }).then((response) => {
-        if (!response.ok) {
+        if (response.ok) {
+          SessionHandler.setRefreshFeed(true);
+        } else {
           console.error("Delete request has failed");
         }
       });

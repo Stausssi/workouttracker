@@ -1,6 +1,10 @@
 const sql = require("../createConnection");
 
-const Event = function () {    
+const Event = function (event) {    
+    this.title= event.title,
+    this.start= event.start,
+    this.end= event.end,
+    this.user= event.user
 }
 
 Event.get = (user, response) => { 

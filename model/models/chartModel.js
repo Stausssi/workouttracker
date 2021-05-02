@@ -1,6 +1,14 @@
 const sql = require("../createConnection");
 
-const Chart = function () { //chart constructor
+const Chart = function (chart) { //chart constructor
+    this.name= chart.name,
+    this.type= chart.type,
+    this.category= chart.category,
+    this.fill= chart.fill,
+    this.param_sport= chart.param_sport,
+    this.year= chart.year,
+    this.user= chart.user,
+    this.sqlfunc= chart.sqlfunc
 }
 
 Chart.getAll = (user, response) => {     //get all events

@@ -61,6 +61,10 @@ export default class FullCalendar extends React.Component<Props, State> {
     this.getEvents();
   }
 
+  componentWillUnmount() {
+    this.abortController.abort();
+}
+
   initCalendar() {
     //create calendar
     if (typeof this.calendar !== "undefined") {
