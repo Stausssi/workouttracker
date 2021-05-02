@@ -4,7 +4,7 @@ import {faHome, faSignInAlt, faUser} from "@fortawesome/free-solid-svg-icons";
 import ActivityModal from "./activity/ActivityModal";
 import {Link} from "react-router-dom";
 import SessionHandler from "../utilities/SessionHandler";
-import NewLogo from "../img/TransarentLogo.png";
+import NewLogo from "../img/Logo.png";
 
 //Head of React app. Used on every page. Integration of Modal to create Activity and Search
 
