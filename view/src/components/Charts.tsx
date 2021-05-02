@@ -246,10 +246,11 @@ export default class Graphs extends React.Component<Props, State> {
       // create new unique div and new unique button for each new chart
       let chartBox = document.createElement("div");  
       chartBox.className = "box";
+      chartBox.style.maxHeight = "600px";
       chartBox.id = "chartBoxID_" + chart.name; // ChartBox ID
       let canvas = document.createElement("canvas"); //Canvas, where chart will be displayed
-      canvas.height = 500; //set chart height to 500px
       canvas.id = "chartID_" + chart.name;          // Canvas ID
+      canvas.style.maxHeight = "85%";
       canvas.style.width = "100%"; //set chart canvas to full width
       let button = document.createElement("button"); //Button, to delete chart
       button.id = chart.name; //Set button ID to chart title
@@ -300,7 +301,8 @@ export default class Graphs extends React.Component<Props, State> {
     new Chart(canvas, {
       //Create chart
       options: {
-        responsive: false, //set chart static height
+        
+        responsive: true, //set chart static height
         maintainAspectRatio: false, //disable maintaining ratio of chart when resizing
         scales: {
           x: {
@@ -329,7 +331,7 @@ export default class Graphs extends React.Component<Props, State> {
           },
         },
       },
-      height: "500px",
+      height: "30%",
       type: chart.type, //Define chart type
       data: {
         labels: labels,
