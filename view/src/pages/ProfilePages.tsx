@@ -6,7 +6,7 @@ import {BACKEND_URL} from "../App";
 import DatePicker from "react-datepicker";
 import NotificationBox from "../components/NotificationBox";
 import {postData} from "../components/Feed/FeedContent";
-import {ActivityBox} from "../components/activity/ActivityBox";
+import {ProfileActivityContainer} from "../components/profile/ProfileActivities";
 
 //Validate email address from input to show a warning if something went Wrong
 function validateEmail(email: string) {
@@ -279,7 +279,6 @@ export class FollowingPage extends React.Component<any, FollowingState> {
 
         this.getUserInformation();
 
-        this.getLastActivities = this.getLastActivities.bind(this);
         this.handleBlockClick = this.handleBlockClick.bind(this);
         this.handleFollowClick = this.handleFollowClick.bind(this);
     }
@@ -297,10 +296,6 @@ export class FollowingPage extends React.Component<any, FollowingState> {
         this.abortController.abort()
     }
 
-    componentDidMount() {
-        //get most recent activities
-        this.getLastActivities(2);
-    }
 
     getUserInformation() {
         // Fetch user data
@@ -409,31 +404,6 @@ export class FollowingPage extends React.Component<any, FollowingState> {
         }
     }
 
-    // get the X most recent activities for a given user
-    getLastActivities(numberOfActivities: number) {
-        const get_url = BACKEND_URL + "feed/own?offset=0&user=" + this.state.username;
-        fetch(get_url, {
-            method: "GET",
-            headers: {
-                Accepts: "application/json",
-                Authorization: SessionHandler.getAuthToken()
-            },
-            signal: this.abortController.signal
-        }).then((response) => {
-            if (response.ok) {
-                return response.json().then(response => {
-                    const activities = response["activities"];
-                    this.setState({
-                        postData: activities.slice(0, numberOfActivities)
-                    });
-                });
-            }
-        }).catch((error: any) => {
-            if (error.name !== "AbortError") {
-                console.log("Fetch failed:", error);
-            }
-        });
-    }
 
     render() {
 
@@ -441,14 +411,14 @@ export class FollowingPage extends React.Component<any, FollowingState> {
             <section className='main'>
                 <Head/>
                 <div className="section has-background-black-ter">
-
+                        <div className="container">
                         <div className="card is-medium">
                             <div className="card-content">
                                 <div className="media">
                                     <div className="media-left">
                                         <figure className="image is-48x48">
                                             <img src="https://bulma.io/images/placeholders/96x96.png"
-                                                 alt="Placeholder image"/>
+                                                 alt="Placeholder"/>
                                         </figure>
                                     </div>
                                     <div className="media-content">
@@ -500,15 +470,13 @@ export class FollowingPage extends React.Component<any, FollowingState> {
 
                                     <div className="is-divider" data-content="Most Recent Activities"/>
 
-                                    {this.state.postData.map((activity: postData, index: number) => (
-                                        <div className="mb-5" key={index}><ActivityBox ownFeed={this.props.ownFeed}
-                                                                                       postData={activity}/></div>))
-                                    }
+                                    <ProfileActivityContainer username={this.state.username}/>
 
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
                 <Foot/>
             </section>
         )
