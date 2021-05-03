@@ -2,6 +2,7 @@ import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSearch} from "@fortawesome/free-solid-svg-icons";
 import onClickOutside from "react-onclickoutside";
+import FadeIn from 'react-fade-in';
 
 import SearchResult from "./SearchResult";
 import {BACKEND_URL} from "../../App";
@@ -143,7 +144,10 @@ class SearchBar extends React.Component<Props, State> {
                                 </div>
                             </div>
                             :
-                            this.state.searchResults}
+                            <FadeIn transitionDuration={300}>
+                                {this.state.searchResults}
+                            </FadeIn>
+                        }
                     </div>
                 </div>
             </div>
