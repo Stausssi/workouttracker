@@ -7,6 +7,7 @@ import CommentContainer from "../comments/CommentContainer";
 import SessionHandler from "../../utilities/SessionHandler";
 import {BACKEND_URL} from "../../App";
 import {Formatter} from "../../utilities/Formatter";
+import {Link} from "react-router-dom";
 
 // Define title and formatting function for every data entry
 export const activityInfo = {
@@ -179,7 +180,7 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
                             <p className="title is-4">{props.sport}</p>
                             <p className="subtitle is-6">
                                 <time>{Formatter.formatDateTime(new Date(Date.parse(String(props.addedAt))))}</time>
-                                {this.props.ownFeed ? "" : " - " + props.username}
+                                {this.props.ownFeed ? "" : <> -  @<Link to={`/users/${props.username}`}>{props.username}</Link></>}
                             </p>
                         </div>
                         <div className="field has-addons">
