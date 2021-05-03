@@ -7,6 +7,7 @@ import DatePicker from "react-datepicker";
 import NotificationBox from "../components/NotificationBox";
 import {postData} from "../components/Feed/FeedContent";
 import {ProfileActivityContainer} from "../components/profile/ProfileActivities";
+import {Formatter} from "../utilities/Formatter";
 
 //Validate email address from input to show a warning if something went Wrong
 function validateEmail(email: string) {
@@ -461,21 +462,20 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                                         </thead>
                                     <tbody>
                                         <tr>
-                                            <td>{this.state.date.toISOString().slice(0, 10)}</td>
-                                            <td>{this.state.weight}</td>
+                                            <td>{Formatter.formatDate(this.state.date)}</td>
+                                            <td>{this.state.weight} kg</td>
                                             <td>{this.state.email}</td>
                                         </tr>
                                     </tbody>
                                     </table>
-
-                                    <div className="is-divider" data-content="Most Recent Activities"/>
-
-                                    <ProfileActivityContainer username={this.state.username}/>
-
                                 </div>
                             </div>
                         </div>
-                    </div>
+                            <div className="box mt-4">
+                                <div className="is-divider" data-content="Most Recent Activities"/>
+                                <ProfileActivityContainer username={this.state.username}/>
+                            </div>
+                        </div>
                 </div>
                 <Foot/>
             </section>
