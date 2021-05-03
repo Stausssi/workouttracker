@@ -98,7 +98,7 @@ export default class Login extends Component<{}, State> {
                                 <div className="field">
                                     <label className="label">Email or username</label>
                                     <div className="control">
-                                        <input type="email" autoFocus name="email" className="input"
+                                        <input type="email" autoFocus name="email" className="input" autoComplete="username"
                                                placeholder="Enter email"
                                                value={this.state.email} onChange={this.handleChange}/>
                                     </div>
@@ -107,7 +107,7 @@ export default class Login extends Component<{}, State> {
                                 <div className="field">
                                     <label className="label">Password</label>
                                     <div className="control">
-                                        <input type="password" name="password" className="input"
+                                        <input type="password" name="password" className="input" autoComplete="current-password"
                                                placeholder="Enter password"
                                                value={this.state.password} onChange={this.handleChange}/>
                                     </div>

@@ -61,7 +61,7 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
 
         this.state = {
             showThumbsUp: false,
-            thumbsUpCounter: 0
+            thumbsUpCounter: this.props.postData.likes
         }
 
         this.abortController = new AbortController();
@@ -89,8 +89,6 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
                 console.log("Fetch failed:", error);
             }
         });
-
-        this.countThumbs();
 
         // Refresh thumbs every 30s
         this.thumbsRefreshInterval = setInterval(() => {
