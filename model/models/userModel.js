@@ -124,7 +124,7 @@ User.updateProfileInDB = (req, confirmationToken, resMessage) => {
             if (error) {
                 resMessage(error, '');
             } else {
-                resMessage(null, 'PUT resived!')
+                resMessage(null, 'PUT received!')
             }
         });
     } else {

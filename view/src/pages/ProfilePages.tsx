@@ -119,7 +119,7 @@ export class OwnProfile extends React.Component<any, OwnState> {
                     email: ''
                 });
             } else {
-                this.setState({errorMessage: 'Please fill out a valid email'});
+                this.setState({errorMessage: 'Please enter a valid email'});
             }
         }
         //nice put req to parse the data in the DB
@@ -228,7 +228,7 @@ export class OwnProfile extends React.Component<any, OwnState> {
                             <NotificationBox message={this.state.errorMessage} type={"is-danger"} hasDelete={false}/>
 
                             <button
-                                className='input is-black is-outlined'
+                                className='button is-black is-outlined'
                                 type='submit'
                                 onClick={this.handleSubmit}
                             >
