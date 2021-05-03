@@ -39,10 +39,6 @@ export default class Login extends Component<{}, State> {
         event.preventDefault();
 
         if (!(email === '' || pw === '')) {
-            //catch wrong
-
-            //hash Password ?
-
             //sends User credentials to API
 
             fetch(BACKEND_URL + 'login', {
