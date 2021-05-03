@@ -191,7 +191,7 @@ export default class SignUp extends Component<{}, State> {
                                     </div>
                                     <div className="field-body">
                                         <div className="field">
-                                            <input name="username" type="text" className="input"
+                                            <input name="username" type="text" className="input" autoComplete="username"
                                                    placeholder="Enter username"
                                                    value={this.state.username} onChange={this.handleChange}/>
                                         </div>
@@ -247,12 +247,12 @@ export default class SignUp extends Component<{}, State> {
                                     </div>
                                     <div className="field-body">
                                         <div className="field">
-                                            <input name="password1" type="password" className="input"
+                                            <input name="password1" type="password" className="input" autoComplete="new-password"
                                                    placeholder="Enter password"
                                                    value={this.state.password1} onChange={this.handleChange}/>
                                         </div>
                                         <div className="field">
-                                            <input name="password2" type="password" className="input"
+                                            <input name="password2" type="password" className="input" autoComplete="new-password"
                                                    placeholder="Confirm password"
                                                    value={this.state.password2} onChange={this.handleChange}/>
                                         </div>
