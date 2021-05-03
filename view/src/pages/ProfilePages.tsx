@@ -480,7 +480,7 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                             </div>
                         </div>
                         <div className="box mt-4">
-                            <div className="is-divider" data-content="Most Recent Activities"/>
+                            <div className="divider">Most Recent Activities</div>
                             <ProfileActivityContainer username={this.state.username}/>
                         </div>
                     </div>
