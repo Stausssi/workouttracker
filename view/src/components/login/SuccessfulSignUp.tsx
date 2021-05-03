@@ -3,6 +3,7 @@ import React from "react";
 export default class SuccessfulSignup extends React.Component<any, any> {
     render() {
         return (
+            <div className="hero is-fullheight has-background-grey-dark">
             <section className="section">
                 <div className="columns is-centered">
                     <div className="column is-5-tablet is-4-desktop is-3-widescreen">
@@ -16,6 +17,7 @@ export default class SuccessfulSignup extends React.Component<any, any> {
                     </div>
                 </div>
             </section>
+            </div>
         );
     }
 }
