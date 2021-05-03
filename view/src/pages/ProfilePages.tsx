@@ -1,8 +1,10 @@
 import React from 'react';
+import {Helmet} from "react-helmet";
+
 import Head from '../components/Head';
 import Foot from '../components/Foot';
 import SessionHandler from "../utilities/SessionHandler";
-import {BACKEND_URL} from "../App";
+import {BACKEND_URL, PAGE_TITLE} from "../App";
 import DatePicker from "react-datepicker";
 import NotificationBox from "../components/NotificationBox";
 
@@ -168,6 +170,9 @@ export class OwnProfile extends React.Component<any, OwnState> {
     render() {
         return (
             <>
+                <Helmet>
+                    <title>{PAGE_TITLE} | Profile</title>
+                </Helmet>
                 <Head/>
                 <div id="body-content" className="has-background-black-ter hasScrollbar">
                     <div className="container">
@@ -402,6 +407,9 @@ export class FollowingPage extends React.Component<any, FollowingState> {
     render() {
         return (
             <>
+                <Helmet>
+                    <title>{PAGE_TITLE} | {this.state.username}'s profile</title>
+                </Helmet>
                 <Head/>
                 <div id="body-content" className="has-background-black-ter">
                     <div className="container box">

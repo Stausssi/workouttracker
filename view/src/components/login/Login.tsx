@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import NotificationBox from "../NotificationBox";
-import {BACKEND_URL, FRONTEND_URL} from "../../App";
+import {BACKEND_URL, FRONTEND_URL, PAGE_TITLE} from "../../App";
+import {Helmet} from "react-helmet";
 
 interface State {
     email: string,
@@ -88,38 +89,44 @@ export default class Login extends Component<{}, State> {
     //return rendered component
     render() {
         return (
-            <section className="section">
-                <div className="columns is-centered">
-                    <div className="column is-5-tablet is-4-desktop is-3-widescreen">
-                        <form className="box ">
-                            <h3 className="title">Log in</h3>
+            <>
+                <Helmet>
+                    <title>{PAGE_TITLE} | Login</title>
+                </Helmet>
+                <section className="section">
+                    <div className="columns is-centered">
+                        <div className="column is-5-tablet is-4-desktop is-3-widescreen">
+                            <form className="box ">
+                                <h3 className="title">Log in</h3>
 
-                            <div className="field">
-                                <label className="label">Email or username</label>
-                                <div className="control">
-                                    <input type="email" autoFocus name="email" className="input"
-                                           placeholder="Enter email"
-                                           value={this.state.email} onChange={this.handleChange}/>
+                                <div className="field">
+                                    <label className="label">Email or username</label>
+                                    <div className="control">
+                                        <input type="email" autoFocus name="email" className="input"
+                                               placeholder="Enter email"
+                                               value={this.state.email} onChange={this.handleChange}/>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="field">
-                                <label className="label">Password</label>
-                                <div className="control">
-                                    <input type="password" name="password" className="input"
-                                           placeholder="Enter password"
-                                           value={this.state.password} onChange={this.handleChange}/>
+                                <div className="field">
+                                    <label className="label">Password</label>
+                                    <div className="control">
+                                        <input type="password" name="password" className="input"
+                                               placeholder="Enter password"
+                                               value={this.state.password} onChange={this.handleChange}/>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <NotificationBox message={this.state.errorMessage} type={"is-success"} hasDelete={false}/>
+                                <NotificationBox message={this.state.errorMessage} type={"is-danger"}
+                                                 hasDelete={false}/>
 
-                            <button className="button is-primary" onClick={this.handleSubmit}>Sign in</button>
-                            <br/>
-                        </form>
+                                <button className="button is-primary" onClick={this.handleSubmit}>Sign in</button>
+                                <br/>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </>
         );
     }
 }
