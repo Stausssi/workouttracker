@@ -21,8 +21,11 @@ body {
 
 #body-content {
     flex: 1;
-    overflow-y: hidden;
     min-height: 10em;
+    overflow: auto;
+}
+
+.flexColumns {
     display: flex;
     flex-direction: row;
 }

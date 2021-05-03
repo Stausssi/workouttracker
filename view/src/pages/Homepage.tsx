@@ -17,17 +17,13 @@ class Homepage extends React.Component<any, any> {
         return (
             <>
                 <Head/>
-                <div id="body-content">
+                <div id="body-content" className="flexColumns">
                     <div className="mainColumn" id="col-1">
                         <FeedContainer/>
                     </div>
                     <div className="mainColumn" id="col-2">
-                        <div id="calendarcontainer">
-                            <Calendar/>
-                        </div>
-                        <div id="chartscontainer">
-                            <Graphs/>
-                        </div>
+                        <Calendar/>
+                        <Graphs/>
                     </div>
                 </div>
                 <Foot/>
