@@ -67,7 +67,7 @@ exports.get = (request, response) => {
 exports.remove = (request, response) => {
     const activityid = request.body.id //id of event, to identify dataset which will be deleted
     let username = request.username;
-    if (!request.body || isParamMissing([username, eventid])) {
+    if (!request.body || isParamMissing([username, activityid])) {
         response.sendStatus(400)
     } else {
         Activity.remove(activityid, username, (error, data) => {

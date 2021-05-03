@@ -177,7 +177,7 @@ export class OwnProfile extends React.Component<any, OwnState> {
                     <title>{PAGE_TITLE} | Profile</title>
                 </Helmet>
                 <Head/>
-                <div id="body-content" className="has-background-black-ter hasScrollbar">
+                <div id="body-content" className="has-background-grey-dark hasScrollbar">
                     <div className="container">
                         <form className='box'>
                             <p className="is-size-4">Hello {this.state.username},<br/> here you can change your account
@@ -419,8 +419,8 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                     <title>{PAGE_TITLE} | {this.state.username}'s profile</title>
                 </Helmet>
                 <Head/>
-                <div className="section has-background-black-ter">
-                        <div className="container">
+                <div id="body-content" className="has-background-grey-dark hasScrollbar">
+                    <div className="container">
                         <div className="card is-medium">
                             <div className="card-content">
                                 <div className="media">
@@ -468,22 +468,22 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                                             <td><b>E-Mail</b></td>
                                         </tr>
                                         </thead>
-                                    <tbody>
+                                        <tbody>
                                         <tr>
                                             <td>{Formatter.formatDate(this.state.date)}</td>
                                             <td>{this.state.weight} kg</td>
                                             <td>{this.state.email}</td>
                                         </tr>
-                                    </tbody>
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
-                            <div className="box mt-4">
-                                <div className="is-divider" data-content="Most Recent Activities"/>
-                                <ProfileActivityContainer username={this.state.username}/>
-                            </div>
+                        <div className="box mt-4">
+                            <div className="is-divider" data-content="Most Recent Activities"/>
+                            <ProfileActivityContainer username={this.state.username}/>
                         </div>
+                    </div>
                 </div>
                 <Foot/>
             </>
