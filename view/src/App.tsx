@@ -1,4 +1,4 @@
-import {BrowserRouter, Route} from "react-router-dom";
+import {BrowserRouter, Redirect, Route} from "react-router-dom";
 import Homepage from "./pages/Homepage";
 import "./css/App.css";
 import "bulma";
