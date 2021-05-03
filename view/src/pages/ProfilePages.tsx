@@ -432,7 +432,7 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                                             this.state.username !== SessionHandler.getUsername() ?
                                                 <>
                                                     <button
-                                                        className="button is-success"
+                                                        className="button is-success mr-2"
                                                         onClick={this.handleFollowClick}
                                                         disabled={this.state.relationship.blocked}
                                                     >

@@ -34,7 +34,7 @@ export class ProfileActivityBox extends React.Component<ProfileActivityProps, Ac
 
     render() {
         const props = this.props.postData;
-        const image_path = props.sport + '.png';
+        const image_path = "/" + props.sport + '.png';
         return (
             <div className="card">
                 <div className="card-content">
