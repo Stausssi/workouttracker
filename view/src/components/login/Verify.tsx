@@ -31,21 +31,23 @@ export default class Verify extends React.Component<any, State> {
 
     render() {
         return (
-            <section className="section">
-                <div className="columns is-centered">
-                    <div className="column is-5-tablet is-4-desktop is-3-widescreen">
-                        <br/><br/><br/>
-                        <form className="box ">
-                            <p>Your Email was successfully verified!</p>
-                            <p>You can login now!</p>
-                            <br/>
-                            <progress className="progress is-success" value={this.state.progress} max="100">60%
-                            </progress>
-                        </form>
+            <div className="hero is-fullheight has-background-grey-dark">
+                <section className="section">
+                    <div className="columns is-centered">
+                        <div className="column is-5-tablet is-4-desktop is-3-widescreen">
+                            <br/><br/><br/>
+                            <form className="box ">
+                                <p>Your Email was successfully verified!</p>
+                                <p>You can login now!</p>
+                                <br/>
+                                <progress className="progress is-success" value={this.state.progress} max="100">60%
+                                </progress>
+                            </form>
 
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         );
     }
 }
