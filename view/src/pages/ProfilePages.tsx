@@ -169,7 +169,7 @@ export class OwnProfile extends React.Component<any, OwnState> {
         return (
             <>
                 <Head/>
-                <div id="body-content" className="has-background-black-ter">
+                <div id="body-content" className="has-background-black-ter hasScrollbar">
                     <div className="container">
                         <form className='box'>
                             <p className="is-size-4">Hello {this.state.username},<br/> here you can change your account

@@ -18,10 +18,11 @@ class Homepage extends React.Component<any, any> {
             <>
                 <Head/>
                 <div id="body-content" className="flexColumns">
-                    <div className="mainColumn" id="col-1">
+                    <div className="mainColumn hasScrollbar" id="col-1">
                         <FeedContainer/>
                     </div>
-                    <div className="mainColumn" id="col-2">
+                    <div className="is-divider-vertical px-2 m-0" />
+                    <div className="mainColumn hasScrollbar" id="col-2">
                         <Calendar/>
                         <Graphs/>
                     </div>
