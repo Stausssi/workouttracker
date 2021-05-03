@@ -1,4 +1,4 @@
-import {BrowserRouter, Route} from "react-router-dom";
+import {BrowserRouter, Redirect, Route} from "react-router-dom";
 import Homepage from "./pages/Homepage";
 import "./css/App.css";
 import "bulma";
@@ -36,17 +36,17 @@ export default class App extends Component<Props, State> {
                         <Route exact path="/" component={SessionHandler.isLoggedIn() ? Homepage : LoginContainer}/>
                         <Route exact path="/dev" component={Homepage}/>
                         <ProtectedRoute exact path="/login" component={LoginContainer}
-                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                                        AuthenticationFunction={SessionHandler.isNotLoggedIn}/>
                         <ProtectedRoute exact path="/sign-up" component={LoginContainer}
-                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                                        AuthenticationFunction={SessionHandler.isNotLoggedIn}/>
                         <ProtectedRoute exact path="/verify" component={Verify}
-                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                                        AuthenticationFunction={SessionHandler.isNotLoggedIn}/>
                         <ProtectedRoute exact path="/successful-signup" component={SuccessfulSignup}
-                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                                        AuthenticationFunction={SessionHandler.isNotLoggedIn}/>
                         <ProtectedRoute exact path="/profile" component={OwnProfile}
-                                        AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
+                                        AuthenticationFunction={SessionHandler.isLoggedIn}/>
                         <ProtectedRoute exact path="/users/:username" component={FollowingPage}
-                                        AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
+                                        AuthenticationFunction={SessionHandler.isLoggedIn}/>
                     </div>
                 </div>
             </BrowserRouter>
