@@ -7,6 +7,9 @@ import SessionHandler from "../utilities/SessionHandler";
 import {BACKEND_URL, PAGE_TITLE} from "../App";
 import DatePicker from "react-datepicker";
 import NotificationBox from "../components/NotificationBox";
+import {postData} from "../components/Feed/FeedContent";
+import {ProfileActivityContainer} from "../components/profile/ProfileActivities";
+import {Formatter} from "../utilities/Formatter";
 
 //Validate email address from input to show a warning if something went Wrong
 function validateEmail(email: string) {
@@ -257,6 +260,7 @@ interface FollowingState {
     dateChange: Boolean,
     weight: number | string,
     relationship: any
+    postData: postData[] | [],
 }
 
 export class FollowingPage extends React.Component<any, FollowingState> {
@@ -273,7 +277,8 @@ export class FollowingPage extends React.Component<any, FollowingState> {
             dateChange: false,
             weight: '',
             email: '',
-            relationship: {}
+            relationship: {},
+            postData: [],
         };
 
         this.abortController = new AbortController();
@@ -296,6 +301,7 @@ export class FollowingPage extends React.Component<any, FollowingState> {
     componentWillUnmount() {
         this.abortController.abort()
     }
+
 
     getUserInformation() {
         // Fetch user data
@@ -404,58 +410,80 @@ export class FollowingPage extends React.Component<any, FollowingState> {
         }
     }
 
+
     render() {
+
         return (
             <>
                 <Helmet>
                     <title>{PAGE_TITLE} | {this.state.username}'s profile</title>
                 </Helmet>
                 <Head/>
-                <div id="body-content" className="has-background-black-ter">
-                    <div className="container box">
-                        <p className="is-size-4">This is the page from {this.state.username},<br/> here you can see
-                            some
-                            general information</p>
-                        <div className='field'>
-                            <label className="label">Firstname</label>
-                            <p>{this.state.firstname}</p>
+                <div className="section has-background-black-ter">
+                        <div className="container">
+                        <div className="card is-medium">
+                            <div className="card-content">
+                                <div className="media">
+                                    <div className="media-left">
+                                        <figure className="image is-48x48">
+                                            <img src="https://bulma.io/images/placeholders/96x96.png"
+                                                 alt="Placeholder"/>
+                                        </figure>
+                                    </div>
+                                    <div className="media-content">
+                                        <p className="title is-4">{this.state.firstname} {this.state.lastname}</p>
+                                        <p className="subtitle is-6">@{this.state.username}</p>
+
+                                    </div>
+
+                                    <div className="field has-addons">
+                                        {
+                                            this.state.username !== SessionHandler.getUsername() ?
+                                                <>
+                                                    <button
+                                                        className="button is-success mr-2"
+                                                        onClick={this.handleFollowClick}
+                                                        disabled={this.state.relationship.blocked}
+                                                    >
+                                                        {(this.state.relationship.following ? "Unf" : "F") + "ollow"}
+                                                    </button>
+                                                    <button
+                                                        className="button is-danger"
+                                                        onClick={this.handleBlockClick}
+                                                    >
+                                                        {(this.state.relationship.hasBlocked ? "Unb" : "B") + "lock"}
+                                                    </button>
+                                                </> :
+                                                <></>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div className="content">
+                                    <table className="table">
+                                        <thead>
+                                        <tr>
+                                            <td><b>Date of Birth</b></td>
+                                            <td><b>Weight</b></td>
+                                            <td><b>E-Mail</b></td>
+                                        </tr>
+                                        </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{Formatter.formatDate(this.state.date)}</td>
+                                            <td>{this.state.weight} kg</td>
+                                            <td>{this.state.email}</td>
+                                        </tr>
+                                    </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                        <div className='field'>
-                            <label className="label">Lastname</label>
-                            <p>{this.state.lastname}</p>
+                            <div className="box mt-4">
+                                <div className="is-divider" data-content="Most Recent Activities"/>
+                                <ProfileActivityContainer username={this.state.username}/>
+                            </div>
                         </div>
-                        <div className='field'>
-                            <label className="label">Date of Birth</label>
-                            <p>{this.state.date.toISOString().slice(0, 10)}</p>
-                        </div>
-                        <div className='field'>
-                            <label className="label">Weight</label>
-                            <p>{this.state.weight}</p>
-                        </div>
-                        <div className='field'>
-                            <label className="label">e-mail</label>
-                            <p>{this.state.email}</p>
-                        </div>
-                    </div>
-                    {
-                        this.state.username !== SessionHandler.getUsername() ?
-                            <>
-                                <button
-                                    className="button is-success"
-                                    onClick={this.handleFollowClick}
-                                    disabled={this.state.relationship.blocked}
-                                >
-                                    {(this.state.relationship.following ? "Unf" : "F") + "ollow"}
-                                </button>
-                                <button
-                                    className="button is-danger"
-                                    onClick={this.handleBlockClick}
-                                >
-                                    {(this.state.relationship.hasBlocked ? "Unb" : "B") + "lock"}
-                                </button>
-                            </> :
-                            <></>
-                    }
                 </div>
                 <Foot/>
             </>

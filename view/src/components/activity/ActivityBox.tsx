@@ -9,7 +9,7 @@ import {BACKEND_URL} from "../../App";
 import {Formatter} from "../../utilities/Formatter";
 
 // Define title and formatting function for every data entry
-const activityInfo = {
+export const activityInfo = {
     distance: { // db unit: Meters
         title: 'Distance',
         format: (distanceInMeters: number) => Formatter.format_MeterKilometer(distanceInMeters)
@@ -45,7 +45,7 @@ interface ActivityProps {
     ownFeed: boolean
 }
 
-interface ActivityState {
+export interface ActivityState {
     showThumbsUp: boolean,
     thumbsUpCounter: number
 }
@@ -215,7 +215,7 @@ interface TableProps {
 }
 
 //displays an activity table inside an activity feed box
-class ActivityTable extends React.Component<TableProps, {}> {
+export class ActivityTable extends React.Component<TableProps, {}> {
     constructor(props: TableProps) {
         super(props);
 

@@ -5,6 +5,7 @@ import ActivityModal from "./activity/ActivityModal";
 import {Link} from "react-router-dom";
 import SessionHandler from "../utilities/SessionHandler";
 import NewLogo from "../img/Logo.png";
+import React from "react";
 
 //Head of React app. Used on every page. Integration of Modal to create Activity and Search
 
@@ -17,36 +18,48 @@ export const Head = () => (
                 </div>
             </div>
             <div className="navbar-end">
-                <div className="navbar-item">
-                    <SearchBar/>
-                </div>
-                <Link className="navbar-item" to="/">
-                    <span className="icon">
-                        <FontAwesomeIcon icon={faHome}/>
-                    </span>
-                    <div>Home</div>
-                </Link>
-                <Link className="navbar-item" to="/profile">
-                    <span className="icon">
-                        <FontAwesomeIcon icon={faUser}/>
-                    </span>
-                    <div>Profile</div>
-                </Link>
-                <div className="navbar-item">
-                    <ActivityModal/>
-                </div>
-                <span className="navbar-item">
-                    <Link
-                        className="button is-primary is-inverted"
-                        to={"/login"}
-                        onClick={() => SessionHandler.logOut()}>
-
+                {SessionHandler.isLoggedIn() ?
+                    <>
+                        <div className="navbar-item">
+                            <SearchBar/>
+                        </div>
+                        <Link className="navbar-item" to="/">
                         <span className="icon">
-                            <FontAwesomeIcon icon={faSignInAlt}/>
+                            <FontAwesomeIcon icon={faHome}/>
                         </span>
-                        <span>Logout</span>
-                    </Link>
-                </span>
+                            <div>Home</div>
+                        </Link>
+                        <Link className="navbar-item" to="/profile">
+                        <span className="icon">
+                            <FontAwesomeIcon icon={faUser}/>
+                        </span>
+                            <div>Profile</div>
+                        </Link>
+                        <div className="navbar-item">
+                            <ActivityModal/>
+                        </div>
+                        <span className="navbar-item">
+                        <Link
+                            className="button is-primary is-inverted"
+                            to={"/login"}
+                            onClick={() => SessionHandler.logOut()}>
+
+                            <span className="icon">
+                                <FontAwesomeIcon icon={faSignInAlt}/>
+                            </span>
+                            <span>Logout</span>
+                        </Link>
+                    </span>
+                    </> :
+                    <div className="navbar-end">
+                        <div className="navbar-item">
+                            <div className="buttons">
+                                <Link className="button is-primary" to={"/login"}>Sign in</Link>
+                                <Link className="button is-light" to={"/sign-up"}>Sign up</Link>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </nav>
     </div>

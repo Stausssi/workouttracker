@@ -1,4 +1,4 @@
-import {Redirect, Route, RouteProps} from 'react-router';
+import {Route, Redirect, RouteProps} from 'react-router';
 
 export type ProtectedRouteProps = {
     /*
@@ -30,4 +30,3 @@ export default function ProtectedRoute({
         )
     }
 }
-;
