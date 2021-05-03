@@ -1,4 +1,4 @@
-import {Route, RouteProps} from 'react-router';
+import {Route, Redirect, RouteProps} from 'react-router';
 
 export type ProtectedRouteProps = {
     /*
