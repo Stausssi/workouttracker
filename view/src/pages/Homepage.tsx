@@ -17,7 +17,7 @@ class Homepage extends React.Component<any, any> {
         return (
             <>
                 <Head/>
-                <div id="body-content" className="flexColumns">
+                <div id="body-content" className="flexColumns has-background-grey-dark">
                     <div className="mainColumn hasScrollbar" id="col-1">
                         <FeedContainer/>
                     </div>
