@@ -167,7 +167,7 @@ export default class SearchResult extends React.Component<Props, State> {
                     <div className="control">
                         <Link to={"/users/" + this.props.username}>
                             <input
-                                className="input is-static"
+                                className="input is-static searchResult"
                                 type="text"
                                 value={this.props.username}
                                 readOnly={true}

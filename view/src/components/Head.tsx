@@ -11,7 +11,11 @@ import NewLogo from "../img/Logo.png";
 export const Head = () => (
     <div id="header">
         <nav className="navbar p-2 is-dark">
-            <img src={NewLogo} alt="Logo" width={250}/>
+            <div className="navbar-brand">
+                <div className="navbar-item">
+                    <img src={NewLogo} alt="Logo"/>
+                </div>
+            </div>
             <div className="navbar-end">
                 <div className="navbar-item">
                     <SearchBar/>
