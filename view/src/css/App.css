@@ -62,7 +62,7 @@ body {
     color: #ffffff !important;
 }
 
-a.navbar-item:hover {
+a.navbar-item:hover, a.navbar-item:focus {
     background-color: #292929 !important;
 }
 

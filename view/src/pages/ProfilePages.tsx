@@ -178,7 +178,7 @@ export class OwnProfile extends React.Component<any, OwnState> {
                 </Helmet>
                 <Head/>
                 <div id="body-content" className="has-background-grey-dark hasScrollbar">
-                    <div className="container">
+                    <div className="container mt-5">
                         <form className='box'>
                             <p className="is-size-4">Hello {this.state.username},<br/> here you can change your account
                                 values</p>
@@ -420,7 +420,7 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                 </Helmet>
                 <Head/>
                 <div id="body-content" className="has-background-grey-dark hasScrollbar">
-                    <div className="container">
+                    <div className="container mt-5">
                         <div className="card is-medium">
                             <div className="card-content">
                                 <div className="media">
@@ -436,19 +436,19 @@ export class FollowingPage extends React.Component<any, FollowingState> {
 
                                     </div>
 
-                                    <div className="field has-addons">
+                                    <div className="field has-addons is-flex-wrap-wrap is-justify-content-center">
                                         {
                                             this.state.username !== SessionHandler.getUsername() ?
                                                 <>
                                                     <button
-                                                        className="button is-success mr-2"
+                                                        className="button is-success m-1"
                                                         onClick={this.handleFollowClick}
                                                         disabled={this.state.relationship.blocked}
                                                     >
                                                         {(this.state.relationship.following ? "Unf" : "F") + "ollow"}
                                                     </button>
                                                     <button
-                                                        className="button is-danger"
+                                                        className="button is-danger m-1"
                                                         onClick={this.handleBlockClick}
                                                     >
                                                         {(this.state.relationship.hasBlocked ? "Unb" : "B") + "lock"}

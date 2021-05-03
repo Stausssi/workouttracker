@@ -12,11 +12,7 @@ import React from "react";
 export const Head = () => (
     <div id="header">
         <nav className="navbar p-2 is-dark">
-            <div className="navbar-brand">
-                <div className="navbar-item">
-                    <img src={NewLogo} alt="Logo"/>
-                </div>
-            </div>
+            <img src={NewLogo} alt="Logo" width={250}/>
             <div className="navbar-end">
                 {SessionHandler.isLoggedIn() ?
                     <>
@@ -52,11 +48,11 @@ export const Head = () => (
                     </span>
                     </> :
                     <div className="navbar-end">
-                        <div className="navbar-item">
-                            <div className="buttons">
-                                <Link className="button is-primary" to={"/login"}>Sign in</Link>
-                                <Link className="button is-light" to={"/sign-up"}>Sign up</Link>
-                            </div>
+                        <div className="navbar-item px-1">
+                            <Link className="button is-primary" to={"/login"}>Sign in</Link>
+                        </div>
+                        <div className="navbar-item px-1">
+                            <Link className="button is-light" to={"/sign-up"}>Sign up</Link>
                         </div>
                     </div>
                 }
