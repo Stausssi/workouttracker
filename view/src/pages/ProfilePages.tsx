@@ -12,7 +12,7 @@ function validateEmail(email: string) {
 }
 
 interface OwnState {
-    username: string ,
+    username: string,
     firstname: string,
     lastname: string,
     email: string,
@@ -169,7 +169,7 @@ export class OwnProfile extends React.Component<any, OwnState> {
         return (
             <section className='main'>
                 <Head/>
-                <div className="section has-background-black-ter">
+                <section id="body-content" className="section has-background-black-ter">
                     <div className="container">
                         <form className='box'>
                             <p className="is-size-4">Hello {this.state.username},<br/> here you can change your account
@@ -236,7 +236,7 @@ export class OwnProfile extends React.Component<any, OwnState> {
                             </button>
                         </form>
                     </div>
-                </div>
+                </section>
                 <Foot/>
             </section>
         )
@@ -403,9 +403,10 @@ export class FollowingPage extends React.Component<any, FollowingState> {
         return (
             <section className='main'>
                 <Head/>
-                <div className="section has-background-black-ter">
+                <section id="body-content" className="section has-background-black-ter">
                     <div className="container box">
-                        <p className="is-size-4">This is the page from {this.state.username},<br/> here you can see some
+                        <p className="is-size-4">This is the page from {this.state.username},<br/> here you can see
+                            some
                             general information</p>
                         <div className='field'>
                             <label className="label">Firstname</label>
@@ -447,7 +448,7 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                             </> :
                             <></>
                     }
-                </div>
+                </section>
                 <Foot/>
             </section>
         )
