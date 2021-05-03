@@ -9,7 +9,7 @@ import NewLogo from "../img/Logo.png";
 //Head of React app. Used on every page. Integration of Modal to create Activity and Search
 
 export const Head = () => (
-    <div id="head">
+    <div id="header">
         <nav className="navbar p-2 is-dark">
             <img src={NewLogo} alt="Logo" width={250}/>
             <div className="navbar-end">
@@ -47,4 +47,5 @@ export const Head = () => (
         </nav>
     </div>
 );
+
 export default Head;

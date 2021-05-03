@@ -31,24 +31,20 @@ export default class App extends Component<Props, State> {
             // This BrowserRouter handles the routing of the entire application
             // TODO: Fix router refresh problem, see: https://stackoverflow.com/questions/44943920/react-router-stay-at-the-same-page-after-refresh
             <BrowserRouter>
-                <div className="App">
-                    <div className="children">
-                        <Route exact path="/" component={SessionHandler.isLoggedIn() ? Homepage : LoginContainer}/>
-                        <Route exact path="/dev" component={Homepage}/>
-                        <ProtectedRoute exact path="/login" component={LoginContainer}
-                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
-                        <ProtectedRoute exact path="/sign-up" component={LoginContainer}
-                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
-                        <ProtectedRoute exact path="/verify" component={Verify}
-                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
-                        <ProtectedRoute exact path="/successful-signup" component={SuccessfulSignup}
-                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
-                        <ProtectedRoute exact path="/profile" component={OwnProfile}
-                                        AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
-                        <ProtectedRoute exact path="/users/:username" component={FollowingPage}
-                                        AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
-                    </div>
-                </div>
+                <Route exact path="/" component={SessionHandler.isLoggedIn() ? Homepage : LoginContainer}/>
+                <Route exact path="/dev" component={Homepage}/>
+                <ProtectedRoute exact path="/login" component={LoginContainer}
+                                AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                <ProtectedRoute exact path="/sign-up" component={LoginContainer}
+                                AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                <ProtectedRoute exact path="/verify" component={Verify}
+                                AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                <ProtectedRoute exact path="/successful-signup" component={SuccessfulSignup}
+                                AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                <ProtectedRoute exact path="/profile" component={OwnProfile}
+                                AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
+                <ProtectedRoute exact path="/users/:username" component={FollowingPage}
+                                AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
             </BrowserRouter>
         );
     }

@@ -167,9 +167,9 @@ export class OwnProfile extends React.Component<any, OwnState> {
 
     render() {
         return (
-            <section className='main'>
+            <>
                 <Head/>
-                <section id="body-content" className="section has-background-black-ter">
+                <div id="body-content" className="has-background-black-ter">
                     <div className="container">
                         <form className='box'>
                             <p className="is-size-4">Hello {this.state.username},<br/> here you can change your account
@@ -236,9 +236,9 @@ export class OwnProfile extends React.Component<any, OwnState> {
                             </button>
                         </form>
                     </div>
-                </section>
+                </div>
                 <Foot/>
-            </section>
+            </>
         )
     }
 }
@@ -401,9 +401,9 @@ export class FollowingPage extends React.Component<any, FollowingState> {
 
     render() {
         return (
-            <section className='main'>
+            <>
                 <Head/>
-                <section id="body-content" className="section has-background-black-ter">
+                <div id="body-content" className="has-background-black-ter">
                     <div className="container box">
                         <p className="is-size-4">This is the page from {this.state.username},<br/> here you can see
                             some
@@ -448,9 +448,9 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                             </> :
                             <></>
                     }
-                </section>
+                </div>
                 <Foot/>
-            </section>
+            </>
         )
     }
 }

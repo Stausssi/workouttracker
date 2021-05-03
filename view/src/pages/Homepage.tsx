@@ -15,13 +15,13 @@ class Homepage extends React.Component<any, any> {
 
     render() {
         return (
-            <section className='main'>
+            <>
                 <Head/>
-                <section id="body-content">
-                    <div id="col-1">
+                <div id="body-content">
+                    <div className="mainColumn" id="col-1">
                         <FeedContainer/>
                     </div>
-                    <div id="col-2">
+                    <div className="mainColumn" id="col-2">
                         <div id="calendarcontainer">
                             <Calendar/>
                         </div>
@@ -29,9 +29,9 @@ class Homepage extends React.Component<any, any> {
                             <Graphs/>
                         </div>
                     </div>
-                </section>
+                </div>
                 <Foot/>
-            </section>
+            </>
         )
     }
 }

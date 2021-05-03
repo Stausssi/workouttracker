@@ -1,53 +1,47 @@
 @import "~@creativebulma/bulma-divider";
 
-.main {
+html {
+    background-color: #202028 !important;
+    height: 100%;
+    text-align: center;
+    overflow: hidden !important;
+}
+
+body {
+    height: 100%;
+    min-height: 20em;
+}
+
+#root {
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 #body-content {
-    height: 85%;
+    flex: 1;
+    overflow-y: hidden;
+    min-height: 10em;
+    display: flex;
+    flex-direction: row;
 }
 
-body > #root > div {
-    height: 100vh;
+.mainColumn {
+    flex: 1;
+    overflow-y: scroll;
+    background-color: #4e4e4e;
+    color: white;
 }
 
-html {
-    overflow-y: hidden !important;
+#header {
+    flex: 0;
 }
 
-.App,
-.children {
-    background-color: #202028 !important;
-    text-align: center;
-    height: 100%;
-    overflow-y: hidden !important;
-}
-
-.footer {
+#footer {
+    flex: 0;
     background-color: #0d0d15 !important;
     color: white;
-}
-
-#col-1 {
-    width: 50%;
-    float: left;
-    height: 100%;
-    background-color: #4e4e4e;
-    overflow-y: scroll;
-    color: white;
-    min-height: 0;
-}
-
-#col-2 {
-    width: 50%;
-    float: left;
-    height: 100%;
-    background-color: #4a4a4a;
-    overflow-y: scroll;
-    color: white;
-    min-height: 0;
 }
 
 .fc-popover {
