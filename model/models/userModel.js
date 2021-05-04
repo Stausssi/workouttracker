@@ -23,7 +23,6 @@ User.create = (newUser, status) => {
             console.log("error: ", error);
             status(error, false);
         } else {
-            console.log("created user: ", {newUser});
             status(error, true);
         }
     });
@@ -43,11 +42,9 @@ User.exists = (newUser, user_exists) => {
         } else {
             if (typeof (results[0]) == "undefined") {
                 //results are empty
-                console.log("Signup: User " + newUser.username + " / " + newUser.email + " does not exist");
                 user_exists(null, false);
             } else {
                 //a user with the corresponding username/ email was found!
-                console.log("Signup: User " + newUser.username + " / " + newUser.email + " does already exist");
                 user_exists(null, true);
             }
         }

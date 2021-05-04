@@ -5,11 +5,11 @@ const bcrypt = require("bcryptjs");
 const mail = require("../utilities/mail/confirmationEmail");
 const tokenGeneration = require("../utilities/authentication/AccessTokenSecret.config");
 const {isParamMissing, basicSuccessErrorHandling} = require("../utilities/misc");
+const {validateName,validateEmail,validateUsername,validatePassword} = require("../utilities/RegexValidator");
 
 //creates a new user if the email/username doesn't already exist
 exports.signup = (req, res) => {
-    //validate request --> add more checks !!!!!!!!!!!!!!!!!!!!!!!!!!
-    // console.log(req.body);
+
     let username = req.body.username;
     let password = req.body.password;
     let firstname = req.body.firstname;
@@ -18,9 +18,20 @@ exports.signup = (req, res) => {
     let weight = req.body.weight;
     let email = req.body.email;
 
+
     if (isParamMissing([req.body, username, password, firstname, lastname, date, weight, email])) {
         res.sendStatus(400);
     } else {
+
+        // validate firstname, lastname, username, email, password
+        const firstBool = validateEmail(email) && validatePassword(password) && validateUsername(username);
+        const secondBool = validateName(firstname) && validateName(lastname);
+
+        if(!(firstBool && secondBool)){
+            res.sendStatus(400);
+            return;
+        }
+
         //create a user object
         const newUser = new User({
             username: username,
