@@ -10,6 +10,8 @@ import NotificationBox from "../components/NotificationBox";
 import {postData} from "../components/Feed/FeedContent";
 import {ProfileActivityContainer} from "../components/profile/ProfileActivities";
 import {Formatter} from "../utilities/Formatter";
+import {Redirect} from "react-router";
+import {BrowserRouter} from "react-router-dom";
 
 //Validate email address from input to show a warning if something went Wrong
 function validateEmail(email: string) {
@@ -318,12 +320,40 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                 // Examine the text in the response
                 response.json().then((data) => {
                     this.setState({
-                        firstname: data[0].firstname ? data[0].firstname : this.state.firstname,
-                        lastname: data[0].lastname ? data[0].lastname : this.state.lastname,
-                        date: data[0].date ? new Date(data[0].date) : this.state.date,
-                        weight: data[0].weight ? data[0].weight : this.state.weight,
-                        email: data[0].email ? data[0].email : this.state.email
+                        firstname: data[0].firstname,
+                        lastname: data[0].lastname,
+                        date: new Date(data[0].date),
+                        weight: data[0].weight,
+                        email: data[0].email
+                    }, () => {
+
+                        // Get their relationship
+                        fetch(BACKEND_URL + "users/getRelationship?user=" + this.state.username, {
+                            method: "GET",
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json',
+                                Authorization: SessionHandler.getAuthToken()
+                            },
+                            signal: this.abortController.signal
+                        }).then((response) => {
+                            if (response.ok) {
+                                response.json().then((response) => this.setState({
+                                    relationship: response
+                                }));
+                            }
+                        }).catch((error: any) => {
+                            // Don't react to 'AbortError's
+                            if (error.name !== "AbortError") {
+                                console.log(error);
+                            }
+                        });
                     });
+                });
+            } else if (response.status === 404) {
+                this.props.history.push({
+                    pathname: "/NotFound",
+                    state: { username: this.state.username }
                 });
             } else {
                 console.log('Looks like there was a problem. Status Code: ', response.status);
@@ -335,27 +365,6 @@ export class FollowingPage extends React.Component<any, FollowingState> {
             }
         });
 
-        // Get their relationship
-        fetch(BACKEND_URL + "users/getRelationship?user=" + this.state.username, {
-            method: "GET",
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: SessionHandler.getAuthToken()
-            },
-            signal: this.abortController.signal
-        }).then((response) => {
-            if (response.ok) {
-                response.json().then((response) => this.setState({
-                    relationship: response
-                }));
-            }
-        }).catch((error: any) => {
-            // Don't react to 'AbortError's
-            if (error.name !== "AbortError") {
-                console.log(error);
-            }
-        });
     }
 
     handleBlockClick(event: any) {
@@ -413,7 +422,6 @@ export class FollowingPage extends React.Component<any, FollowingState> {
 
 
     render() {
-
         return (
             <>
                 <Helmet>
@@ -488,6 +496,6 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                 </div>
                 <Foot/>
             </>
-        )
+        );
     }
 }

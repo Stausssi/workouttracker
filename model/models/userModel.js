@@ -92,7 +92,7 @@ User.selectProfileData = (req, profileData) => {
         if (error) {
             profileData(error, "{}");
         } else {
-            profileData(null, JSON.stringify(rows));
+            profileData(null, rows);
         }
     });
 }

@@ -12,6 +12,8 @@ import Verify from "./components/login/Verify";
 import SuccessfulSignup from "./components/login/SuccessfulSignUp";
 import {OwnProfile, FollowingPage} from "./pages/ProfilePages";
 import {Helmet} from "react-helmet";
+import NotFound from "./pages/NotFound";
+import {Switch} from "react-router";
 
 interface Props {
 }
@@ -38,20 +40,25 @@ export default class App extends Component<Props, State> {
                     <title>{PAGE_TITLE}</title>
                 </Helmet>
                 <BrowserRouter>
-                    <Route exact path="/" component={SessionHandler.isLoggedIn() ? Homepage : LoginContainer}/>
-                    <Route exact path="/dev" component={Homepage}/>
-                    <ProtectedRoute exact path="/login" component={LoginContainer}
-                                    AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
-                    <ProtectedRoute exact path="/sign-up" component={LoginContainer}
-                                    AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
-                    <ProtectedRoute exact path="/verify" component={Verify}
-                                    AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
-                    <ProtectedRoute exact path="/successful-signup" component={SuccessfulSignup}
-                                    AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
-                    <ProtectedRoute exact path="/profile" component={OwnProfile}
-                                    AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
-                    <ProtectedRoute exact path="/users/:username" component={FollowingPage}
-                                    AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
+                    <Switch>
+                        <Route exact path="/" component={SessionHandler.isLoggedIn() ? Homepage : LoginContainer}/>
+                        <Route exact path="/dev" component={Homepage}/>
+                        <ProtectedRoute exact path="/login" component={LoginContainer}
+                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                        <ProtectedRoute exact path="/sign-up" component={LoginContainer}
+                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                        <ProtectedRoute exact path="/verify" component={Verify}
+                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                        <ProtectedRoute exact path="/successful-signup" component={SuccessfulSignup}
+                                        AuthenticationFunction={SessionHandler.isNotLoggedIn} redirectPath={"/"}/>
+                        <ProtectedRoute exact path="/profile" component={OwnProfile}
+                                        AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
+                        <ProtectedRoute exact path="/users/:username" component={FollowingPage}
+                                        AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
+                        <ProtectedRoute path="/NotFound" component={NotFound}
+                                        AuthenticationFunction={SessionHandler.isLoggedIn} redirectPath={"/"}/>
+                        <Route component={NotFound}/>
+                    </Switch>
                 </BrowserRouter>
             </>
         );

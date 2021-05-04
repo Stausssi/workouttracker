@@ -133,7 +133,11 @@ exports.getInformation = (req, res) => {
             console.log(error);
             res.sendStatus(500);
         } else {
-            res.status(200).send(profileData);
+            if (profileData.length > 0) {
+                res.status(200).send(profileData);
+            } else {
+                res.sendStatus(404);
+            }
         }
     });
 }
