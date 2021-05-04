@@ -165,7 +165,7 @@ export default class SearchResult extends React.Component<Props, State> {
             <div className="dropdown-item">
                 <div className="field has-addons">
                     <div className="control">
-                        <Link to={"/users/" + this.props.username}>
+                        <Link to={"/users/" + encodeURIComponent(this.props.username)}>
                             <input
                                 className="input is-static searchResult"
                                 type="text"
