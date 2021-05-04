@@ -4,15 +4,7 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import {BACKEND_URL, FRONTEND_URL, PAGE_TITLE} from "../../App";
 import {Helmet} from "react-helmet";
-
-function validateEmail(email: string) {
-    return /^[^@]+@\w+(\.\w+)+\w$/.test(email);
-}
-
-function validatePassword(password: string) {
-    // regex for: min 8 letter password, with at least a symbol, upper and lower case letters and a number
-    return /^(?=.*\d)(?=.*[!@#$%^&_*-])(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(password);
-}
+import {RegexValidator} from "../../utilities/RegexValidator"
 
 interface State {
     firstname: string,
@@ -78,16 +70,16 @@ export default class SignUp extends Component<{}, State> {
 
         if (!(email === '' || pw1 === '' || pw2 === '' || firstname === '' || lastname === '' || username === '' || weight === 0 || !this.state.dateChange)) {
             //all inputs must be filled
-            if (firstname.length <= 30 && lastname.length <= 30) {
+            if (RegexValidator.validateName(firstname) && RegexValidator.validateName(lastname)) {
                 //firstname/Lastname max 30 characters
-                if (username.length <= 20) {
+                if (RegexValidator.validateUsername(username)) {
                     //username max 20 characters
-                    if (validateEmail(email)) {
+                    if (RegexValidator.validateEmail(email)) {
                         //email must have correct form
-                        if (weight >= 10 && weight <= 250) {
+                        if (weight >= 10 && weight <= 400) {
                             if (pw1 === pw2) {
                                 //the passwords must be equal
-                                if (validatePassword(pw1)) {
+                                if (RegexValidator.validatePassword(pw1)) {
                                     // password must have at least 8 letters, a symbol, upper case letters and a number
 
                                     // set date to date string
@@ -120,14 +112,14 @@ export default class SignUp extends Component<{}, State> {
                                                 window.location.href = FRONTEND_URL + "successful-signup";
                                             } else {
                                                 //update error message: --> no success
-                                                this.setNotification("The given username or email already exist!");
+                                                this.setNotification("The given username or email already exists!");
                                             }
                                         } else {
                                             this.setNotification("A server error occurred!");
                                         }
                                     });
                                 } else {
-                                    this.setNotification('Your password must have at least 8 letters, a symbol, upper case letters and a number');
+                                    this.setNotification('Your password must have at least 8 letters, a symbol, an upper case letter and a number');
                                 }
                             } else {
                                 this.setNotification('The passwords must be equal!');
@@ -139,10 +131,10 @@ export default class SignUp extends Component<{}, State> {
                         this.setNotification('Please enter a correct email!');
                     }
                 } else {
-                    this.setNotification('The username must have 20 characters or less');
+                    this.setNotification('The username must have max. 20 alphanumeric characters or ( - , _ )');
                 }
             } else {
-                this.setNotification('The firstname/lastname must have 30 characters or less');
+                this.setNotification('The firstname/lastname must have 30 alphanumeric characters or less');
             }
         } else {
             this.setNotification('Please fill out every field!');
