@@ -1,15 +1,13 @@
 const Event = require("../../model/models/calendarModel");
 const {isParamMissing} = require("../utilities/misc");
 
-exports.get = (request, response) => {
-    //find events which belonged to currently logged user
+exports.get = (request, response) => {  //find events which belonged to currently logged user
     let username = request.username;
     if (isParamMissing([username])) { //return Bad Request if user is missing
         request.sendStatus(400)
     } else {
         Event.get(username, (error, data) => {
             if (error) {
-                console.log(error);
                 response.sendStatus(500)
             } else {
                 response.status(200).send({body: JSON.stringify(data)});  //return events if sql request has succeeded
@@ -43,9 +41,9 @@ exports.create = (request, response) => {
     }
 };
 
-//remove event from DB
+//Remove event from DB
 exports.remove = (request, response) => {
-    const eventId = request.body.id //id of event, to identify dataset which will be deleted
+    const eventId = request.body.id //id of event which will be deleted
     let username = request.username;
     if (!request.body || isParamMissing([username, eventId])) {
         response.sendStatus(400)
