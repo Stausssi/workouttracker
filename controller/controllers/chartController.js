@@ -10,7 +10,6 @@ exports.get = (request, response) => {
     } else {
         Chart.getAll(username, (error, charts) => {
             if (error) {
-                console.error(error);
                 response.sendStatus(500)
             } else {
                 response.status(200).send({body: JSON.stringify(charts)});
@@ -32,7 +31,6 @@ exports.getDataset = (request, response) => {
         if (sqlfunc === "sum") {    //get datasets with sql function sum
             Data.getAmount(category, sport, year, username, (error, data) => {
                 if (error) {
-                    console.error(error);
                     response.sendStatus(500)
                 } else {
                     response.status(200).send({body: JSON.stringify(data)});
@@ -41,7 +39,6 @@ exports.getDataset = (request, response) => {
         } else if (sqlfunc === "avg") { //get datasets with sql function avg
             Data.getAverage(category, sport, year, username, (error, data) => {
                 if (error) {
-                    console.error(error);
                     response.sendStatus(500)
                 } else {
                     response.status(200).send({body: JSON.stringify(data)});

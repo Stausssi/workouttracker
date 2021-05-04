@@ -46,8 +46,8 @@ export default class FullCalendar extends React.Component<Props, State> {
         this.abortController = new AbortController();
     }
 
+    //open and close modal
     action = () => {
-        //open and close modal
         let active = !this.state.active;
         if (active) {
             this.setState(() => ({active: active}));
@@ -57,7 +57,6 @@ export default class FullCalendar extends React.Component<Props, State> {
     };
 
     componentDidMount() {
-        // init calendar and render events on mount
         this.initCalendar();
         this.getEvents();
     }
@@ -66,45 +65,38 @@ export default class FullCalendar extends React.Component<Props, State> {
         this.abortController.abort();
     }
 
+    //create calendar
     initCalendar() {
-        //create calendar
-        if (typeof this.calendar !== "undefined") {
-            //check if calendar already exists. If exits: destroy old calendar and create new
+        if (typeof this.calendar !== "undefined") {                 //check if calendar already exists. If exits: destroy old calendar and create new
             this.calendar.destroy();
         }
         const canvas = document.getElementById("calendarFull") as HTMLCanvasElement; //get Canvas Element where Calendar will be displayed
         this.calendar = new Calendar(canvas, {
-            //configure calendar
             initialView: "dayGridMonth", //set initial view (Month view)
             firstDay: 1, //set first day on Monday
             dayMaxEvents: 2, //set max events to show per day. Other events display in popup
             timeZone: "local",
-            headerToolbar: {
-                //set buttons for navigations/change views
+            headerToolbar: {        //set buttons for navigations/change views
                 left: "prev,next",
                 center: "title",
                 right: "today", //today (to display month of actual day. Disabled if actual month is already displayed)
             },
-            eventTimeFormat: {
-                //event time format
+            eventTimeFormat: {      //event time format
                 hour: "2-digit",
                 minute: "2-digit", //Display time as e.g. 05:04 instead of 5:4
                 hour12: false, //24h Format
             },
-            slotLabelFormat: {
-                //calendar view time format
+            slotLabelFormat: {   //calendar view time format
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: false,
             },
             defaultAllDay: true,
             plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin], //add plugins to fullcalendar
-            //height: "600px", //set height for table
-            contentHeight: "auto",
-            selectable: true, //enable selection of dates
+            contentHeight: "auto",        
+            selectable: true,           //enable selection of dates
             select: (info) => this.create(info), //Open create function on select date range
-            eventDidMount: (element) => {
-                // add delete button to events
+            eventDidMount: (element) => {       // add delete button to events
                 let deleteButton = document.createElement("button");
                 deleteButton.onclick = () => this.removeEvent(element); //remove event
                 deleteButton.className = "delete";
@@ -114,14 +106,14 @@ export default class FullCalendar extends React.Component<Props, State> {
         this.calendar.render(); //render calendar on document
     }
 
+    //Get selected dates and open modal to set title of new event
     create(info: any) {
-        //Get selected dates and open modal to set title of new event
         this.setState({startDate: info.startStr, endDate: info.endStr});
         this.action();
     }
 
+    //create event
     createEvent() {
-        //create event
         if (this.state.title && this.state.title !== "") {
             const event = {
                 title: this.state.title,
@@ -137,6 +129,7 @@ export default class FullCalendar extends React.Component<Props, State> {
         }
     }
 
+    //get activities as events
     getActivity() {
         fetch(BACKEND_URL + "activity/get", {
             method: "GET",
@@ -150,7 +143,7 @@ export default class FullCalendar extends React.Component<Props, State> {
                 let activityEvents: any[] = [];
                 return response.json().then((response) => {
                     let posts = JSON.parse(response.body);
-                    posts.map((item: any) => {
+                    posts.map((item: any) => {                  //get end date of activity with duration and format result
                         let end = moment(item.startedAt)
                             .add(item.duration, "seconds")
                             .format("YYYY-MM-DD HH:mm:ss");
@@ -162,10 +155,10 @@ export default class FullCalendar extends React.Component<Props, State> {
                             groupId: "activityEvents",
                             color: "green",
                         };
-                        activityEvents.push(event);
+                        activityEvents.push(event);     //add activities to array
                         return event;
                     });
-                    this.calendar?.addEventSource(activityEvents); //add new events
+                    this.calendar?.addEventSource(activityEvents); //add array as event source
                 });
             } else {
                 return response.json().then((response) => {
@@ -176,8 +169,8 @@ export default class FullCalendar extends React.Component<Props, State> {
         });
     }
 
+    //get events from DB
     getEvents() {
-        //get events from DB
         fetch(BACKEND_URL + "events/get", {
             method: "GET",
             headers: {
@@ -200,8 +193,8 @@ export default class FullCalendar extends React.Component<Props, State> {
         });
     }
 
+    //Add new event to database
     setEvents(data: any) {
-        //Add new event to DB
         fetch(BACKEND_URL + "events/add", {
             method: "POST",
             headers: {
@@ -213,7 +206,6 @@ export default class FullCalendar extends React.Component<Props, State> {
             signal: this.abortController.signal,
         }).then((response) => {
             if (!response.ok) {
-                //if error on add event, display error message
                 return response.json().then((response) => {
                     console.error(
                         "Event could not be added to database. Please contact an administrator for more information. Error is: " +
@@ -226,11 +218,11 @@ export default class FullCalendar extends React.Component<Props, State> {
         });
     }
 
+    //remove event from database
     removeEvent(element: any) {
         if (element.event.groupId === "activityEvents") {
             element.event.remove(); //remove on frontend
-            fetch(BACKEND_URL + "activity/remove", {
-                //remove an activity from DB
+            fetch(BACKEND_URL + "activity/remove", {        //remove an activity from database
                 method: "DELETE",
                 headers: {
                     accept: "application/json",
@@ -240,17 +232,15 @@ export default class FullCalendar extends React.Component<Props, State> {
                 body: JSON.stringify({id: element.event.id}),
                 signal: this.abortController.signal,
             }).then((response) => {
-                //Displays information message on console
                 if (response.ok) {
-                    SessionHandler.setRefreshFeed(true);
+                    SessionHandler.setRefreshFeed(true);        //Update frontend
                 } else {
                     console.error("Delete request has failed");
                 }
             });
         } else {
             element.event.remove(); //remove on frontend
-            fetch(BACKEND_URL + "events/remove", {
-                //remove an event from DB
+            fetch(BACKEND_URL + "events/remove", {  //remove an event from database
                 method: "DELETE",
                 headers: {
                     accept: "application/json",
@@ -260,7 +250,6 @@ export default class FullCalendar extends React.Component<Props, State> {
                 body: JSON.stringify({id: element.event.id}),
                 signal: this.abortController.signal,
             }).then((response) => {
-                //Displays information message on console
                 if (!response.ok) {
                     console.error("Delete request has failed");
                 }
@@ -268,8 +257,8 @@ export default class FullCalendar extends React.Component<Props, State> {
         }
     }
 
+    //Update state on change in a input field
     handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
-        //Update state on change in a input field
         const target = event.target;
         const value = target.value;
         const name = target.name;

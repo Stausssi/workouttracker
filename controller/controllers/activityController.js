@@ -46,7 +46,7 @@ exports.add = (req, res) => {
 }
 
 
-//find activity which belonged to currently logged user
+//Find activity which belonged to currently logged user
 exports.get = (request, response) => {
     let username = request.username;
     if (isParamMissing([username])) { //return bad Request if user is missing
@@ -54,7 +54,6 @@ exports.get = (request, response) => {
     } else {
         Activity.get(username, (error, data) => {
             if (error) {
-                console.log(error);
                 response.sendStatus(500)
             } else {
                 response.status(200).send({body: JSON.stringify(data)});  //return events if sql request has succeeded
@@ -63,9 +62,9 @@ exports.get = (request, response) => {
     }
 };
 
-//remove activity from DB
+//remove activity from database
 exports.remove = (request, response) => {
-    const activityid = request.body.id //id of event, to identify dataset which will be deleted
+    const activityid = request.body.id //find activity to delete by id 
     let username = request.username;
     if (!request.body || isParamMissing([username, activityid])) {
         response.sendStatus(400)

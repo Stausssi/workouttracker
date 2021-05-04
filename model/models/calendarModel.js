@@ -7,7 +7,7 @@ const Event = function (event) {
     this.user= event.user
 }
 
-Event.get = (user, response) => { 
+Event.get = (user, response) => {       //get events created by user
     sql.query("SELECT * FROM events where user = ?", [user],
         function (error, result) {
             if (error) {
@@ -18,22 +18,9 @@ Event.get = (user, response) => {
         });
 }
 
-Event.getActivityEvents = (user, response) => { 
-    sql.query("SELECT activity_id ,sport as title, startedAt,duration FROM activity WHERE user = ?", [user],
-        function (error, result) {
-            if (error) {
-                response(error, null)
-            } else {
-                response(null, result)
-            }
-        });
-}
-
-
-Event.create = (newEvent, result) => {  
+Event.create = (newEvent, result) => {          //create events
     sql.query("INSERT INTO events SET ?", [newEvent], (error, res) => {
         if (error) {
-            console.log("error: ", error);
             result(newEvent, false);
         } else {
             result(null, true);
