@@ -178,7 +178,7 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
                             <p className="title is-4">{props.sport}</p>
                             <p className="subtitle is-6">
                                 <time>{Formatter.formatDateTime(new Date(Date.parse(String(props.addedAt))))}</time>
-                                {this.props.ownFeed ? "" : <> -  <Link className="has-text-primary" to={`/users/${encodeURIComponent(props.username)}`}>@{props.username}</Link></>}
+                                {this.props.ownFeed ? "" : <> -  <Link className="has-text-primary" to={`/users/${props.username}`}>@{props.username}</Link></>}
                             </p>
                         </div>
                         <div className="field has-addons">

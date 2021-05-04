@@ -33,6 +33,8 @@ export default class App extends Component<Props, State> {
         // "successful-signup"  Homepage    Successful-Signup
         // "profile"            Profile     Login
         // "users/:username"    UserPage    Login
+        // "NotFound"           NotFound    Login
+
         // This BrowserRouter handles the routing of the entire application
         return (
             <>

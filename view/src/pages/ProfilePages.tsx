@@ -272,7 +272,7 @@ export class FollowingPage extends React.Component<any, FollowingState> {
         super(props);
 
         this.state = {
-            username: decodeURIComponent(props.match.params.username),
+            username: props.match.params.username,
             firstname: '',
             lastname: '',
             date: new Date(),
@@ -293,7 +293,7 @@ export class FollowingPage extends React.Component<any, FollowingState> {
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<FollowingState>, snapshot?: any) {
         // Get new values if username changed
-        let newUser = decodeURIComponent(this.props.match.params.username);
+        let newUser = this.props.match.params.username;
         if (this.state.username !== newUser) {
             this.setState({
                 username: newUser
