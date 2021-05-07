@@ -10,11 +10,7 @@ import NotificationBox from "../components/NotificationBox";
 import {postData} from "../components/Feed/FeedContent";
 import {ProfileActivityContainer} from "../components/profile/ProfileActivities";
 import {Formatter} from "../utilities/Formatter";
-
-//Validate email address from input to show a warning if something went Wrong
-function validateEmail(email: string) {
-    return /^[^@]+@\w+(\.\w+)+\w$/.test(email);
-}
+import {RegexValidator} from "../utilities/RegexValidator";
 
 interface OwnState {
     username: string,
@@ -30,11 +26,14 @@ interface OwnState {
     weightPlaceholder: string;
     emailPlaceholder: string;
 
-    errorMessage: string
+    notifyMessage: string,
+    notifyType: string
 }
 
 //Profile page
 export class OwnProfile extends React.Component<any, OwnState> {
+    private readonly abortController: AbortController;
+
     constructor(props: any) {
         super(props);
 
@@ -52,14 +51,21 @@ export class OwnProfile extends React.Component<any, OwnState> {
             weightPlaceholder: 'Add your weight',
             emailPlaceholder: 'Add your email',
 
-            errorMessage: '',
+            notifyMessage: '',
+            notifyType: 'is-danger',
         };
+
+        this.abortController = new AbortController();
 
         this.getDefaultValues();
 
         this.handleDateChange = this.handleDateChange.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     //get placeholders by loading the Page
@@ -70,6 +76,7 @@ export class OwnProfile extends React.Component<any, OwnState> {
                 'Content-Type': 'application/json',
                 Authorization: SessionHandler.getAuthToken()
             },
+            signal: this.abortController.signal
         }).then((response) => {
             if (response.ok) {
                 // Examine the text in the response
@@ -89,6 +96,10 @@ export class OwnProfile extends React.Component<any, OwnState> {
             } else {
                 console.log('Looks like there was a problem. Status Code: ', response.status);
             }
+        }).catch((error: any) => {
+            if (error.name !== "AbortError") {
+                console.log("Fetch failed:", error);
+            }
         });
     }
 
@@ -106,64 +117,68 @@ export class OwnProfile extends React.Component<any, OwnState> {
     //if submit new changes to the system
     handleSubmit(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
-        this.setState({errorMessage: ''});
         let date = "";
         if (this.state.dateChange) {
             this.setState({dateChange: false});
 
             // add a day because the minutes toISOString converts it not right
-            const datePusOneDay = new Date(this.state.date.getTime() + 86400000);
-            date = datePusOneDay.toISOString().slice(0, 10);
+            const datePlusOneDay = new Date(this.state.date.getTime() + 86400000);
+            date = datePlusOneDay.toISOString().slice(0, 10);
         }
-        let email = "";
-        if (this.state.email) {
-            if (validateEmail(this.state.email)) {
-                email = this.state.email;
-                this.setState({
-                    emailPlaceholder: this.state.email,
-                    email: ''
-                });
+
+        if (RegexValidator.validateName(this.state.firstname) ||
+            RegexValidator.validateName(this.state.firstnamePlaceholder) && this.state.firstname === "") {
+            if (RegexValidator.validateName(this.state.lastname) ||
+                RegexValidator.validateName(this.state.lastnamePlaceholder) && this.state.lastname === "") {
+                if ((this.state.weight >= 10 && this.state.weight <= 400) ||
+                    (Number(this.state.weightPlaceholder) >= 10 && Number(this.state.weightPlaceholder) <= 400)) {
+                    if (RegexValidator.validateEmail(this.state.email) ||
+                        RegexValidator.validateEmail(this.state.emailPlaceholder) && this.state.email === "") {
+                        let emailMessage = this.state.email ? ' Please verify your new email before the next login' : '';
+
+                        //nice put req to parse the data in the DB
+                        fetch(BACKEND_URL + 'users/update', {
+                            method: 'PUT',
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json',
+                                Authorization: SessionHandler.getAuthToken()
+                            },
+                            body: JSON.stringify({
+                                firstname: this.state.firstname,
+                                lastname: this.state.lastname,
+                                date: date,
+                                weight: this.state.weight,
+                                email: this.state.email,
+                            }),
+                            signal: this.abortController.signal
+                        }).then((response) => {
+                            this.getDefaultValues();
+                            this.setNotification(response.ok ? "Your Changes have been saved!" + emailMessage : "Something went wrong while saving your changes", !response.ok);
+                        }).catch((error: any) => {
+                            if (error.name !== "AbortError") {
+                                console.log("Fetch failed:", error);
+                            }
+                        });
+                    } else {
+                        this.setNotification("Please enter a valid email");
+                    }
+                } else {
+                    this.setNotification("Please enter a valid weight");
+                }
             } else {
-                this.setState({errorMessage: 'Please enter a valid email'});
+                this.setNotification("Please enter a valid lastname (30 characters)");
             }
+        } else {
+            this.setNotification("Please enter a valid firstname (30 characters)");
         }
-        //nice put req to parse the data in the DB
-        fetch(BACKEND_URL + 'users/update', {
-            method: 'PUT',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: SessionHandler.getAuthToken()
-            },
-            body: JSON.stringify({
-                firstname: this.state.firstname,
-                lastname: this.state.lastname,
-                date: date,
-                weight: this.state.weight,
-                email: email,
-            }),
-        });
+    }
 
-        if (this.state.firstname) {
-            this.setState({
-                firstnamePlaceholder: this.state.firstname,
-                firstname: ''
-            });
-        }
-
-        if (this.state.lastname) {
-            this.setState({
-                lastnamePlaceholder: this.state.lastname,
-                lastname: ''
-            });
-        }
-
-        if (this.state.weight) {
-            this.setState({
-                weightPlaceholder: this.state.weight.toString(),
-                weight: ''
-            });
-        }
+    setNotification(message: string, isError: boolean = true) {
+        this.setState({
+            notifyMessage: message,
+            notifyType: isError ? "is-danger" : "is-success"
+        })
     }
 
     handleDateChange(date: Date) {
@@ -207,6 +222,8 @@ export class OwnProfile extends React.Component<any, OwnState> {
                                 <DatePicker
                                     maxDate={new Date()}
                                     selected={this.state.date}
+                                    showMonthDropdown={true}
+                                    showYearDropdown={true}
                                     onChange={this.handleDateChange}
                                     dateFormat="dd.MM.yyyy"/>
                             </div>
@@ -233,7 +250,10 @@ export class OwnProfile extends React.Component<any, OwnState> {
                             </div>
                             <br/>
 
-                            <NotificationBox message={this.state.errorMessage} type={"is-danger"} hasDelete={false}/>
+                            <NotificationBox
+                                message={this.state.notifyMessage}
+                                type={this.state.notifyType}
+                                hasDelete={false}/>
 
                             <button
                                 className='button is-black is-outlined'
@@ -351,7 +371,7 @@ export class FollowingPage extends React.Component<any, FollowingState> {
             } else if (response.status === 404) {
                 this.props.history.push({
                     pathname: "/NotFound",
-                    state: { username: this.state.username }
+                    state: {username: this.state.username}
                 });
             } else {
                 console.log('Looks like there was a problem. Status Code: ', response.status);
