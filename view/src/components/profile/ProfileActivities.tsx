@@ -80,7 +80,7 @@ export class ProfileActivityContainer extends React.Component<profileActivitiesP
                             )
                         )
                         :
-                        <p className="tag is-info is-light is-medium">{this.props.username} has no activities!</p>
+                        <p className="tag is-primary is-medium">{this.props.username} has no activities!</p>
                 }
             </>
         );

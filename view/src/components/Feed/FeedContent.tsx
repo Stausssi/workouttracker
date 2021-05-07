@@ -128,7 +128,7 @@ export class Feed extends React.Component<FeedProps, FeedState> {
                                 </div>
                             }
                             endMessage={
-                                <p className="tag is-info is-light is-medium mb-5">No new activities found</p>
+                                <p className="tag is-primary is-medium mb-5">No new activities found</p>
                             }
                             scrollThreshold={0.9}
                             scrollableTarget="col-1"

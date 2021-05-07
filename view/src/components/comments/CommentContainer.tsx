@@ -112,7 +112,7 @@ export default class CommentContainer extends Component<{ activity_id: number },
 
             return fieldsHTML;
         } else {
-            return <p className="tag is-info">No Comments here yet. Be the first!</p>
+            return <p className="tag is-primary is-medium">No Comments here yet. Be the first!</p>
         }
     }
 
