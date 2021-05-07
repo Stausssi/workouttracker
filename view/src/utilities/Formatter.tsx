@@ -89,7 +89,7 @@ export class Formatter {
 
     // Add unit to a given pace
     static format_pace(kmPerHour: number) {
-        return (kmPerHour).toFixed(1) + " km/h";
+        return kmPerHour.toFixed(1) + " km/h";
     }
 
     // Add unit to the heart rate

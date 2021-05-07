@@ -12,7 +12,7 @@ interface profileActivitiesState {
     postData: postData[] | [],
 }
 
-export class ProfileActivityContainer extends React.Component<profileActivitiesProps, profileActivitiesState > {
+export class ProfileActivityContainer extends React.Component<profileActivitiesProps, profileActivitiesState> {
     private readonly abortController: AbortController;
 
     constructor(props: profileActivitiesProps) {
@@ -29,6 +29,12 @@ export class ProfileActivityContainer extends React.Component<profileActivitiesP
     componentDidMount() {
         //get most recent activities (2)
         this.getLastActivities(2)
+    }
+
+    componentDidUpdate(prevProps: Readonly<profileActivitiesProps>, prevState: Readonly<profileActivitiesState>, snapshot?: any) {
+        if (prevProps.username !== this.props.username) {
+            this.getLastActivities(2);
+        }
     }
 
     // get the X most recent activities for a given user
@@ -62,15 +68,19 @@ export class ProfileActivityContainer extends React.Component<profileActivitiesP
     }
 
     render() {
+        const postData = this.state.postData;
         return (
             <>
                 {
-                    this.state.postData.map((activity: postData, index: number) => (
-                            <div className="mb-5" key={index}>
-                                <ProfileActivityBox postData={activity}/>
-                            </div>
+                    postData.length > 0 ?
+                        postData.map((activity: postData, index: number) => (
+                                <div className="mb-5" key={"user_feed_" + this.props.username + index}>
+                                    <ProfileActivityBox postData={activity}/>
+                                </div>
+                            )
                         )
-                    )
+                        :
+                        <p className="tag is-info is-light is-medium">{this.props.username} has no activities!</p>
                 }
             </>
         );

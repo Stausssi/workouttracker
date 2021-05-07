@@ -25,7 +25,7 @@ export const NotFound = (props: any) => {
                                     <>
                                         The {type}
                                         <span
-                                            className="subtitle is-4 is-family-code mx-2">
+                                            className="subtitle is-3 is-family-code mx-2">
                                             '{spanText}'
                                         </span>
                                     </> :

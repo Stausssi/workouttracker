@@ -7,7 +7,7 @@ const elementPerRequest = 5; // number of activities that are sent within one re
 
 exports.getFeed = (req, res) => {
     const type = req.params.type;
-    const user = req.params.user? req.params.user: req.username;
+    const user = req.query.user ? req.query.user: req.username;
     const start_offset = parseInt(req.query.offset);
 
     if (type === "own") {

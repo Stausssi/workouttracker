@@ -178,7 +178,8 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
                             <p className="title is-4">{props.sport}</p>
                             <p className="subtitle is-6">
                                 <time>{Formatter.formatDateTime(new Date(Date.parse(String(props.addedAt))))}</time>
-                                {this.props.ownFeed ? "" : <> -  <Link className="has-text-primary" to={`/users/${props.username}`}>@{props.username}</Link></>}
+                                {this.props.ownFeed ? "" : <> - <Link className="has-text-primary"
+                                                                      to={`/users/${props.username}`}>@{props.username}</Link></>}
                             </p>
                         </div>
                         <div className="field has-addons">
@@ -215,17 +216,6 @@ interface TableProps {
 
 //displays an activity table inside an activity feed box
 export class ActivityTable extends React.Component<TableProps, {}> {
-    constructor(props: TableProps) {
-        super(props);
-
-        //get props keys
-        const activityObject = this.props["activityData"];
-
-        //iterate over props and check if value exists --> delete if not
-        // @ts-ignore
-        Object.keys(activityObject).forEach((k: any) => activityObject[k] == null && delete activityObject[k])
-    }
-
     renderTableHeaders(activityData: activityData) {
         let keys = Object.keys(activityData) //get property keys
 
@@ -242,6 +232,10 @@ export class ActivityTable extends React.Component<TableProps, {}> {
     }
 
     render() {
+        // Delete "null" keys from activityData
+        // @ts-ignore
+        Object.keys(this.props.activityData).forEach((k: any) => this.props.activityData[k] === null && delete this.props.activityData[k]);
+
         return (
             <>
                 <table className="table is-narrow">

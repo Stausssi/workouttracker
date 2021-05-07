@@ -10,8 +10,6 @@ import NotificationBox from "../components/NotificationBox";
 import {postData} from "../components/Feed/FeedContent";
 import {ProfileActivityContainer} from "../components/profile/ProfileActivities";
 import {Formatter} from "../utilities/Formatter";
-import {Redirect} from "react-router";
-import {BrowserRouter} from "react-router-dom";
 
 //Validate email address from input to show a warning if something went Wrong
 function validateEmail(email: string) {
@@ -454,7 +452,7 @@ export class FollowingPage extends React.Component<any, FollowingState> {
                                                         onClick={this.handleFollowClick}
                                                         disabled={this.state.relationship.blocked}
                                                     >
-                                                        {(this.state.relationship.following ? "Unf" : "F") + "ollow"}
+                                                        {(this.state.relationship.following && !this.state.relationship.blocked ? "Unf" : "F") + "ollow"}
                                                     </button>
                                                     <button
                                                         className="button is-danger m-1"
