@@ -90,10 +90,6 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
             }
         });
 
-        // Refresh thumbs every 30s
-        this.thumbsRefreshInterval = setInterval(() => {
-            this.countThumbs();
-        }, 30000);
 
         this.countThumbs = this.countThumbs.bind(this);
         this.thumbIsPressed = this.thumbIsPressed.bind(this);
