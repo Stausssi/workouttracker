@@ -21,4 +21,6 @@ exports.basicSuccessErrorHandling = (error, res, successCode = 201) => {
 }
 
 exports.BACKEND_URL = "https://workouttracker.server-welt.com:9000/backend/"
+
 exports.FRONTEND_URL = "https://workouttracker.server-welt.com"
+
