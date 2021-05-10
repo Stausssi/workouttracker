@@ -12,7 +12,7 @@ exports.sendConfirmationEmail = (user) => {
         html: config.emailContent(user)
     };
 
-    transporter = nodemailer.createTransport({
+    let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: config.auth
     });

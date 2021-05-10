@@ -3,7 +3,7 @@ const request = require('request');
 const urlParse = require('url-parse');
 const queryParser = require('query-string');
 const axios = require('axios');
-const GoogleFit = require("../../model/models/GoogleFitModel");
+const GoogleFit = require("../../model/models/googleFitModel");
 
 /*Here is the hole logic of the google Fit import data stuff
 * First it generate the url to sing up with google to become the Permission to access there Data.
