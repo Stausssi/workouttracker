@@ -1,3 +1,5 @@
+import {FRONTEND_URL} from "../../view/src/App";
+
 const express = require('express');
 const router = express.Router();
 
@@ -21,7 +23,7 @@ router.post('/login', users.login);
 router.post('/signup', users.signup);
 router.get('/verify/:hash', function (req, res) {
     users.verifyEmail(req, res);
-    res.redirect('http://localhost:3000/verify');
+    res.redirect(FRONTEND_URL + '/verify');
 });
 
 router.get('/users/get/:user', authenticateJWT, users.getInformation);
