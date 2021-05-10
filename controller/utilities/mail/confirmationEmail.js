@@ -4,6 +4,8 @@
 const nodemailer = require('nodemailer');
 const config = require("./emailConfirmation.config");
 
+console.log(`${__dirname}/../public/images/logo.jpg`);
+
 exports.sendConfirmationEmail = (user) => {
     const mailOptions = {
         from: config.auth.user,
@@ -13,12 +15,12 @@ exports.sendConfirmationEmail = (user) => {
         attachements: [
             {
                 filename: 'arrow.png',
-                path: '/images',
+                path: `${__dirname}/images/arrow.png`,
                 cid: 'arrow' //same cid value as in the html img src
             },
             {
                 filename: 'Logo.png',
-                path: '/images',
+                path: `${__dirname}/images/Logo.png`,
                 cid: 'Logo' //same cid value as in the html img src
             }]
     };
