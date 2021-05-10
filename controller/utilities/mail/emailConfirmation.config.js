@@ -1,4 +1,4 @@
-const {BACKEND_URL} = require("../utilities/misc");
+const {BACKEND_URL} = require("../misc");
 
 //Secret for JWT Generation
 exports.confirmSecret = "A8KedSV6AUNIbmj06lDUic2P3s7PZJrywGbuu5uzMDgXexdEHwzG1GjJjXXj9BRprq7JSjr1uNBWmUE7keRSuE5FYj6o9UMfijRu7wwX9NAjAY2";
