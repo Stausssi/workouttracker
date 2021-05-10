@@ -56,7 +56,6 @@ User.verifyToken = (token, success) => {
         token
     ], function (error, results) {
         console.log(error);
-        console.log(results);
     });
 }
 
