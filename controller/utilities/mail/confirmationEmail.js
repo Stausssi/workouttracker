@@ -9,7 +9,18 @@ exports.sendConfirmationEmail = (user) => {
         from: config.auth.user,
         to: user.email,
         subject: 'Registration Confirmation',
-        html: config.emailContent(user)
+        html: config.emailContent(user),
+        attachements: [
+            {
+                filename: 'arrow.png',
+                path: '/images',
+                cid: 'arrow' //same cid value as in the html img src
+            },
+            {
+                filename: 'Logo.png',
+                path: '/images',
+                cid: 'Logo' //same cid value as in the html img src
+            }]
     };
 
     let transporter = nodemailer.createTransport({
