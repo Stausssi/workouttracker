@@ -11,6 +11,7 @@ const Feed = function (activity_array) {
         this.activities.push({
             activity_id: row.activity_id,
             likes: row.likes,
+            thumbUp: row.thumbUp,
             activityData: {
                 distance: row.distance,
                 duration: row.duration,
@@ -33,15 +34,20 @@ const Feed = function (activity_array) {
 // result: return possible errors or the results result(error: Boolean, return: Object)
 
 Feed.getOwnFeed = (user, start, amount, result) => {
-    sql.query('SELECT * FROM ' +
-        '(SELECT * FROM activity WHERE user=? ORDER BY addedAt DESC LIMIT ?, ?) activities ' +
-        'LEFT OUTER JOIN ' +
-        '(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsUp GROUP BY activity_id) likecount ' +
-        'USING(activity_id)',
+    sql.query('SELECT activity_id, user, sport, startedAt, addedAt, distance,' +
+        ' duration, pace, averageHeartRate, altitudeDifference, IFNULL(likes, 0) as likes,' +
+        ' IFNULL(ThumbUp, FALSE) AS thumbUp' +
+        ' FROM(SELECT * FROM activity WHERE user=? ORDER BY addedAt DESC LIMIT ?, ?) activities' +
+        ' LEFT OUTER JOIN(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsUp GROUP BY activity_id) likecount' +
+        ' USING(activity_id)' +
+        ' LEFT OUTER JOIN' +
+        ' (SELECT activity_id, TRUE as ThumbUp FROM thumbsUp WHERE username_fk=?) isThumbUp' +
+        ' USING (activity_id);',
         [
             user,
             start,
-            amount
+            amount,
+            user,
         ], (error, db_results, fields) => {
             if (error) {
                 //if an error occurs, return
@@ -58,17 +64,21 @@ Feed.getOwnFeed = (user, start, amount, result) => {
 //Docstring
 Feed.getFollowingFeed = (user, start, amount, result) => {
     //get Feed for users that "user" is following, just like in getOwnFeed() and append the number of likes for each post
-    sql.query('SELECT * FROM ' +
-        '(SELECT * FROM activity WHERE user in ' +
-        '(SELECT followed FROM following WHERE follower=? AND blocked=0) ' +
-        'ORDER BY addedAt DESC LIMIT ?, ?) activities ' +
-        'LEFT OUTER JOIN ' +
-        '(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsUp GROUP BY activity_id) likecount ' +
-        'USING(activity_id)',
+    sql.query('SELECT activity_id, user, sport, startedAt, addedAt, distance,' +
+        ' duration, pace, averageHeartRate, altitudeDifference, IFNULL(likes, 0) as likes,' +
+        ' IFNULL(ThumbUp, FALSE) AS thumbUp' +
+        ' FROM(SELECT * FROM activity WHERE user in (SELECT followed FROM following WHERE follower=? AND blocked=0)' +
+        ' ORDER BY addedAt DESC LIMIT ?, ?) activities' +
+        ' LEFT OUTER JOIN(SELECT COUNT(username_fk) as likes, activity_id FROM thumbsUp' +
+        ' GROUP BY activity_id) likecount' +
+        ' USING(activity_id)' +
+        ' LEFT OUTER JOIN(SELECT activity_id, TRUE as ThumbUp FROM thumbsUp WHERE username_fk=?) isThumbUp' +
+        ' USING (activity_id);',
         [
             user,
             start,
-            amount
+            amount,
+            user
         ], (error, db_results, fields) => {
             if (error) {
                 //if an error occurs, return
