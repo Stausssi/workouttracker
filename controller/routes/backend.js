@@ -1,5 +1,3 @@
-import {FRONTEND_URL} from "../../view/src/App";
-
 const express = require('express');
 const router = express.Router();
 
@@ -12,6 +10,8 @@ const chart = require("../controllers/chartController");
 const feed = require("../controllers/feedController");
 const comment = require("../controllers/interactionController");
 const googlefit = require("../controllers/googlefitController");
+
+const {BACKEND_URL, FRONTEND_URL} = require("../utilities/misc");
 
 const {authenticateJWT} = require("../utilities/authentication/MiddlewareAuthentication");
 

@@ -9,7 +9,6 @@ const {validateName,validateEmail,validateUsername,validatePassword} = require("
 
 //creates a new user if the email/username doesn't already exist
 exports.signup = (req, res) => {
-
     let username = req.body.username;
     let password = req.body.password;
     let firstname = req.body.firstname;

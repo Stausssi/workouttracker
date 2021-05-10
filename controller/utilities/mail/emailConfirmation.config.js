@@ -1,3 +1,5 @@
+const {BACKEND_URL} = require("../utilities/misc");
+
 //Secret for JWT Generation
 exports.confirmSecret = "A8KedSV6AUNIbmj06lDUic2P3s7PZJrywGbuu5uzMDgXexdEHwzG1GjJjXXj9BRprq7JSjr1uNBWmUE7keRSuE5FYj6o9UMfijRu7wwX9NAjAY2";
 
@@ -13,6 +15,6 @@ exports.emailContent = (user) => {
         "Dear " + user.firstname + " " + user.lastname + ",<br>" +
         "there is just one more step to do before your registration is finished!<br>" +
         "Please press the button below: <br><br>" +
-        "<a href='https://workouttracker.server-welt.com:9000/backend/verify/" + user.confirmationToken + "'>Confirm</a>"
+        "<a href={BACKEND_URL + 'verify/" + user.confirmationToken + "'}>Confirm</a>"
     );
 }
