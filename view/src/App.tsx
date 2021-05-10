@@ -68,5 +68,7 @@ export default class App extends Component<Props, State> {
 }
 
 export const PAGE_TITLE = "Workout-Tracker";
-export const BACKEND_URL = "https://workouttracker.server-welt.com:9000/backend/";
-export const FRONTEND_URL = "https://workouttracker.server-welt.com/";
+// export const BACKEND_URL = "https://workouttracker.server-welt.com:9000/backend/";
+// export const FRONTEND_URL = "https://workouttracker.server-welt.com/";
+export const FRONTEND_URL = "http://localhost:3000/";
+export const BACKEND_URL = "http://localhost:9000/backend/";

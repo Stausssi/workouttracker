@@ -5,8 +5,6 @@
 const nodemailer = require('nodemailer');
 const config = require("./emailConfirmation.config");
 
-console.log(`${__dirname}/../public/images/logo.jpg`);
-
 exports.sendConfirmationEmail = (user) => {
     const mailOptions = {
         from: config.auth.user,
