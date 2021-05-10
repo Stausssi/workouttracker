@@ -127,13 +127,13 @@ export class OwnProfile extends React.Component<any, OwnState> {
         }
 
         if (RegexValidator.validateName(this.state.firstname) ||
-            RegexValidator.validateName(this.state.firstnamePlaceholder) && this.state.firstname === "") {
+            (RegexValidator.validateName(this.state.firstnamePlaceholder) && this.state.firstname === "")) {
             if (RegexValidator.validateName(this.state.lastname) ||
-                RegexValidator.validateName(this.state.lastnamePlaceholder) && this.state.lastname === "") {
+                (RegexValidator.validateName(this.state.lastnamePlaceholder) && this.state.lastname === "")) {
                 if ((this.state.weight >= 10 && this.state.weight <= 400) ||
                     (Number(this.state.weightPlaceholder) >= 10 && Number(this.state.weightPlaceholder) <= 400)) {
                     if (RegexValidator.validateEmail(this.state.email) ||
-                        RegexValidator.validateEmail(this.state.emailPlaceholder) && this.state.email === "") {
+                        (RegexValidator.validateEmail(this.state.emailPlaceholder) && this.state.email === "")) {
                         let emailMessage = this.state.email ? ' Please verify your new email before the next login' : '';
 
                         //nice put req to parse the data in the DB
