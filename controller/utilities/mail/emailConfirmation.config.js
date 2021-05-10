@@ -13,6 +13,6 @@ exports.emailContent = (user) => {
         "Dear " + user.firstname + " " + user.lastname + ",<br>" +
         "there is just one more step to do before your registration is finished!<br>" +
         "Please press the button below: <br><br>" +
-        "<a href='https://workouttracker.server-welt.com:9000/backend/verify/" + user.confirmationToken + "'>Confirm</a>"
+        "<a href='http://localhost:9000/backend/verify/" + user.confirmationToken + "'>Confirm</a>"
     );
 }
