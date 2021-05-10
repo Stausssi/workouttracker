@@ -11,6 +11,7 @@ import {ActivityBox, activityData} from "../activity/ActivityBox";
 
 export interface postData {
     activity_id: number,
+    thumbUp: boolean,
     likes: number,
     activityData: activityData,
     username: string,

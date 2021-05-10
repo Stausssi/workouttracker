@@ -60,64 +60,13 @@ export class ActivityBox extends React.Component<ActivityProps, ActivityState> {
         super(props);
 
         this.state = {
-            showThumbsUp: false,
+            showThumbsUp: this.props.postData.thumbUp,
             thumbsUpCounter: this.props.postData.likes
         }
 
         this.abortController = new AbortController();
 
-        // Check whether the user has already liked the activity
-        fetch(BACKEND_URL + 'interaction/isThumbsUpSet?activity=' + this.props.postData.activity_id, {
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: SessionHandler.getAuthToken()
-            },
-            signal: this.abortController.signal
-        }).then((response) => {
-            if (response.ok) {
-                // Examine the text in the response
-                response.json().then((data) => {
-                    this.setState({showThumbsUp: data});
-                });
-            } else {
-                console.log('Looks like there was a problem. Status Code: ' + response.status);
-            }
-
-        }).catch((error: any) => {
-            if (error.name !== "AbortError") {
-                console.log("Fetch failed:", error);
-            }
-        });
-
-
-        this.countThumbs = this.countThumbs.bind(this);
         this.thumbIsPressed = this.thumbIsPressed.bind(this);
-    }
-
-    //Count Thumbs
-    countThumbs() {
-        fetch(BACKEND_URL + "interaction/countThumbs?activity=" + this.props.postData.activity_id, {//get as default
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: SessionHandler.getAuthToken()
-            },
-            signal: this.abortController.signal
-        }).then((response) => {
-            if (response.ok) {
-                // Examine the text in the response
-                response.json().then((data) => {
-                    this.setState({thumbsUpCounter: data[0].counter});
-                });
-            } else {
-                console.log('Looks like there was a problem. Status Code: ' + response.status);
-            }
-        }).catch((error: any) => {
-            if (error.name !== "AbortError") {
-                console.log("Fetch failed:", error);
-            }
-        });
     }
 
     thumbIsPressed(event: any) {
