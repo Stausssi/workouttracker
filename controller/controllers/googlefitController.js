@@ -1,3 +1,5 @@
+import {BACKEND_URL} from "../../view/src/App";
+
 const {google} = require('googleapis')
 const request = require('request');
 const urlParse = require('url-parse');
@@ -16,7 +18,7 @@ exports.getFitURL = (req, res) => {
         //client secret
         "-go0MpwOnEw3MicUM_S7rOPW",
         //link to redirect to
-        "http://localhost:9000/backend/googlefit/activity"
+        BACKEND_URL + "googlefit/activity"
     );
     //generates URL
     const scopes = ["https://www.googleapis.com/auth/fitness.location.read https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.heart_rate.read profile email "];
@@ -49,7 +51,7 @@ exports.insertActivitysFromGoogle = async (req, res) => {
         //client secret
         "-go0MpwOnEw3MicUM_S7rOPW",
         //link to redirect to
-        "http://localhost:9000/backend/googlefit/activity"
+        BACKEND_URL + "googlefit/activity"
     );
 
     const tokens = await oauth2Client.getToken(code);
@@ -169,6 +171,6 @@ exports.insertActivitysFromGoogle = async (req, res) => {
             console.log("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!");
             console.log(err);
         });
-    if (dberror) res.send('<script>alert("Internal server error!"); window.location.href = "http://localhost:3000/"; </script>');
-    else res.send('<script>alert("We import your Activitys from the last Year"); window.location.href = "http://localhost:3000/"; </script>');
+    if (dberror) res.send('<script>alert("Internal server error!"); window.location.href = "https://workouttracker.server-welt.com"; </script>');
+    else res.send('<script>alert("We import your Activitys from the last Year"); window.location.href = "https://workouttracker.server-welt.com"; </script>');
 }
