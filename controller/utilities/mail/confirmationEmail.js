@@ -1,6 +1,8 @@
 // sends a confirmation email to to specified email adress with a link to unlock the user
 
 //imports
+const {BACKEND_URL} = require("../misc");
+
 const nodemailer = require('nodemailer');
 const config = require("./emailConfirmation.config");
 
@@ -15,12 +17,12 @@ exports.sendConfirmationEmail = (user) => {
         attachements: [
             {
                 filename: 'arrow.png',
-                path: `${__dirname}/images/arrow.png`,
+                path: BACKEND_URL + "/images/arrow.png",
                 cid: 'arrow' //same cid value as in the html img src
             },
             {
                 filename: 'Logo.png',
-                path: `${__dirname}/images/Logo.png`,
+                path: BACKEND_URL + "/images/Logo.png",
                 cid: 'Logo' //same cid value as in the html img src
             }]
     };
