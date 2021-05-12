@@ -6,7 +6,7 @@
 const app = require('../app');
 const debug = require('debug')('controller:server');
 // const https = require('https');
-const https = require('http');
+const https = require('https');
 const fs = require('fs');
 
 /**
@@ -19,8 +19,8 @@ app.set('port', port);
  * Create HTTPS server.
  */
 const server = https.createServer({
-    // key: fs.readFileSync("/etc/letsencrypt/live/workouttracker.server-welt.com/privkey.pem"),
-    // cert: fs.readFileSync("/etc/letsencrypt/live/workouttracker.server-welt.com/cert.pem")
+    key: fs.readFileSync("/etc/letsencrypt/live/workouttracker.server-welt.com/privkey.pem"),
+    cert: fs.readFileSync("/etc/letsencrypt/live/workouttracker.server-welt.com/cert.pem")
 }, app);
 
 /**
