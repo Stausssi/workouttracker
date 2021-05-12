@@ -42,7 +42,6 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
     "css-build": "node-sass --omit-source-map-url src/style/App.scss src/style/App.css",
     "css-watch": "npm run css-build -- --watch",
     "start": "react-scripts start",
