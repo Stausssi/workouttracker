@@ -1,0 +1,92 @@
+@charset "utf-8";
+
+// Style feed switch
+$switch-focus: None;
+
+@import "../../node_modules/bulma/bulma.sass";
+@import "../../node_modules/@creativebulma/bulma-divider/src/sass/index";
+@import "../../node_modules/bulma-extensions/bulma-switch/src/sass/index";
+
+html {
+  background-color: #202028 !important;
+  height: 100%;
+  text-align: center;
+  overflow: hidden !important;
+}
+
+body {
+  height: 100%;
+  min-height: 20em;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#body-content {
+  flex: 1;
+  min-height: 10em;
+  overflow: auto;
+}
+
+/*
+ * Scrollbar Styling
+ */
+.hasScrollbar::-webkit-scrollbar {
+  width: 1em;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.hasScrollbar::-webkit-scrollbar-thumb {
+  border-radius: 0.33em;
+  background-color: #646464;
+}
+
+.hasScrollbar::-webkit-scrollbar-thumb:active, .hasScrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #5c5c5c;
+}
+
+.flexColumns {
+  display: flex;
+  flex-direction: row;
+}
+
+.mainColumn {
+  flex: 1;
+  overflow-y: scroll;
+  overflow-x: hidden !important;
+  color: white;
+}
+
+#header {
+  flex: 0;
+}
+
+.navbar-item {
+  color: #ffffff !important;
+}
+
+a.navbar-item:hover, a.navbar-item:focus {
+  background-color: #292929 !important;
+}
+
+#footer {
+  flex: 0;
+  background-color: #0d0d15 !important;
+  color: white;
+}
+
+.fc-popover {
+  background: gray !important;
+}
+
+.feedSwitch {
+  padding-left: 3.75rem !important;
+}
+
+.searchResult {
+  cursor: pointer;
+}

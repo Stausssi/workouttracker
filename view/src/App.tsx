@@ -1,8 +1,6 @@
 import {BrowserRouter, Route} from "react-router-dom";
 import Homepage from "./pages/Homepage";
-import "./css/App.css";
-import "bulma";
-import "bulma-extensions/dist/css/bulma-extensions.min.css";
+import "./style/App.css";
 import {Component} from "react";
 
 import SessionHandler from "./utilities/SessionHandler";
