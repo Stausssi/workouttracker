@@ -1,6 +1,6 @@
 import {BrowserRouter, Route} from "react-router-dom";
 import Homepage from "./pages/Homepage";
-import "./style/App.css";
+import "./style/App.scss";
 import {Component} from "react";
 
 import SessionHandler from "./utilities/SessionHandler";
