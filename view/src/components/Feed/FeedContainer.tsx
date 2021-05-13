@@ -1,6 +1,5 @@
 import React from 'react';
-import '../../css/App.css';
-import 'bulma-extensions'
+import '../../style/App.css';
 import {Feed} from "./FeedContent";
 
 /*

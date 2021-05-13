@@ -7,7 +7,6 @@ import en from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
 import SessionHandler from "../utilities/SessionHandler";
 import {BACKEND_URL} from "../App";
-import "bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css";
 import NotificationBox from "./NotificationBox";
 
 interface Props {

@@ -24,3 +24,5 @@ yarn-debug.log*
 yarn-error.log*
 
 package-lock.json
+view/src/style/App.css
+view/src/style/App.css
