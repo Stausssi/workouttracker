@@ -24,7 +24,6 @@ GoogleFit.insertGoogleFItActivityInDB = (data, profileData) => {
                     data.distance,
                     data.averageHeartRate
                 ], function (error, rows, fields) {
-                    console.log(error);
                     if (error) profileData(error);
                 });
             }
