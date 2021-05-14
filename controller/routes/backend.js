@@ -58,11 +58,7 @@ router.put('/interaction/thumbsUp', authenticateJWT, comment.thumbsUp);
 router.get('/interaction/isThumbsUpSet', authenticateJWT, comment.isThumbsUpSet);
 router.get('/interaction/countThumbs', authenticateJWT, comment.countThumbs);
 
-router.get('/googlefit/getURLTing', googlefit.getFitURL);
+router.get('/googlefit/getURLTing', authenticateJWT, googlefit.getFitURL);
 router.get('/googlefit/activity', googlefit.insertActivitysFromGoogle);
-
-router.get('/testConnection', function (req, res, next) {
-    res.send('Connection to the backend established!');
-})
 
 module.exports = router;
