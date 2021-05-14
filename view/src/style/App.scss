@@ -90,3 +90,11 @@ a.navbar-item:hover, a.navbar-item:focus {
 .searchResult {
   cursor: pointer;
 }
+
+.divider.is-vertical::before {
+  margin-bottom: 0;
+}
+
+.divider.is-vertical::after {
+  margin-top: 0;
+}
