@@ -11,9 +11,6 @@ GoogleFit.insertGoogleFItActivityInDB = (data, profileData) => {
         data.starttime,
         data.distance
     ], function (error, rows, fields) {//AND `distance`='" + res.data.bucket[0].dataset[0].point[0].value[0].fpVal + "'
-        console.log(error)
-        console.log(rows)
-        console.log("SELECT `activity_id` FROM `activity` WHERE `user`='" + data.username + "' AND `duration`='" + data.duration + "' AND `sport`='" + data.sport + "' AND `startedAt`='" + data.starttime + "';")
         if (error) profileData(error);
         else {
             //hier ist das ergebnis in rows

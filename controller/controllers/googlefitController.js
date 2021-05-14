@@ -27,7 +27,7 @@ exports.getFitURL = (req, res) => {
         state: JSON.stringify({
             callbackURL: req.body.callbackURL,
             userID: req.body.userid,
-            username: "MeinUsername" //req.username
+            username: req.username
         })
     })
 
@@ -106,9 +106,6 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                                 const avarageSpeed = (res.data.bucket[0].dataset[0].point[0].value[0].fpVal / 1000) / (duration / 3600);
                                 const distance = parseInt(res.data.bucket[0].dataset[0].point[0].value[0].fpVal);
 
-                                console.log("activityType:" + session.activityType + " timestamp:" + session.startTimeMillis + " duration:" + duration);
-                                console.log(res.data.bucket[0].dataset[0].point[0].value[0].fpVal);
-
                                 //get the heart rate in bpm form google in the timespan from the session
                                 //therefore merge all data points from to an float at google cloud and do count several points from different Devices only once
                                 const body = {
@@ -149,26 +146,26 @@ exports.insertActivitysFromGoogle = async (req, res) => {
                                                 if (error) dberror = true;
                                             });
                                         } catch (e) {
-                                            console.log(e);
+                                            console.error(e);
                                         }
                                     })
                             } catch (e) {
-                                console.log(e);
+                                console.error(e);
                             }
                         })
                         .catch(err => {
-                            console.log("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!");
-                            console.log(err);
-                            console.log(tokens.tokens.access_token);
+                            console.error("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!");
+                            console.error(err);
+                            // console.error(tokens.tokens.access_token);
                         });
                 }
             } catch (e) {
-                console.log(e);
+                console.error(e);
             }
         })
         .catch(err => {
-            console.log("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!");
-            console.log(err);
+            console.error("OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!");
+            console.error(err);
         });
     if (dberror) res.send('<script>alert("Internal server error!"); window.location.href = "https://workouttracker.server-welt.com"; </script>');
     else res.send('<script>alert("We import your Activitys from the last Year"); window.location.href = "https://workouttracker.server-welt.com"; </script>');
