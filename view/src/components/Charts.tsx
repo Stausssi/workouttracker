@@ -377,7 +377,7 @@ export default class Graphs extends React.Component<Props, State> {
                     sqlfunc: sqlfunc,
                 };
                 this.createRequest(chart);   //create request
-                //this.setCharts(chart);      //Add new chart to DB
+                this.setCharts(chart);      //Add new chart to DB
                 this.action();              //close modal
             } else {                        
                 this.setState({
