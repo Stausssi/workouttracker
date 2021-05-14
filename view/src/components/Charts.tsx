@@ -377,7 +377,7 @@ export default class Graphs extends React.Component<Props, State> {
                     sqlfunc: sqlfunc,
                 };
                 this.createRequest(chart);   //create request
-                this.setCharts(chart);      //Add new chart to DB
+                //this.setCharts(chart);      //Add new chart to DB
                 this.action();              //close modal
             } else {                        
                 this.setState({
@@ -537,9 +537,9 @@ export default class Graphs extends React.Component<Props, State> {
     //update input fields on change
     handleOnChange(
         event:
-            | React.ChangeEvent<HTMLInputElement>
-            | React.ChangeEvent<HTMLSelectElement>
-    ) {
+        | React.ChangeEvent<HTMLInputElement>
+        | React.ChangeEvent<HTMLSelectElement>
+        ) {
         const target = event.target;
         const value = target.value;
         const name = target.name;
@@ -613,6 +613,7 @@ export default class Graphs extends React.Component<Props, State> {
                                             className="type"
                                             name="type"
                                             id="type"
+                                            value={this.state.type}
                                             onChange={(type) => this.handleOnChange(type)}
                                         >
                                             {this.renderOptions(types)}
@@ -628,6 +629,7 @@ export default class Graphs extends React.Component<Props, State> {
                                                     type="checkbox"
                                                     name="switchfunc"
                                                     className="switch"
+                                                    checked={this.state.switchfunc}
                                                     id="switchfunc"
                                                     onChange={(switchfunc) =>
                                                         this.handleOnCheck(switchfunc)
@@ -648,6 +650,7 @@ export default class Graphs extends React.Component<Props, State> {
                                         <select
                                             className="select is-fullwidth mb-5"
                                             name="category"
+                                            value={this.state.category}
                                             id="category"
                                             onChange={(category) => this.handleOnChange(category)}
                                         >
@@ -660,6 +663,7 @@ export default class Graphs extends React.Component<Props, State> {
                                         <select
                                             className="sport"
                                             name="sport"
+                                            value={this.state.sport}
                                             id="sport"
                                             onChange={(sport) => this.handleOnChange(sport)}
                                         >
