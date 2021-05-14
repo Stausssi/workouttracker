@@ -25,6 +25,7 @@ Chart.getAll = (user, response) => {     //get all events
 Chart.create = (newChart, response) => {    //insert new chart into db   
     sql.query("INSERT INTO charts SET ?", [newChart], (error, results) => {
         if (error) {
+            console.error(error);
             response(error, false);
         } else {
             response(null, true);
