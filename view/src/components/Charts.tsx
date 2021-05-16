@@ -500,7 +500,9 @@ export default class Graphs extends React.Component<Props, State> {
     fill() {
         if (this.state.type === "line" || this.state.type === "radar") {
             return (
-                <div className="m-2">
+                <div className="columns is-centered mt-2">
+                <div className="column is-one-quarter">
+                     <div className="field">
                     <input
                         type="checkbox"
                         name="fill"
@@ -512,6 +514,8 @@ export default class Graphs extends React.Component<Props, State> {
                         {this.state.fill ? <span>Filled</span> : <span>Not filled</span>}
                     </label>
                 </div>
+            </div>
+            </div>
             );
         } else {
             return "";
