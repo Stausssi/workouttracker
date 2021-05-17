@@ -661,7 +661,7 @@ export default class Graphs extends React.Component<Props, State> {
                                             {this.handleCategories()}
                                         </select>
                                     </div>
-                                    <div className="is-divider" data-content="Optional"/>
+                                    <div className="divider">Optional</div>
                                     <label className="label">Filter for sport</label>
                                     <div className="select is-fullwidth mb-5">
                                         <select

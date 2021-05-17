@@ -211,8 +211,13 @@ export default class SignUp extends Component<{}, State> {
                                     </div>
                                     <div className="field-body">
                                         <div className="field">
-                                            <DatePicker selected={this.state.date} onChange={this.handleDateChange}
-                                                        dateFormat="dd.MM.yyyy"/>
+                                            <DatePicker
+                                                maxDate={new Date()}
+                                                selected={this.state.date}
+                                                showMonthDropdown={true}
+                                                showYearDropdown={true}
+                                                onChange={this.handleDateChange}
+                                                dateFormat="dd.MM.yyyy"/>
                                         </div>
                                     </div>
                                 </div>
